@@ -1,0 +1,10 @@
+worldwarpaint ideas (anything goes in here)
+scroller world
+sprinkler tower
+missile tower
+mobile ai units that are created by buildings (or maybe manually?)
+    paint roller guy
+    paint gun guy
+only resource is paint
+the more land you control the faster your paint streams in
+paint wells are a strategic point
