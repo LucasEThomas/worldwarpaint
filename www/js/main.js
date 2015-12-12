@@ -25,6 +25,7 @@ function create() {
 
     //  Modify the world and camera bounds
     game.world.setBounds(0, 0, 3000, 3000);
+    $(window).resize(function() { window.resizeGame(); } );
     
     //draw the background layer
     spriteBackgroundLayer = game.add.sprite(0, 0, 'background');
@@ -100,4 +101,19 @@ function render() {
 
     game.debug.cameraInfo(game.camera, 32, 32);
 
+}
+
+function resizeGame() {
+    var height = $(window).height();
+    var width = $(window).width();
+
+    game.width = width;
+    game.height = height;
+    game.stage.bounds.width = width;
+    game.stage.bounds.height = height;
+
+    if (game.renderType === Phaser.WEBGL)
+    {
+        game.renderer.resize(width, height);
+    }
 }
