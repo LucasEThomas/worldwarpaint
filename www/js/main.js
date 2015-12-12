@@ -20,23 +20,23 @@ var gameBoardBmdLayer; //The game board layer. This is the semi-transparent laye
 function create() {
 
     //  Modify the world and camera bounds
-    game.world.setBounds(-1000, -1000, 2000, 2000);
+    game.world.setBounds(0, 0, 3000, 3000);
     
     //draw the background layer
-    spriteBackgroundLayer = game.add.sprite(-900, -900, 'background');
+    spriteBackgroundLayer = game.add.sprite(0, 0, 'background');
     
     //create the gameboard bitmap data that we can draw stuff to
     bmdGameBoardLayer = game.add.bitmapData(this.game.width, this.game.height);
     
     //draw bezier curves to it
-    paintGround.drawSplotch(1000,1000);
+    paintGround.drawSplotch(700,700);
     
-    //paintGround.drawSplotch(-500,-500);
+    paintGround.drawSplotch(500,500);
     
-    //paintGround.drawSplotch(200,200);
+    paintGround.drawSplotch(200,200);
     
     //add it as a sprite object to the actual game so that we can see it.
-    game.add.sprite(-1000, -1000, bmdGameBoardLayer);
+    game.add.sprite(0, 0, bmdGameBoardLayer);
     
     
     //add a random sprite
@@ -65,7 +65,8 @@ function create() {
     game.add.tween(logo2.cameraOffset).to( { y: 400 }, 2000, Phaser.Easing.Back.InOut, true, 0, 2000, true);
 
     cursors = game.input.keyboard.createCursorKeys();
-
+    
+    //possible conflict
 }
 
 function update() {
