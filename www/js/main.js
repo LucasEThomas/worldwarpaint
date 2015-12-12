@@ -30,7 +30,7 @@ function create() {
     spriteBackgroundLayer = game.add.sprite(0, 0, 'background');
     
     //create the gameboard bitmap data that we can draw stuff to
-    bmdGameBoardLayer = game.add.bitmapData(this.game.width, this.game.height);
+    gameBoardBmdLayer = game.add.bitmapData(game.world.width, game.world.height);
     
     //draw bezier curves to it
     paintGround.drawSplotch(700,700);
@@ -40,7 +40,7 @@ function create() {
     paintGround.drawSplotch(200,200);
     
     //add it as a sprite object to the actual game so that we can see it.
-    game.add.sprite(0, 0, bmdGameBoardLayer);
+    game.add.sprite(0, 0, gameBoardBmdLayer);
     
     
     //add a random sprite
@@ -70,7 +70,6 @@ function create() {
 
     cursors = game.input.keyboard.createCursorKeys();
     
-
     towerButton.makeButtons();
 
 }
