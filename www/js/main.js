@@ -14,14 +14,33 @@ function preload() {
 var cursors;
 var logo1;
 var logo2;
+var backgroundSpriteLayer; //The game layer where the unchanging background terrain image is drawn.
+var gameBoardBmdLayer; //The game board layer. This is the semi-transparent layer where the players' paint colors are drawn.
 
 function create() {
 
     //  Modify the world and camera bounds
     game.world.setBounds(-1000, -1000, 2000, 2000);
+    
+    //draw the background layer
+    spriteBackgroundLayer = game.add.sprite(-900, -900, 'background');
+    
+    //create the gameboard bitmap data that we can draw stuff to
+    bmdGameBoardLayer = game.add.bitmapData(this.game.width, this.game.height);
+    
+    //draw bezier curves to it
+    paintGround.drawSplotch(1000,1000);
+    
+    //paintGround.drawSplotch(-500,-500);
+    
+    //paintGround.drawSplotch(200,200);
+    
+    //add it as a sprite object to the actual game so that we can see it.
+    game.add.sprite(-1000, -1000, bmdGameBoardLayer);
+    
+    
+    //add a random sprite
     game.add.sprite(game.world.randomX, game.world.randomY, 'mushroom')
-    
-    
     
     for (var i = 0; i < 200; i++)
     {
@@ -29,8 +48,6 @@ function create() {
     }
 
     game.add.text(0, 0, "this text scrolls\nwith the background", { font: "32px Arial", fill: "#f26c4f", align: "center" });
-    var background = game.add.sprite(-900, -900, 'background');
-//    var bmd = background.
     
     logo1 = game.add.sprite(0, 0, 'phaser');
     logo1.fixedToCamera = true;
