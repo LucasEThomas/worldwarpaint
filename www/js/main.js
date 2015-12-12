@@ -8,6 +8,10 @@ function preload() {
     game.load.image('sonic', 'assets/sprites/sonic_havok_sanity.png');
     game.load.image('phaser', 'assets/sprites/asdf.png');
     game.load.image('background', 'assets/background.jpg');
+    game.load.image('blueButton1', 'assets/BlueButton1.png');
+    game.load.image('blueButton2', 'assets/BlueButton2.png');
+    game.load.image('blueButton3', 'assets/BlueButton3.png');
+    game.load.image('blueButton4', 'assets/BlueButton4.png');
 
 }
 
@@ -65,6 +69,8 @@ function create() {
     game.add.tween(logo2.cameraOffset).to( { y: 400 }, 2000, Phaser.Easing.Back.InOut, true, 0, 2000, true);
 
     cursors = game.input.keyboard.createCursorKeys();
+    
+    towerButton.makeButtons();
 
 }
 
