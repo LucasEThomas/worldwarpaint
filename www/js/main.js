@@ -1,4 +1,6 @@
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render : render });
+
+    var game = new Phaser.Game($(window).width(), $(window).height(), Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render : render });
+
 
 function preload() {
 
@@ -112,17 +114,16 @@ function render() {
 
 }
 
-function resizeGame() {
+function resizeGame() {    
     var height = $(window).height();
     var width = $(window).width();
 
     game.width = width;
     game.height = height;
-    game.stage.bounds.width = width;
-    game.stage.bounds.height = height;
-
-    if (game.renderType === Phaser.WEBGL)
-    {
-        game.renderer.resize(width, height);
-    }
+    game.canvas.width = width;
+    game.canvas.height = height;
+    game.scale.width = width;
+    game.scale.height = height;
+    game.camera.setSize(width, height);
+    game.renderer.resize(width, height);
 }
