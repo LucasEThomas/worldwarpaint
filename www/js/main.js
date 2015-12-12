@@ -12,6 +12,10 @@ function preload() {
     game.load.image('blueButton2', 'assets/BlueButton2.png');
     game.load.image('blueButton3', 'assets/BlueButton3.png');
     game.load.image('blueButton4', 'assets/BlueButton4.png');
+    game.load.image('towerBlue1', 'assets/TowerBlue1.png');
+    game.load.image('towerBlue2', 'assets/TowerBlue2.png');
+    game.load.image('towerBlue3', 'assets/TowerBlue3.png');
+    game.load.image('towerBlue4', 'assets/TowerBlue4.png');
 
 }
 
@@ -93,6 +97,11 @@ function update() {
     else if (cursors.right.isDown)
     {
         game.camera.x += 4;
+    }
+    
+    if (towerDrag)
+    {
+        tower.dragCord();   
     }
 
 }
