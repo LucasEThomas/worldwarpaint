@@ -16,5 +16,5 @@ paintGround.drawSplotch = function (x, y) {
     bmdGameBoardLayer.ctx.quadraticCurveTo(x+60, y+120, x+65, y+100);
     bmdGameBoardLayer.ctx.quadraticCurveTo(x+125, y+100, x+125, y+62.5);
     bmdGameBoardLayer.ctx.quadraticCurveTo(x+125, y+25, x+75, y+25);
-    bmdGameBoardLayer.ctx.stroke();//random comment
+    bmdGameBoardLayer.ctx.stroke();
   }
