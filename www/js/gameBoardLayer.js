@@ -55,7 +55,3 @@ gameBoardLayer.generateBlobControlPoints = function(x, y, radius,count){
     }
     return toReturn;
 }
-
-Math.getRandomArbitrary = function(min, max) {
-  return Math.random() * (max - min) + min;
-}
