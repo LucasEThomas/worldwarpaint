@@ -21,7 +21,8 @@ function preload() {
 var cursors;
 var logo1;
 var logo2;
-var backgroundSpriteLayer; //The game layer where the unchanging background terrain image is drawn.
+var backgroundLayerSprite; //The game layer where the unchanging background terrain image is drawn.
+var gameBoardLayerSprite;
 
 function create() {
 
@@ -30,24 +31,16 @@ function create() {
     $(window).resize(function() { window.resizeGame(); } );
     
     //draw the background layer
-    spriteBackgroundLayer = game.add.sprite(0, 0, 'background');
+    backgroundLayerSprite = game.add.sprite(0, 0, 'background');
     
     //create the gameboard bitmap data that we can draw stuff to
     gameBoardLayer.initialize();
-    
-    //draw bezier curves to it
-    gameBoardLayer.drawSplotch(700,700);
-    gameBoardLayer.drawSplotch(500,500);
-    gameBoardLayer.drawSplotch(200,200);
-    //gameBoardLayer.drawCircles(300,300,100);
-    //gameBoardLayer.drawBlob(600,300,200);
 
+    //setup the game input so that it works (I think is what this does)
     cursors = game.input.keyboard.createCursorKeys();
     
+    //make the tower buttons!!!
     towerButton.makeButtons();
-    
-    //spriteBackgroundLayer.events.onInputDown.add(fireBlob);
-    game.input.onTap.add(fireBlob, this);
 }
 
 var keyboardScrollSpeed = 16;
@@ -74,10 +67,6 @@ function render() {
 
     game.debug.cameraInfo(game.camera, 32, 32);
 
-}
-
-var fireBlob = function(){
-    gameBoardLayer.drawBlob(game.input.worldX, game.input.worldY, 50);
 }
 
 function resizeGame() {    
