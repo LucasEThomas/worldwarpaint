@@ -42,12 +42,12 @@ gameBoardLayer.drawCircles = function (x, y, radius){
 }
 
 gameBoardLayer.drawBlob = function (x, y, radius){
-    var tension = 20;
+    var tension = radius*0.1;
     var controlPoints = this.generateBlobControlPoints(x,y,radius,32);
     
     this.gameBoardBmd.ctx.beginPath();
     this.gameBoardBmd.ctx.fillStyle = '#0f6';
-    this.gameBoardBmd.ctx.globalAlpha = 0.6;
+    this.gameBoardBmd.ctx.globalAlpha = 0.5;
     this.gameBoardBmd.ctx.moveTo(controlPoints[0].x, controlPoints[0].y);
     
     for (var i = 0; i <= controlPoints.length - 1; i++){
@@ -60,8 +60,6 @@ gameBoardLayer.drawBlob = function (x, y, radius){
         var nextTangent = nextnextPoint.clone().subtract(point).normalize().multiplyScalar(tension);
         var cp1 = point.clone().add(tangent);
         var cp2 = nextPoint.clone().subtract(nextTangent);
-        
-        
         
         this.gameBoardBmd.ctx.bezierCurveTo(cp1.x,cp1.y,cp2.x,cp2.y,nextPoint.x,nextPoint.y);
     }
