@@ -45,6 +45,9 @@ function create() {
     cursors = game.input.keyboard.createCursorKeys();
     
     towerButton.makeButtons();
+    
+    //spriteBackgroundLayer.events.onInputDown.add(fireBlob);
+    game.input.onTap.add(fireBlob, this);
 }
 
 var keyboardScrollSpeed = 16;
@@ -71,6 +74,10 @@ function render() {
 
     game.debug.cameraInfo(game.camera, 32, 32);
 
+}
+
+var fireBlob = function(){
+    gameBoardLayer.drawBlob(game.input.worldX, game.input.worldY, 50);
 }
 
 function resizeGame() {    
