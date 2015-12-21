@@ -46,9 +46,7 @@ gameBoardLayer.drawBlob = function (x, y, radius){
     var controlPoints = this.generateBlobControlPoints(x,y,radius,32);
     
     this.gameBoardBmd.ctx.beginPath();
-    this.gameBoardBmd.ctx.lineWidth = 2
-    this.gameBoardBmd.ctx.fillStyle = '#0f4';
-    this.gameBoardBmd.ctx.fillStyle = '#0f0';
+    this.gameBoardBmd.ctx.fillStyle = '#0f6';
     this.gameBoardBmd.ctx.globalAlpha = 0.6;
     this.gameBoardBmd.ctx.moveTo(controlPoints[0].x, controlPoints[0].y);
     
@@ -68,9 +66,8 @@ gameBoardLayer.drawBlob = function (x, y, radius){
         this.gameBoardBmd.ctx.bezierCurveTo(cp1.x,cp1.y,cp2.x,cp2.y,nextPoint.x,nextPoint.y);
     }
     this.gameBoardBmd.ctx.fill();
-    this.gameBoardBmd.ctx.stroke();
     
-    gameBoardLayer.debugControlPoints(controlPoints, tension);
+    //gameBoardLayer.debugControlPoints(controlPoints, tension);
 }
 
 gameBoardLayer.debugControlPoints = function(controlPoints, tension){
