@@ -50,13 +50,13 @@ gameBoardLayer.drawBlob = function (x, y, radius){
     this.gameBoardBmd.ctx.fillStyle = '#0f4';
     this.gameBoardBmd.ctx.fillStyle = '#0f0';
     this.gameBoardBmd.ctx.globalAlpha = 0.6;
+    this.gameBoardBmd.ctx.moveTo(controlPoints[0].x, controlPoints[0].y);
     
-    for (var i = 0; i <= controlPoints.length; i++){
-        var n = i % controlPoints.length;
-        var point = controlPoints[n];
-        var prevPoint = controlPoints[(n>0)?n-1:controlPoints.length-1];
-        var nextPoint = controlPoints[(n+1)%controlPoints.length];
-        var nextnextPoint = controlPoints[(n+2)%controlPoints.length];
+    for (var i = 0; i <= controlPoints.length - 1; i++){
+        var point = controlPoints[i];
+        var prevPoint = controlPoints[(i>0)?i-1:controlPoints.length-1];
+        var nextPoint = controlPoints[(i+1)%controlPoints.length];
+        var nextnextPoint = controlPoints[(i+2)%controlPoints.length];
         
         var tangent = nextPoint.clone().subtract(prevPoint).normalize().multiplyScalar(tension);
         var nextTangent = nextnextPoint.clone().subtract(point).normalize().multiplyScalar(tension);
@@ -66,44 +66,44 @@ gameBoardLayer.drawBlob = function (x, y, radius){
         
         
         this.gameBoardBmd.ctx.bezierCurveTo(cp1.x,cp1.y,cp2.x,cp2.y,nextPoint.x,nextPoint.y);
-        //this.gameBoardBmd.ctx.lineTo(point.x,point.y);
     }
     this.gameBoardBmd.ctx.fill();
     this.gameBoardBmd.ctx.stroke();
     
-//    this.gameBoardBmd.ctx.globalAlpha = 1;
-//    for (var i = 0; i <= controlPoints.length; i++){
-//        var n = i % controlPoints.length;
-//        
-//        var point = controlPoints[n];
-//        var prevPoint = controlPoints[(n>0)?n-1:controlPoints.length-1];
-//        var nextPoint = controlPoints[(n+1)%controlPoints.length];
-//        var nextnextPoint = controlPoints[(n+2)%controlPoints.length];
-//        
-//        var tangent = nextPoint.clone().subtract(prevPoint).normalize().multiplyScalar(tension);
-//        var nextTangent = nextnextPoint.clone().subtract(point).normalize().multiplyScalar(tension);
-//        var cp1 = nextPoint.clone().add(nextTangent);
-//        var cp2 = point.clone().subtract(tangent);
-//        
-//        
-//        this.gameBoardBmd.ctx.moveTo(point.x, point.y);
-//        //this.gameBoardBmd.ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
-//        this.gameBoardBmd.ctx.beginPath();
-//        this.gameBoardBmd.ctx.fillStyle = '#f' + i + '' + i;
-//        this.gameBoardBmd.ctx.ellipse(cp1.x,cp1.y,3,3,0,0,360,false);
-//        this.gameBoardBmd.ctx.fill();
-//        
-//        this.gameBoardBmd.ctx.beginPath();
-//        this.gameBoardBmd.ctx.fillStyle = '#' + i + '' + i + 'f';
-//        this.gameBoardBmd.ctx.ellipse(cp2.x,cp2.y,3,3,0,0,360,false);
-//        this.gameBoardBmd.ctx.fill();
-//        
-//        this.gameBoardBmd.ctx.beginPath();
-//        this.gameBoardBmd.ctx.fillStyle = '#0ff';
-//        this.gameBoardBmd.ctx.ellipse(point.x,point.y,5,5,0,0,360,false);
-//        this.gameBoardBmd.ctx.fill();
-//        
-//    }
+    gameBoardLayer.debugControlPoints(controlPoints, tension);
+}
+
+gameBoardLayer.debugControlPoints = function(controlPoints, tension){
+    this.gameBoardBmd.ctx.globalAlpha = 1;
+    for (var i = 0; i <= controlPoints.length - 1; i++){
+        var point = controlPoints[i];
+        var prevPoint = controlPoints[(i>0)?i-1:controlPoints.length-1];
+        var nextPoint = controlPoints[(i+1)%controlPoints.length];
+        var nextnextPoint = controlPoints[(i+2)%controlPoints.length];
+        
+        var tangent = nextPoint.clone().subtract(prevPoint).normalize().multiplyScalar(tension);
+        var nextTangent = nextnextPoint.clone().subtract(point).normalize().multiplyScalar(tension);
+        var cp1 = point.clone().add(tangent);
+        var cp2 = nextPoint.clone().subtract(nextTangent);
+        
+        
+        this.gameBoardBmd.ctx.moveTo(point.x, point.y);
+        //this.gameBoardBmd.ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
+        this.gameBoardBmd.ctx.beginPath();
+        this.gameBoardBmd.ctx.fillStyle = '#f20';
+        this.gameBoardBmd.ctx.ellipse(cp1.x,cp1.y,3,3,0,0,360,false);
+        this.gameBoardBmd.ctx.fill();
+        
+        this.gameBoardBmd.ctx.beginPath();
+        this.gameBoardBmd.ctx.fillStyle = '#f90';
+        this.gameBoardBmd.ctx.ellipse(cp2.x,cp2.y,3,3,0,0,360,false);
+        this.gameBoardBmd.ctx.fill();
+        
+        this.gameBoardBmd.ctx.beginPath();
+        this.gameBoardBmd.ctx.fillStyle = '#0ff';
+        this.gameBoardBmd.ctx.ellipse(point.x,point.y,5,5,0,0,360,false);
+        this.gameBoardBmd.ctx.fill();
+    }
 }
 
 gameBoardLayer.generateBlobControlPoints = function(x, y, radius,count){
