@@ -15,7 +15,7 @@ function preload() {
     game.load.image('towerBlue2', 'assets/TowerBlue2.png');
     game.load.image('towerBlue3', 'assets/TowerBlue3.png');
     game.load.image('towerBlue4', 'assets/TowerBlue4.png');
-
+    game.load.image('notebookPaper', 'assets/tileableNotebookPaper.png');
 }
 
 var cursors;
@@ -31,7 +31,7 @@ function create() {
     $(window).resize(function() { window.resizeGame(); } );
     
     //draw the background layer
-    backgroundLayerSprite = game.add.sprite(0, 0, 'background');
+    backgroundLayerSprite = game.add.tileSprite(0, 0, 3000, 3000, 'notebookPaper');
     
     //create the gameboard bitmap data that we can draw stuff to
     gameBoardLayer.initialize();

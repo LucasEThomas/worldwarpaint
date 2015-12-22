@@ -42,8 +42,6 @@ gameBoardLayer.drawBlob = function (x, y, radius){
         this.gameBoardBmd.ctx.bezierCurveTo(cp1.x,cp1.y,cp2.x,cp2.y,nextPoint.x,nextPoint.y);
     }
     this.gameBoardBmd.ctx.fill();
-    
-    //gameBoardLayer.debugControlPoints(controlPoints, tension);
 }
 
 gameBoardLayer.generateBlobControlPoints = function(x, y, radius,count){
