@@ -1,4 +1,5 @@
-towerButton = function (){
+towerButton = function ()
+{
     
 }
 
@@ -21,22 +22,45 @@ towerButton2 = game.add.sprite(0, 0, 'blueButton2');
 towerButton2.fixedToCamera = true;
 towerButton2.cameraOffset.setTo(30, 210);
 towerButton2.anchor.setTo(0.5,0.5);
+towerButton2.inputEnabled = true;
+towerButton2.events.onInputDown.add(this.selectTower2);
     
 towerButton3 = game.add.sprite(0, 0, 'blueButton3');
 towerButton3.fixedToCamera = true;
 towerButton3.cameraOffset.setTo(30, 270);
 towerButton3.anchor.setTo(0.5,0.5);
+towerButton3.inputEnabled = true;
+towerButton3.events.onInputDown.add(this.selectTower3);
     
 towerButton4 = game.add.sprite(0, 0, 'blueButton4');
 towerButton4.fixedToCamera = true;
 towerButton4.cameraOffset.setTo(30, 330);
 towerButton4.anchor.setTo(0.5,0.5);
+towerButton4.inputEnabled = true;
+towerButton4.events.onInputDown.add(this.selectTower4);
     
 }
 
-towerButton.selectTower1 = function(){
-    
+towerButton.selectTower1 = function()
+{   
     selectedTower = 1;
     tower.dragTower();
-    
+}
+
+towerButton.selectTower2 = function()
+{   
+    selectedTower = 2;
+    tower.dragTower();
+}
+
+towerButton.selectTower3 = function()
+{   
+    selectedTower = 3;
+    tower.dragTower();
+}
+
+towerButton.selectTower4 = function()
+{   
+    selectedTower = 4;
+    tower.dragTower();
 }
