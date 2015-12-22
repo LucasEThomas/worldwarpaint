@@ -27,11 +27,11 @@ var gameBoardLayerSprite;
 function create() {
 
     //  Modify the world and camera bounds
-    game.world.setBounds(0, 0, 3000, 3000);
+    game.world.setBounds(0, 0, 3200, 3200);
     $(window).resize(function() { window.resizeGame(); } );
     
     //draw the background layer
-    backgroundLayerSprite = game.add.tileSprite(0, 0, 3000, 3000, 'notebookPaper');
+    backgroundLayerSprite = game.add.tileSprite(0, 0, 3200, 3200, 'notebookPaper');
     
     //create the gameboard bitmap data that we can draw stuff to
     gameBoardLayer.initialize();
