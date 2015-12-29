@@ -1,10 +1,11 @@
 worldwarpaint ideas (anything goes in here)
-scroller world
-sprinkler tower
-missile tower
-mobile ai units that are created by buildings (or maybe manually?)
-    paint roller guy
-    paint gun guy
-only resource is paint
-the more land you control the faster your paint streams in
-paint wells are a strategic point
+* scroller world
+* sprinkler tower
+* missile tower
+* mobile ai units that are created by buildings (or maybe manually?)
+    * paint roller guy
+    * paint gun guy
+* only resource is paint
+* the more land you control the faster your paint streams in
+* paint wells are a strategic point
+* Players can accumulate cards and build decks (towers / abilities / powerups). Each card is assigned a point value, and players are matched with each other based on the similarity of their deck's total calculated point value. Cards can be won through missions, and bought for $$$$! :)
