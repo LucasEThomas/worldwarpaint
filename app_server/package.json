@@ -1,0 +1,31 @@
+{
+  "name": "worldwarpaint",
+  "version": "0.0.1",
+  "description": "A game where you must place towers and paint everything.",
+  "private": true,
+  "scripts": {
+    "start": "node app_server.js",
+    "monitor": "nodemon app_server.js",
+    "deploy": "gcloud preview app deploy app_server.yaml",
+    "lint": "jshint --exclude-path=.gitignore .",
+    "test": "npm run lint"
+  },
+  "author": "Velocirapps",
+  "contributors": [
+    {
+      "name": "Lucas Thomas",
+      "email": ""
+    }
+  ],
+  "license": "",
+  "dependencies": {
+      "express": "^4.13.3",
+      "ws": "^0.8.1"
+  },
+  "devDependencies": {
+    "jshint": "^2.8.0"
+  },
+  "engines": {
+    "node": ">=0.12.7"
+  }
+}
