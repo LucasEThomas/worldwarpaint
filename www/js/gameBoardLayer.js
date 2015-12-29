@@ -14,8 +14,8 @@ gameBoardLayer.initialize = function (){
 
 gameBoardLayer.mouseUp = function(){
     //logic for placing towers goes here?
-    //gameBoardLayer.drawRandomBlob(game.input.worldX, game.input.worldY, 50);
-    //gameBoardLayer.drawRandomSprinkles(game.input.worldX, game.input.worldY, 50, 20);
+    gameBoardLayer.drawRandomBlob(game.input.worldX - 100, game.input.worldY, 50);
+    gameBoardLayer.drawRandomSprinkles(game.input.worldX + 100, game.input.worldY, 50, 20);
     gameBoardLayer.drawRay(game.input.worldX, game.input.worldY, 200, Math.random()*2*Math.PI, Math.PI*0.05);
 }
 
