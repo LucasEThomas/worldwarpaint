@@ -9,7 +9,7 @@ var towers = [];
 tower.dragTower = function()
 { 
     towerDrag = game.add.sprite(0,0, 'towerBlue'+selectedTower);
-    towerDrag.inputEnabled = true;
+    towerDrag.inputEnabled = false;
     towerDrag.anchor.setTo(0.5,0.5);
     towerDrag.events.onInputDown.add(this.towerPlaced);   
 }

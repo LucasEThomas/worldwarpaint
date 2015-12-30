@@ -18,6 +18,12 @@ gameServer.downlinkEvent = function(event){
     gameBoardLayer.drawRandomBlob(data.x, data.y, 10);
 }
 
-gameServer.createTower = function(){
-    
+gameServer.createTower = function(x,y,type){
+    ws.send(JSON.stringify(
+        {
+            event:'new tower', 
+            x:x, 
+            y:y,
+            type:type
+        });
 }

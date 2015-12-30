@@ -14,9 +14,14 @@ gameBoardLayer.initialize = function (){
 
 gameBoardLayer.mouseUp = function(){
     //logic for placing towers goes here?
-    gameBoardLayer.drawRandomBlob(game.input.worldX - 100, game.input.worldY, 50);
-    gameBoardLayer.drawRandomSprinkles(game.input.worldX + 100, game.input.worldY, 50, 20);
-    gameBoardLayer.drawRay(game.input.worldX, game.input.worldY, 200, Math.random()*2*Math.PI, Math.PI*0.05);
+    if(towerDrag){
+        gameServer.createTower(game.input.worldX,game.input.worldY,'basic');
+    }
+    else{
+        gameBoardLayer.drawRandomBlob(game.input.worldX - 100, game.input.worldY, 50);
+        gameBoardLayer.drawRandomSprinkles(game.input.worldX + 100, game.input.worldY, 50, 20);
+        gameBoardLayer.drawRay(game.input.worldX, game.input.worldY, 200, Math.random()*2*Math.PI, Math.PI*0.05);
+    }
 }
 
 gameBoardLayer.gameBoardBmd; //The game board layer. This is the semi-transparent layer where the players' paint colors are drawn.
