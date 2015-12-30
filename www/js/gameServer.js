@@ -21,11 +21,12 @@ gameServer.serverMessage = function(event) {
     }
 }
 
-gameServer.createTower = function(x, y, type) {
+gameServer.createTower = function(x, y, type, id) {
     ws.send(JSON.stringify({
         event: 'new tower',
         x: x,
         y: y,
-        type: type
+        type: type,
+        id: id
     }));
 }
