@@ -61,7 +61,7 @@ gameBoardLayer.drawRandomSprinkles = function (x,y,radius,count){
         var currentX = x + (currentRadius * Math.cos(currentDirection));
         var currentY = y + (currentRadius * Math.sin(currentDirection));
         this.gameBoardBmd.ctx.moveTo(currentX,currentY);
-        this.gameBoardBmd.ctx.ellipse(currentX, currentY,3,3,0,0,360,false);
+        this.gameBoardBmd.ctx.arc(currentX, currentY,3,0,Math.PI*2,false);
     }
     gameBoardLayer.doDraw();
 }
