@@ -10,10 +10,10 @@ class Tower {
     generateRandomSprinkles(count) {
         var toReturn = [];
         for (var i = 0; i < count; i++) {
-            var currentRadius = radius * Math.random();
+            var currentRadius = 100 * Math.random();
             var currentDirection = 2 * Math.PI * Math.random();
-            var currentX = x + (currentRadius * Math.cos(currentDirection));
-            var currentY = y + (currentRadius * Math.sin(currentDirection));
+            var currentX = this.x + (currentRadius * Math.cos(currentDirection));
+            var currentY = this.y + (currentRadius * Math.sin(currentDirection));
             toReturn.push(currentX);
             toReturn.push(currentY);
         }
@@ -31,11 +31,12 @@ class Game {
         }, 250);
     }
     gameLoop() {
+        var sprinkles = [];
+        this.towers.forEach((tower, index) => {
+            sprinkles.push.apply(sprinkles, tower.generateRandomSprinkles(1));
+        });
+        
         this.players.forEach((player, index) => {
-            var sprinkles = [];
-            this.towers.forEach((tower, index) => {
-                sprinkles.push.apply(sprinkles, tower.generateRandomSprinkles(1));
-            });
             player.playerLoop(sprinkles);
         });
     }
@@ -50,7 +51,7 @@ class Player {
 
         this.ws.send(JSON.stringify({
             sprinkles: sprinkles
-        }), function () { /* ignore errors */ });
+        }), function() { /* ignore errors */ });
     }
 }
 
@@ -77,21 +78,19 @@ wss.on('connection', function connection(ws) {
 
     games[0].players.push(new Player(ws));
 
-    ws.on('close', function () {
+    ws.on('close', function() {
         games[0].players.splice(ws, 1);
         console.log('client left');
     });
 
-    var towers = [];
-
-    ws.on('message', function (data, flags) {
+    ws.on('message', function(data, flags) {
         data = JSON.parse(data);
         console.log('event rxd');
         if (data.event === 'new tower') {
             console.log('event: create tower');
             var tower = new Tower(data.id, data.x, data.y, data.type);
-            towers.push(tower);
-            console.log(towers);
+            games[0].towers.push(tower);
+            //console.log(towers);
         }
     });
 
