@@ -1,7 +1,8 @@
 "use strict";
 
 class Tower {
-    constructor(x, y, type) {
+    constructor(id, x, y, type) {
+        this.id = id;
         this.x = x;
         this.y = y;
         this.type = type;
@@ -49,7 +50,7 @@ class Player {
 
         this.ws.send(JSON.stringify({
             sprinkles: sprinkles
-        }), function() { /* ignore errors */ });
+        }), function () { /* ignore errors */ });
     }
 }
 
@@ -76,19 +77,19 @@ wss.on('connection', function connection(ws) {
 
     games[0].players.push(new Player(ws));
 
-    ws.on('close', function() {
+    ws.on('close', function () {
         games[0].players.splice(ws, 1);
         console.log('client left');
     });
 
     var towers = [];
 
-    ws.on('message', function(data, flags) {
+    ws.on('message', function (data, flags) {
         data = JSON.parse(data);
         console.log('event rxd');
         if (data.event === 'new tower') {
             console.log('event: create tower');
-            var tower = new Tower(data.x, data.y, data.type);
+            var tower = new Tower(data.id, data.x, data.y, data.type);
             towers.push(tower);
             console.log(towers);
         }
