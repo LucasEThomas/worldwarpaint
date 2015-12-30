@@ -25,5 +25,5 @@ gameServer.createTower = function(x,y,type){
             x:x, 
             y:y,
             type:type
-        });
+        }));
 }
