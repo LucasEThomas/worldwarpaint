@@ -15,7 +15,7 @@ gameBoardLayer.initialize = function (){
 gameBoardLayer.mouseUp = function(){
     //logic for placing towers goes here?
     if(towerDrag){
-        gameServer.createTower(game.input.worldX,game.input.worldY,'basic');
+        tower.towerPlaced();
     }
     else{
         gameBoardLayer.drawRandomBlob(game.input.worldX - 100, game.input.worldY, 50);
