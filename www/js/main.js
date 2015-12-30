@@ -35,6 +35,9 @@ function create() {
     
     //create the gameboard bitmap data that we can draw stuff to
     gameBoardLayer.initialize();
+    
+    //initialize the connection with the game server.
+    gameServer.initialize();
 
     //setup the game input so that it works (I think is what this does)
     cursors = game.input.keyboard.createCursorKeys();
