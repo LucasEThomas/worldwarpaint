@@ -102,7 +102,7 @@ gameBoardLayer.drawRay = function(x, y, radius, angle, thicknessAngle) {
 
 gameBoardLayer.setupDraw = function() {
     this.gameBoardBmd.ctx.beginPath();
-    this.gameBoardBmd.ctx.fillStyle = '#00ff66';
+    this.gameBoardBmd.ctx.fillStyle = Utility.rgbToHex(player.clr.r, player.clr.g, player.clr.b);
     this.gameBoardBmd.ctx.globalAlpha = 0.5;
 }
 
