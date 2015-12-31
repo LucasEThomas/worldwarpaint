@@ -24,7 +24,7 @@ class Tower {
 class Game {
     constructor() {
         this.players = [];
-        this.towers = [];
+        this.towers = [new Tower(1, 300, 300, 1)];
         this.interval = setInterval(() => {
             //console.log(this.players);
             this.gameLoop();
@@ -35,7 +35,7 @@ class Game {
         this.towers.forEach((tower, index) => {
             sprinkles.push.apply(sprinkles, tower.generateRandomSprinkles(1));
         });
-        
+
         this.players.forEach((player, index) => {
             player.playerLoop(sprinkles);
         });
