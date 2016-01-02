@@ -15,7 +15,7 @@ gameBoardLayer.initialize = function() {
 gameBoardLayer.mouseUp = function() {
     //logic for placing towers goes here?
     if (towerDrag) {
-        if (gameBoardLayer.colorMatch(game.input.worldX, game.input.worldY)) {
+        if (gameBoardLayer.colorMatch(game.input.worldX, game.input.worldY, player.clr)) {
             tower.towerPlaced();
         }
     } else {
@@ -27,9 +27,9 @@ gameBoardLayer.mouseUp = function() {
 
 gameBoardLayer.gameBoardBmd; //The game board layer. This is the semi-transparent layer where the players' paint colors are drawn.
 
-gameBoardLayer.colorMatch = function(x, y) {
+gameBoardLayer.colorMatch = function(x, y, rgb) {
     var placeRGB = gameBoardLayer.gameBoardBmd.ctx.getImageData(x, y, 1, 1).data;
-    return (Math.abs(placeRGB[0] - 0) <= 12 && Math.abs(placeRGB[1] - 255) <= 12 && Math.abs(placeRGB[2] - 100) <= 12);
+    return (Math.abs(placeRGB[0] - rgb.r) <= 12 && Math.abs(placeRGB[1] - rgb.g) <= 12 && Math.abs(placeRGB[2] - rgb.b) <= 12);
 }
 
 gameBoardLayer.drawRandomBlob = function(x, y, radius) {

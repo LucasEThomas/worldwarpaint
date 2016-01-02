@@ -1,4 +1,5 @@
 "use strict";
+var Utility = require('./Utility.js');
 
 class Tower {
     constructor(id, x, y, type) {
@@ -46,10 +47,14 @@ class Player {
     constructor(ws, game) {
         this.ws = ws;
         this.game = game;
+        this.clr = {};
+        this.clr.r = Utility.rangeInt(0, 255);
+        this.clr.g = Utility.rangeInt(0, 255);
+        this.clr.b = Utility.rangeInt(0, 255);
     }
     playerLoop(sprinkles) {
-
         this.ws.send(JSON.stringify({
+            event: 'sprinkle',
             sprinkles: sprinkles
         }), function() { /* ignore errors */ });
     }
@@ -75,8 +80,9 @@ wss.on('connection', function connection(ws) {
     //            v = c == 'x' ? r : (r & 0x3 | 0x8);
     //        return v.toString(16);
     //    });
-
-    games[0].players.push(new Player(ws));
+    
+    var player = new Player(ws);
+    games[0].players.push(player);
 
     ws.on('close', function() {
         games[0].players.splice(ws, 1);
@@ -93,5 +99,10 @@ wss.on('connection', function connection(ws) {
             //console.log(towers);
         }
     });
+
+    ws.send(JSON.stringify({
+        event: 'init',
+        playerClr: player.clr
+    }), function() { /* ignore errors */ });
 
 });
