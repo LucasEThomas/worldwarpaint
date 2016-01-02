@@ -44,9 +44,9 @@ class Game {
 }
 
 class Player {
-    constructor(ws, game) {
+    constructor(id, ws) {
         this.ws = ws;
-        this.game = game;
+        this.id = id;
         this.clr = {};
         this.clr.r = Utility.rangeInt(0, 255);
         this.clr.g = Utility.rangeInt(0, 255);
@@ -71,6 +71,8 @@ var WebSocketServer = require('ws').Server,
         port: 8081
     });
 
+var player = null;
+
 wss.on('connection', function connection(ws) {
     console.log('new client connection');
 
@@ -80,12 +82,12 @@ wss.on('connection', function connection(ws) {
     //            v = c == 'x' ? r : (r & 0x3 | 0x8);
     //        return v.toString(16);
     //    });
-    
-    var player = new Player(ws);
-    games[0].players.push(player);
+
+    //var player = new Player(ws);
+    //games[0].players.push(new Player('3222', ws));
 
     ws.on('close', function() {
-        games[0].players.splice(ws, 1);
+        //games[0].players.splice(ws, 1);
         console.log('client left');
     });
 
@@ -97,12 +99,35 @@ wss.on('connection', function connection(ws) {
             var tower = new Tower(data.id, data.x, data.y, data.type);
             games[0].towers.push(tower);
             //console.log(towers);
+        } else if (data.event === 'initsyncClient') {
+            console.log('initsyncClient');
+            //console.log(data);
+
+            var pindex = -1;
+            for (var key in games[0].players) {
+                if (games[0].players[key].id === data.playerID) {
+                    pindex = key;
+                    break;
+                }
+            }
+            
+            // check if player exists
+            if (pindex >= 0) {
+                console.log('player exists: '+pindex);
+                player = games[0].players[pindex];
+                player.ws = ws;
+            } else {
+                console.log('player does not exist, creating player');
+                player = new Player(data.playerID, ws);
+                games[0].players.push(player);
+            }
+            ws.send(JSON.stringify({
+                event: 'initsyncServer',
+                playerClr: player.clr
+            }), function() { /* ignore errors */ });
         }
     });
 
-    ws.send(JSON.stringify({
-        event: 'init',
-        playerClr: player.clr
-    }), function() { /* ignore errors */ });
+
 
 });
