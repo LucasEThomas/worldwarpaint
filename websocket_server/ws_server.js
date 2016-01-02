@@ -26,6 +26,7 @@ class Tower {
 class Game {
     constructor() {
         this.players = [];
+        // create a towers array, for now we auto-generate two towers linked to two players for testing
         this.towers = [new Tower(1, 300, 300, 1, 'dda2571a-55d9-46d3-96c2-8b984164c904'), new Tower(1, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de')];
         this.interval = setInterval(() => {
             //console.log(this.players);
@@ -60,6 +61,7 @@ class Player {
             sprinkles: sprinkles
         }), function() { /* ignore errors */ });
     }
+    // creates a dictionary for sending player info to the client
     toJSON() {
         return {
             id: this.id,
@@ -104,16 +106,19 @@ wss.on('connection', function connection(ws) {
         console.log('event rxd');
         if (data.event === 'new tower') {
             console.log('event: create tower');
+            // client created tower, syncing data to server
             var tower = new Tower(data.id, data.x, data.y, data.type, data.owner);
             games[0].towers.push(tower);
-            //console.log(towers);
         } else if (data.event === 'initsyncClient') {
             console.log('initsyncClient');
-            //console.log(data);
-
+            // initial sync from client
+            // pindex is used to detect if player is already in the game (based on id)
             var pindex = -1;
+            // iterate players array
             for (var key in games[0].players) {
+                // if id from client matches player in players array
                 if (games[0].players[key].id === data.playerID) {
+                    // set pindex to key of matching player
                     pindex = key;
                     break;
                 }
@@ -121,11 +126,10 @@ wss.on('connection', function connection(ws) {
             
             // check if player exists
             if (pindex >= 0) {
-                console.log('player exists: '+pindex);
                 player = games[0].players[pindex];
                 player.ws = ws;
             } else {
-                console.log('player does not exist, creating player');
+                // player doesn't exist in this game, create the player
                 player = new Player(data.playerID, ws);
                 games[0].players.push(player);
             }
@@ -133,6 +137,7 @@ wss.on('connection', function connection(ws) {
             for (var k in games[0].players) {
                 sendPlayers.push(games[0].players[k].toJSON());
             }
+            // send players to connecting client
             ws.send(JSON.stringify({
                 event: 'initsyncServer',
                 playerClr: player.clr,
