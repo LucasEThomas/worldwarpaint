@@ -27,6 +27,16 @@ gameServer.initialSync = function(event) {
     }));
 };
 
+var players = [];
+
+var getPlayerClr = function(id) {
+    for (var key in players) {
+        if (players[key].id === id) {
+            return players[key].clr;
+        }
+    }
+}
+
 //this event happens whenever new game data comes down from the server
 gameServer.serverMessage = function(event) {
     data = JSON.parse(event.data);
@@ -36,21 +46,32 @@ gameServer.serverMessage = function(event) {
         // server response to initial sync
         // set player color
         player.clr = data.playerClr;
+        players = data.players;
+        console.log(players);
         console.log('initsyncServer');
     } else if (data.event === 'sprinkle') {
         console.log('sprinkle');
-        for (var i = 0; i < data.sprinkles.length; i += 2) {
-            gameBoardLayer.drawSprinkle(data.sprinkles[i], data.sprinkles[i + 1], 3);
+        //console.log(data.sprinkles[0].sprinkles);
+        for (var i = 0; i < data.sprinkles.length; i += 1) {
+            var s = data.sprinkles[i].sprinkles;
+            var owner = data.sprinkles[i].ownerID;
+            console.log(getPlayerClr(owner));
+            gameBoardLayer.drawSprinkle(s[0], s[1], 3, getPlayerClr(owner));
         }
+        /*for (var i = 0; i < data.sprinkles.sprinkles.length; i += 2) {
+            gameBoardLayer.drawSprinkle(data.sprinkles[i], data.sprinkles.sprinkles[i + 1], 3, getPlayerClr(data.sprinkles.ownerID));
+        }
+        console.log(getPlayerClr(data.pid));*/
     }
 }
 
-gameServer.createTower = function(x, y, type, id) {
+gameServer.createTower = function(x, y, type, id, owner) {
     ws.send(JSON.stringify({
         event: 'new tower',
         x: x,
         y: y,
         type: type,
-        id: id
+        id: id,
+        owner: owner
     }));
 }

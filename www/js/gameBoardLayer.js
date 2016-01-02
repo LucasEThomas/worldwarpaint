@@ -77,8 +77,8 @@ gameBoardLayer.drawRandomSprinkles = function(x, y, radius, count) {
     gameBoardLayer.doDraw();
 }
 
-gameBoardLayer.drawSprinkle = function(x, y, radius) {
-    gameBoardLayer.setupDraw();
+gameBoardLayer.drawSprinkle = function(x, y, radius, playerClr) {
+    gameBoardLayer.setupDraw(playerClr);
     this.gameBoardBmd.ctx.moveTo(x, y);
     this.gameBoardBmd.ctx.arc(x, y, 3, 0, Math.PI * 2, false);
     gameBoardLayer.doDraw();
@@ -100,9 +100,9 @@ gameBoardLayer.drawRay = function(x, y, radius, angle, thicknessAngle) {
     gameBoardLayer.doDraw();
 }
 
-gameBoardLayer.setupDraw = function() {
+gameBoardLayer.setupDraw = function(playerClr) {
     this.gameBoardBmd.ctx.beginPath();
-    this.gameBoardBmd.ctx.fillStyle = Utility.rgbToHex(player.clr.r, player.clr.g, player.clr.b);
+    this.gameBoardBmd.ctx.fillStyle = Utility.rgbToHex(playerClr.r, playerClr.g, playerClr.b);
     this.gameBoardBmd.ctx.globalAlpha = 0.5;
 }
 

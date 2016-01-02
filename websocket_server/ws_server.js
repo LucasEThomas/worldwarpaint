@@ -2,11 +2,12 @@
 var Utility = require('./Utility.js');
 
 class Tower {
-    constructor(id, x, y, type) {
+    constructor(id, x, y, type, owner) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.type = type;
+        this.ownerID = owner;
     };
     generateRandomSprinkles(count) {
         var toReturn = [];
@@ -25,7 +26,7 @@ class Tower {
 class Game {
     constructor() {
         this.players = [];
-        this.towers = [new Tower(1, 300, 300, 1)];
+        this.towers = [new Tower(1, 300, 300, 1, 'dda2571a-55d9-46d3-96c2-8b984164c904'), new Tower(1, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de')];
         this.interval = setInterval(() => {
             //console.log(this.players);
             this.gameLoop();
@@ -34,7 +35,8 @@ class Game {
     gameLoop() {
         var sprinkles = [];
         this.towers.forEach((tower, index) => {
-            sprinkles.push.apply(sprinkles, tower.generateRandomSprinkles(1));
+            var sprinkleData = {ownerID: tower.ownerID,sprinkles:tower.generateRandomSprinkles(1)};
+            sprinkles.push(sprinkleData);
         });
 
         this.players.forEach((player, index) => {
@@ -57,6 +59,12 @@ class Player {
             event: 'sprinkle',
             sprinkles: sprinkles
         }), function() { /* ignore errors */ });
+    }
+    toJSON() {
+        return {
+            id: this.id,
+            clr: this.clr
+        };
     }
 }
 
@@ -96,7 +104,7 @@ wss.on('connection', function connection(ws) {
         console.log('event rxd');
         if (data.event === 'new tower') {
             console.log('event: create tower');
-            var tower = new Tower(data.id, data.x, data.y, data.type);
+            var tower = new Tower(data.id, data.x, data.y, data.type, data.owner);
             games[0].towers.push(tower);
             //console.log(towers);
         } else if (data.event === 'initsyncClient') {
@@ -121,9 +129,14 @@ wss.on('connection', function connection(ws) {
                 player = new Player(data.playerID, ws);
                 games[0].players.push(player);
             }
+            var sendPlayers = [];
+            for (var k in games[0].players) {
+                sendPlayers.push(games[0].players[k].toJSON());
+            }
             ws.send(JSON.stringify({
                 event: 'initsyncServer',
-                playerClr: player.clr
+                playerClr: player.clr,
+                players: sendPlayers
             }), function() { /* ignore errors */ });
         }
     });
