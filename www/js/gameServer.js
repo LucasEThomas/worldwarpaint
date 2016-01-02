@@ -28,6 +28,7 @@ gameServer.initialSync = function(event) {
 };
 
 var players = [];
+var towers = [];
 
 var getPlayerClr = function(id) {
     for (var key in players) {
@@ -47,7 +48,11 @@ gameServer.serverMessage = function(event) {
         // set player color
         player.clr = data.playerClr;
         players = data.players;
-        console.log(players);
+        towers = data.towers;
+        towers.forEach(function(e, i) {
+            game.add.sprite(e.x, e.y, 'towerBlue' + e.type)
+        });
+        //console.log(players);
         console.log('initsyncServer');
     } else if (data.event === 'sprinkle') {
         console.log('sprinkle');
@@ -55,7 +60,7 @@ gameServer.serverMessage = function(event) {
         for (var i = 0; i < data.sprinkles.length; i += 1) {
             var s = data.sprinkles[i].sprinkles;
             var owner = data.sprinkles[i].ownerID;
-            console.log(getPlayerClr(owner));
+            //console.log(getPlayerClr(owner));
             gameBoardLayer.drawSprinkle(s[0], s[1], 3, getPlayerClr(owner));
         }
         /*for (var i = 0; i < data.sprinkles.sprinkles.length; i += 2) {

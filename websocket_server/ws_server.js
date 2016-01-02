@@ -136,7 +136,8 @@ wss.on('connection', function connection(ws) {
             ws.send(JSON.stringify({
                 event: 'initsyncServer',
                 playerClr: player.clr,
-                players: sendPlayers
+                players: sendPlayers,
+                towers: games[0].towers
             }), function() { /* ignore errors */ });
         }
     });
