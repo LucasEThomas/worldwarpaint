@@ -29,14 +29,16 @@ class Game {
         // create a towers array, for now we auto-generate two towers linked to two players for testing
         this.towers = [new Tower(1, 300, 300, 1, 'dda2571a-55d9-46d3-96c2-8b984164c904'), new Tower(1, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de')];
         this.interval = setInterval(() => {
-            //console.log(this.players);
             this.gameLoop();
         }, 250);
     }
     gameLoop() {
         var sprinkles = [];
         this.towers.forEach((tower, index) => {
-            var sprinkleData = {ownerID: tower.ownerID,sprinkles:tower.generateRandomSprinkles(1)};
+            var sprinkleData = {
+                ownerID: tower.ownerID,
+                sprinkles: tower.generateRandomSprinkles(1)
+            };
             sprinkles.push(sprinkleData);
         });
 
@@ -56,12 +58,12 @@ class Player {
         this.clr.b = Utility.rangeInt(0, 255);
     }
     playerLoop(sprinkles) {
-        this.ws.send(JSON.stringify({
-            event: 'sprinkle',
-            sprinkles: sprinkles
-        }), function() { /* ignore errors */ });
-    }
-    // creates a dictionary for sending player info to the client
+            this.ws.send(JSON.stringify({
+                event: 'sprinkle',
+                sprinkles: sprinkles
+            }), function() { /* ignore errors */ });
+        }
+        // creates a dictionary for sending player info to the client
     toJSON() {
         return {
             id: this.id,
@@ -74,6 +76,21 @@ var games = [];
 
 //for now we're just going to have one game and all players (clients) will join it
 games[0] = new Game();
+
+var getPlayerIndex = function(playerID) {
+    // pindex is used to detect if player is already in the game (based on id)
+    var pindex = -1;
+    // iterate players array
+    for (var key in games[0].players) {
+        // if id from client matches player in players array
+        if (games[0].players[key].id === playerID) {
+            // set pindex to key of matching player
+            pindex = key;
+            break;
+        }
+    }
+    return pindex;
+}
 
 
 var WebSocketServer = require('ws').Server,
@@ -109,21 +126,22 @@ wss.on('connection', function connection(ws) {
             // client created tower, syncing data to server
             var tower = new Tower(data.id, data.x, data.y, data.type, data.owner);
             games[0].towers.push(tower);
+            // push the new tower to other players
+            var dontSend = getPlayerIndex(data.owner);
+            console.log(dontSend);
+            games[0].players.forEach(function(e, i) {
+                if (dontSend != i) {
+                    e.ws.send(JSON.stringify({
+                        event: 'sync-addTower',
+                        tower: tower
+                    }));
+                }
+            });
         } else if (data.event === 'initsyncClient') {
             console.log('initsyncClient');
             // initial sync from client
-            // pindex is used to detect if player is already in the game (based on id)
-            var pindex = -1;
-            // iterate players array
-            for (var key in games[0].players) {
-                // if id from client matches player in players array
-                if (games[0].players[key].id === data.playerID) {
-                    // set pindex to key of matching player
-                    pindex = key;
-                    break;
-                }
-            }
-            
+
+            var pindex = getPlayerIndex(data.playerID);
             // check if player exists
             if (pindex >= 0) {
                 player = games[0].players[pindex];

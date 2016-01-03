@@ -64,10 +64,13 @@ gameServer.serverMessage = function(event) {
         towers = data.towers;
         // display the towers that existed before the client connected
         towers.forEach(function(e, i) {
-            game.add.sprite(e.x, e.y, 'towerBlue' + e.type)
+            // create a sprite to represent each tower from the server
+            var tower = game.add.sprite(e.x, e.y, 'towerBlue' + e.type);
+            // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
+            tower.anchor.setTo(0.5, 0.5);
         });
     } else if (data.event === 'sprinkle') {
-        console.log('msg-rxd: tower sprinkles');
+        //console.log('msg-rxd: tower sprinkles');
         // sprinkle data received from the server
         // iterate through the sprinkle array
         for (var i = 0; i < data.sprinkles.length; i += 1) {
@@ -77,6 +80,10 @@ gameServer.serverMessage = function(event) {
             // draw the sprinkle
             gameBoardLayer.drawSprinkle(s[0], s[1], 3, getPlayerClr(owner));
         }
+    } else if (data.event === 'sync-addTower') {
+        //console.log('msg-rxd: '+data.event);
+        var tower = game.add.sprite(data.tower.x, data.tower.y, 'towerBlue' + data.tower.type);
+        tower.anchor.setTo(0.5, 0.5);
     }
 }
 

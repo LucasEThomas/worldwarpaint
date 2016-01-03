@@ -20,7 +20,12 @@ tower.dragCord = function () {
 
 tower.towerPlaced = function () {
     // create a Phaser sprite object for a new tower
-    var tower = game.add.sprite(game.input.worldX, game.input.worldY, 'towerBlue' + selectedTower);
+    
+    // grab the xy coords
+    var placeX = game.input.worldX;
+    var placeY = game.input.worldY;
+    
+    var tower = game.add.sprite(placeX, placeY, 'towerBlue' + selectedTower);
 
     // enable input so we can detect when the mouse is clicked while dragging the sprite
     tower.inputEnabled = true;
@@ -38,7 +43,7 @@ tower.towerPlaced = function () {
     towers.push(tower);
 
     // tell the server we created a new tower
-    gameServer.createTower(game.input.worldX, game.input.worldY, selectedTower, tower.id, player.id);
+    gameServer.createTower(placeX, placeY, selectedTower, tower.id, player.id);
 
     // stop dragging a new tower
     towerDrag.destroy();
