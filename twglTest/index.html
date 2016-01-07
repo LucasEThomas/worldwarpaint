@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<style type="text/css">
+    html, body {
+
+        margin:10;
+    }
+    canvas {
+        border: 2px solid black;
+        width: 128px;
+        height: 128px;
+    }
+</style>
+
+<head>
+    <meta charset="utf-8">
+
+    <title>World War Paint</title>
+    <meta name="description" content="worldwarpaint">
+    <meta name="author" content="lukeandjosh">
+
+</head>
+
+<body>
+    <!-- vertex shader -->
+    <script src="/webgl-utils.js"></script>
+<!--    <script src="https://rawgit.com/greggman/twgl.js/master/dist/twgl.min.js"></script>-->
+    
+    <script id="2d-vertex-shader" type="x-shader/x-vertex">
+    attribute vec2 a_position;
+    attribute vec2 a_texCoord;
+
+    uniform float u_flipY;
+    uniform vec2 u_resolution;
+
+    varying vec2 v_texCoord;
+
+    void main() {
+       // convert the rectangle from pixels to 0.0 to 1.0
+       vec2 zeroToOne = a_position / u_resolution;
+
+       // convert from 0->1 to 0->2
+       vec2 zeroToTwo = zeroToOne * 2.0;
+
+       // convert from 0->2 to -1->+1 (clipspace)
+       vec2 clipSpace = zeroToTwo - 1.0;
+
+       gl_Position = vec4(clipSpace * vec2(1, u_flipY), 0, 1);
+
+       // pass the texCoord to the fragment shader
+       // The GPU will interpolate this value between points.
+       v_texCoord = a_texCoord;
+    }
+    </script>
+    <!-- fragment shader -->
+    <script id="2d-fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+
+        // our 2 canvases
+        uniform sampler2D u_canvasBuff;
+        uniform sampler2D u_canvasDest;
+
+        // the texCoords passed in from the vertex shader.
+        // note: we're only using 1 set of texCoords which means
+        //   we're assuming the canvases are the same size.
+        varying vec2 v_texCoord;
+
+        void main() {
+             // Look up a pixel from first canvas
+             vec4 colorBuff = texture2D(u_canvasBuff, v_texCoord);
+
+             // Look up a pixel from second canvas
+             vec4 colorDest = texture2D(u_canvasDest, v_texCoord);
+
+             // return the 2 colors multiplied
+             gl_FragColor = colorBuff + colorDest;
+        }
+    </script>
+
+    <p>buffer (2dCtx) canvas</p>
+    <canvas id="canvasBuffer" width="128" height="128"></canvas>
+    <p>destination (webgl) canvas</p>
+    <canvas id="canvasDest" width="128" height="128"></canvas>
+    
+    <script src="/main.js"></script>
+</body>
+</html>
