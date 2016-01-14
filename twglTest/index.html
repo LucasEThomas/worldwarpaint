@@ -29,13 +29,17 @@
 <!--    <script src="https://rawgit.com/greggman/twgl.js/master/dist/twgl.min.js"></script>-->
     
     <script id="2d-vertex-shader" type="x-shader/x-vertex">
-    attribute vec2 a_position;
-    attribute vec2 a_texCoord;
+    attribute vec2 a_position; //varies between 0->buffer pixels size
+    //attribute vec2 a_texCoord; //varies between 0->1
 
-    uniform float u_flipY;
-    uniform vec2 u_resolution;
+    uniform float u_flipY; //flip along y axis or not
+    uniform vec2 u_resolution; //total dest resolution
+    
+    uniform vec2 u_buff_resolution; // buff resolution
+    uniform vec2 u_buff_position; // buff position
+    uniform bool u_vxDrawFromBuffer;
 
-    varying vec2 v_texCoord;
+    varying vec2 v_texCoord; //varies between buffer start->buffer end
 
     void main() {
        // convert the rectangle from pixels to 0.0 to 1.0
@@ -51,7 +55,15 @@
 
        // pass the texCoord to the fragment shader
        // The GPU will interpolate this value between points.
-       v_texCoord = a_texCoord;
+       if(u_vxDrawFromBuffer){
+           v_texCoord = zeroToOne;
+           //v_texCoord = (u_buff_position + (a_texCoord * u_buff_resolution)) / u_resolution;
+       }
+       else{
+           v_texCoord = zeroToOne;
+           //v_texCoord = (u_buff_position + (a_texCoord * u_buff_resolution)) / u_resolution;
+           //v_texCoord = a_texCoord;
+       }
     }
     </script>
     <!-- fragment shader -->
@@ -61,6 +73,7 @@
         // our 2 canvases
         uniform sampler2D u_canvasBuff;
         uniform sampler2D u_canvasDest;
+        uniform bool u_fgDrawFromBuffer;
 
         // the texCoords passed in from the vertex shader.
         // note: we're only using 1 set of texCoords which means
@@ -74,8 +87,13 @@
              // Look up a pixel from second canvas
              vec4 colorDest = texture2D(u_canvasDest, v_texCoord);
 
-             // return the 2 colors multiplied
-             gl_FragColor = colorBuff + colorDest;
+             // return the 2 colors added
+             if(u_fgDrawFromBuffer){
+                gl_FragColor = colorBuff + colorDest;//vec4(0.0,1.0,0.0,1.0)
+             }
+             else{
+                gl_FragColor =  colorDest;
+             }
         }
     </script>
 
