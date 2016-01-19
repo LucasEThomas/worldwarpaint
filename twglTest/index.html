@@ -89,7 +89,13 @@
 
              // return the 2 colors added
              if(u_fgDrawFromBuffer){
-                gl_FragColor = colorBuff + colorDest;//vec4(0.0,1.0,0.0,1.0)
+                if(colorBuff.r >= 0.5 || colorDest.g >= 0.5){
+                    gl_FragColor = vec4(0.0,1.0,0.0,1.0);
+                }
+                else{
+                    gl_FragColor = vec4(0.0,0.0,1.0,1.0);
+                }
+                //gl_FragColor = colorBuff + colorDest;//vec4(0.0,0.0,1.0,1.0)
              }
              else{
                 gl_FragColor =  colorDest;
