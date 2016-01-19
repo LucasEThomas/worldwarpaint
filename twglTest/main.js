@@ -125,8 +125,6 @@ var texDest2;
 var fbo1;
 var fbo2;
 
-var toggle = true;
-
 function paintCanvas(x, y, width, height) {
     //load in the buffer canvas data
     gl.activeTexture(gl.TEXTURE0);
@@ -142,39 +140,30 @@ function paintCanvas(x, y, width, height) {
     gl.uniform1f(vxDrawFromBufferLocation, 1); //combine buffer and destination data
     gl.uniform1f(fgDrawFromBufferLocation, 1); //combine buffer and destination data
 
-    gl.uniform1i(u_canvasDestLocation, (toggle ? 2 : 1));
-    gl.activeTexture(gl.TEXTURE0 + (toggle ? 2 : 1)); //set the active texture (why? what does this do?)
-    gl.bindTexture(gl.TEXTURE_2D, toggle ? texDest2 : texDest1);
+    //tell it to write from texDest1
+    gl.uniform1i(u_canvasDestLocation, 1);
+    gl.activeTexture(gl.TEXTURE0 + 1);
+    gl.bindTexture(gl.TEXTURE_2D, texDest1);
+    //into framebuffer2
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2);
     
-    //ping pong between framebuffers rendering each successive result as an aggregate composite of the previous ones
-    if (toggle) {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1); //set the framebuffer we're rendering into (output)
-        gl.drawArrays(gl.TRIANGLES, 0, 6); //do the draw
-    } else {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2); //set the framebuffer we're rendering into (output)
-        gl.drawArrays(gl.TRIANGLES, 0, 6); //do the draw
-    }
+    //do it
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
     
-    //copy to prev canvas
+    //now copy result back to to prev texDest1
     gl.uniform1f(vxDrawFromBufferLocation, 0); //render only the destination texture to the screen
     gl.uniform1f(fgDrawFromBufferLocation, 0); //render only the destination texture to the screen
-    gl.uniform1i(u_canvasDestLocation, (toggle ? 1 : 2));
-    gl.activeTexture(gl.TEXTURE0 + (toggle ? 1 : 2));
-    gl.bindTexture(gl.TEXTURE_2D, toggle ? texDest1 : texDest2); //bind the last destination texture as the input to this draw
-    if (toggle) {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2); //set the framebuffer we're rendering into (output)
-        gl.drawArrays(gl.TRIANGLES, 0, 6); //do the draw
-    } else {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1); //set the framebuffer we're rendering into (output)
-        gl.drawArrays(gl.TRIANGLES, 0, 6); //do the draw
-    }
+    gl.uniform1i(u_canvasDestLocation, 2);
+    gl.activeTexture(gl.TEXTURE0 + 2);
+    gl.bindTexture(gl.TEXTURE_2D, texDest2); //bind the last destination texture as the input to this draw
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1); //set the framebuffer we're rendering into (output)
+    gl.drawArrays(gl.TRIANGLES, 0, 6); //do the draw
     
     //render the result to the screen
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); //now, render to the screen not a framebuffer
     gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), -1); //don't flip the y axis for this operation
     gl.drawArrays(gl.TRIANGLES, 0, 6); //do the draw
 
-    toggle = !toggle; //toggle
 }
 
 function setRectangle(gl, x, y, width, height) {
