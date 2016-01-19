@@ -11,7 +11,6 @@ function startGameLoop() {
     interval = setInterval(() => {
         var circleX = Math.round( Math.random() * 127);
         if (circleX < 16) circleX = 16; else if (circleX >= 127 - 16) circleX = 127 - 16;
-            
         
         var circleY = Math.round( Math.random() * 127);
         if (circleY < 16) circleY = 16; else if (circleY > 127 - 16) circleY = 127 - 16;
@@ -42,25 +41,8 @@ function initializeShaders() {
 
     // look up where the vertex data needs to go.
     var positionLocation = gl.getAttribLocation(program, "a_position");
-    //var texCoordLocation = gl.getAttribLocation(program, "a_texCoord");
-
-    // provide texture coordinates for the rectangle.
-//    var texCoordBuffer = gl.createBuffer();
-//    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
-//    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-//      0.0, 0.0,
-//      1.0, 0.0,
-//      0.0, 1.0,
-//      0.0, 1.0,
-//      1.0, 0.0,
-//      1.0, 1.0]), gl.STATIC_DRAW);
-//    gl.enableVertexAttribArray(texCoordLocation);
-//    gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
-
     // lookup uniforms
     resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-    //buffResolutionLocation = gl.getUniformLocation(program, "u_buff_resolution");
-    //buffPositionLocation = gl.getUniformLocation(program, "u_buff_position");
     vxDrawFromBufferLocation = gl.getUniformLocation(program, "u_vxDrawFromBuffer");
     fgDrawFromBufferLocation = gl.getUniformLocation(program, "u_fgDrawFromBuffer");
 
@@ -110,12 +92,8 @@ function initializeShaders() {
     fbo2 = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texDest2, 0);
-
-    //gl.preserveDrawingBuffer = true;
 }
 var resolutionLocation;
-//var buffResolutionLocation;
-//var buffPositionLocation;
 var u_canvasDestLocation;
 var vxDrawFromBufferLocation;
 var fgDrawFromBufferLocation;
@@ -146,8 +124,6 @@ function paintCanvas(x, y, width, height) {
     gl.bindTexture(gl.TEXTURE_2D, texDest1);
     //into framebuffer2
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2);
-    
-    //do it
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     
     //now copy result back to to prev texDest1
