@@ -8,6 +8,19 @@ var interval = {};
 function startGameLoop() {
     initializeShaders();
     
+    bufferCtx.clearRect(0, 0, canvasBuff.width, canvasBuff.height);
+    bufferCtx.beginPath();
+    bufferCtx.fillStyle = "red";
+    bufferCtx.moveTo(64, 64)
+    bufferCtx.arc(64, 64, 50, 0, Math.PI * 2, false);
+    bufferCtx.fill();
+    paintCanvas(64 - 50, 64 - 50, 100, 100);
+    paintCanvas(64 - 50, 64 - 50, 100, 100);
+    paintCanvas(64 - 50, 64 - 50, 100, 100);
+    paintCanvas(64 - 50, 64 - 50, 100, 100);
+    paintCanvas(64 - 50, 64 - 50, 100, 100);
+    paintCanvas(64 - 50, 64 - 50, 100, 100);
+    
     interval = setInterval(() => {
         var circleX = Math.round( Math.random() * 127);
         if (circleX < 16) circleX = 16; else if (circleX >= 127 - 16) circleX = 127 - 16;
@@ -16,12 +29,12 @@ function startGameLoop() {
         if (circleY < 16) circleY = 16; else if (circleY > 127 - 16) circleY = 127 - 16;
         bufferCtx.clearRect(0, 0, canvasBuff.width, canvasBuff.height);
         bufferCtx.beginPath();
-        bufferCtx.fillStyle = "red";
+        bufferCtx.fillStyle = "#00ff00";
         bufferCtx.moveTo(circleX, circleY)
         bufferCtx.arc(circleX, circleY, 6, 0, Math.PI * 2, false);
         bufferCtx.fill();
         paintCanvas(circleX - 16, circleY - 16, 32, 32);
-    }, 500);
+    }, 50);
 }
 
 function initializeShaders() {

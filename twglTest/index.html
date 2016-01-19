@@ -81,23 +81,34 @@
         varying vec2 v_texCoord;
 
         void main() {
-             // Look up a pixel from first canvas
+             // Look up the pixels from buff and dest canvases
              vec4 colorBuff = texture2D(u_canvasBuff, v_texCoord);
-
-             // Look up a pixel from second canvas
              vec4 colorDest = texture2D(u_canvasDest, v_texCoord);
 
-             // return the 2 colors added
              if(u_fgDrawFromBuffer){
-                if(colorBuff.r >= 0.5 || colorDest.g >= 0.5){
-                    gl_FragColor = vec4(0.0,1.0,0.0,1.0);
+             
+                if(colorBuff.a != 0.0){
+                    gl_FragColor = colorDest;//default value
+                    if(colorDest.a <= 0.0){
+                        gl_FragColor = vec4(colorBuff.rgb, 0.2);
+                    }else if(colorDest.a <= 0.8){
+                        if(colorBuff.rgb == colorDest.rgb){
+                            gl_FragColor = vec4(colorBuff.rgb,colorDest.a + 0.2);
+                            if(gl_FragColor.a > 0.8) {
+                                gl_FragColor = vec4(gl_FragColor.rgb, 0.8);
+                            }
+                        } else {
+                            gl_FragColor = vec4(colorDest.rgb,colorDest.a - 0.2);
+                        }
+                    } else {
+                        gl_FragColor = vec4(colorBuff.rgb,0.8);
+                    }
+                } else {
+                    gl_FragColor = colorDest;
                 }
-                else{
-                    gl_FragColor = vec4(0.0,0.0,1.0,1.0);
-                }
-                //gl_FragColor = colorBuff + colorDest;//vec4(0.0,0.0,1.0,1.0)
              }
              else{
+                //todo, antialiasing code probably goes here.
                 gl_FragColor =  colorDest;
              }
         }
