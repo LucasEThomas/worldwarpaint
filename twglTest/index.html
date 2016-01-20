@@ -87,7 +87,7 @@
 
              if(u_fgDrawFromBuffer){
              
-                if(colorBuff.a != 0.0){
+                if(colorBuff.a == 1.0){
                     gl_FragColor = colorDest;//default value
                     if(colorDest.a <= 0.0){
                         gl_FragColor = vec4(colorBuff.rgb, 0.2);
