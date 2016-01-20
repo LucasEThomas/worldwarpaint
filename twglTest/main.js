@@ -1,7 +1,7 @@
 var canvasBuff = document.getElementById("canvasBuffer");
 var canvasDest = document.getElementById("canvasDest");
 var bufferCtx = canvasBuff.getContext("2d");
-var gl = getWebGLContext(canvasDest, {preserveDrawingBuffer: true});
+var gl = getWebGLContext(canvasDest, {preserveDrawingBuffer: true, premultipliedAlpha: false});
 
 var interval = {};
 
@@ -10,7 +10,7 @@ function startGameLoop() {
     
     bufferCtx.clearRect(0, 0, canvasBuff.width, canvasBuff.height);
     bufferCtx.beginPath();
-    bufferCtx.fillStyle = "red";
+    bufferCtx.fillStyle = "#ff0000";
     bufferCtx.moveTo(64, 64)
     bufferCtx.arc(64, 64, 50, 0, Math.PI * 2, false);
     bufferCtx.fill();
