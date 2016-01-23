@@ -78,7 +78,7 @@ gameServer.serverMessage = function(event) {
             // get the owner of the sprinkle so we can get their color
             var owner = data.sprinkles[i].ownerID;
             // draw the sprinkle
-            gameBoardLayer.drawSprinkle(s[0], s[1], 3, getPlayerClr(owner));
+            gameBoardLayer.drawSprinkle(s[0], s[1], 3, getPlayerClr(owner) || {r:255,g:0,b:0});
         }
     } else if (data.event === 'sync-addTower') {
         //console.log('msg-rxd: '+data.event);
