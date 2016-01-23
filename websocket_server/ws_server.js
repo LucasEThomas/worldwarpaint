@@ -16,8 +16,8 @@ class Tower {
             var currentDirection = 2 * Math.PI * Math.random();
             var currentX = this.x + (currentRadius * Math.cos(currentDirection));
             var currentY = this.y + (currentRadius * Math.sin(currentDirection));
-            toReturn.push(currentX);
-            toReturn.push(currentY);
+            toReturn.push(Math.round(currentX));
+            toReturn.push(Math.round(currentY));
         }
         return toReturn;
     }
