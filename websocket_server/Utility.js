@@ -41,3 +41,5 @@ Math.generateUUID = function() {
         return v.toString(16);
     });
 };
+
+Math.TWOPI = Math.PI*2;

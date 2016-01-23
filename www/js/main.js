@@ -1,5 +1,5 @@
 
-var game = new Phaser.Game($(window).width(), $(window).height(), Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render : render });
+var game = new Phaser.Game($(window).width(), $(window).height(), Phaser.CANVAS, 'phaser_container', { preload: preload, create: create, update: update, render : render });
 
 
 function preload() {
@@ -16,6 +16,9 @@ function preload() {
     game.load.image('towerBlue3', 'assets/TowerBlue3.png');
     game.load.image('towerBlue4', 'assets/TowerBlue4.png');
     game.load.image('notebookPaper', 'assets/tileableNotebookPaper.png');
+    
+    var canvas = document.getElementById("gameboard_canvas");
+    gameBoardLayer.gameBoardDestination.initialize(canvas);
 }
 
 var cursors;
@@ -27,11 +30,11 @@ var gameBoardLayerSprite;
 function create() {
 
     //  Modify the world and camera bounds
-    game.world.setBounds(0, 0, 3200, 3200);
+    game.world.setBounds(0, 0, 2048, 2048);
     $(window).resize(function() { window.resizeGame(); } );
     
     //draw the background layer
-    backgroundLayerSprite = game.add.tileSprite(0, 0, 3200, 3200, 'notebookPaper');
+    backgroundLayerSprite = game.add.tileSprite(0, 0, 2048, 2048, 'notebookPaper');
     
     //create the gameboard bitmap data that we can draw stuff to
     gameBoardLayer.initialize();

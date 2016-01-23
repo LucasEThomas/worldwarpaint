@@ -18,6 +18,8 @@ Math.generateUUID = function() {
     });
 };
 
+Math.TWOPI = Math.PI*2;
+
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
