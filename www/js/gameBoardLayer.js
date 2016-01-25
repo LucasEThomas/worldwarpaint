@@ -89,7 +89,7 @@ gameBoardLayer.drawRandomSprinkles = function(x, y, radius, count) {
 gameBoardLayer.drawSprinkle = function(x, y, radius, playerClr) {
     gameBoardLayer.setupDraw(playerClr);
     gameBoardLayer.gameBoardBuffer.ctx.moveTo(x, y);
-    gameBoardLayer.gameBoardBuffer.ctx.arc(x, y, 3, 0, Math.TWOPI, false);
+    gameBoardLayer.gameBoardBuffer.ctx.arc(x, y, radius, 0, Math.TWOPI, false);
     gameBoardLayer.doDraw(x-radius,y-radius,radius*2,radius*2);
 }
 
