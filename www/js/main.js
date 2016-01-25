@@ -3,7 +3,7 @@ var game = new Phaser.Game($(window).width(), $(window).height(), Phaser.CANVAS,
 
 
 function preload() {
-
+    game.stage.disableVisibilityChange = true;  
     game.stage.backgroundColor = '#007236';
 
     game.load.image('background', 'assets/background.jpg');
@@ -51,9 +51,31 @@ function create() {
 
 var keyboardScrollSpeed = 16;
 
-
+var eventQueue = [];
 function update() {
-
+    //if the the time has come for the next item in the queue to be executed, add it to the renderQueue
+    currentTime = (new Date()).getTime();
+    if(eventQueue.length && eventQueue[0].scheduledTime <= currentTime){
+        var currentTimeSlot = eventQueue.shift();
+        console.log('event!');
+        console.log('eventQueue.length:'+eventQueue.length);
+        console.log('eventQueue.scheduledTime:'+currentTimeSlot.scheduledTime);
+        for(var currentEvent of currentTimeSlot){
+            
+            //todo, need to break out into another method that decides what to do with each event in the timeSlot
+            if(currentEvent.type === 'sprinklerTower'){
+                for(var currentGeometry of currentEvent.data){
+                    gameBoardLayer.drawSprinkle(currentGeometry.x, currentGeometry.y, currentGeometry.radius, {r:255,g:0,b:0});
+                }
+            }
+            
+        }
+        
+    }
+    //bandaid fix for when the browser looses focus and the eventQueue just piles up. Don't wanna memory leak!
+    if(eventQueue.length > 1000){
+        eventQueue.length = 0;
+    }
     
     if (cursors.up.isDown)
         game.camera.y -= keyboardScrollSpeed;
@@ -71,8 +93,8 @@ function update() {
 
 }
 
+renderQueue = [];
 function render() {
-
     game.debug.cameraInfo(game.camera, 32, 32);
 
 }

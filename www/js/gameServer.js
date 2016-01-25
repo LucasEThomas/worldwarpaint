@@ -72,16 +72,13 @@ gameServer.serverMessage = function(event) {
             // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
             tower.anchor.setTo(0.5, 0.5);
         });
-    } else if (data.event === 'sprinkle') {
-        //console.log('msg-rxd: tower sprinkles');
-        // sprinkle data received from the server
-        // iterate through the sprinkle array
-        for (var i = 0; i < data.sprinkles.length; i += 1) {
-            var s = data.sprinkles[i].sprinkles;
-            // get the owner of the sprinkle so we can get their color
-            var owner = data.sprinkles[i].ownerID;
-            // draw the sprinkle
-            gameBoardLayer.drawSprinkle(s[0], s[1], 3, getPlayerClr(owner) || {r:255,g:0,b:0});
+    } else if (data.event === 'scheduleEvents') {
+        //A new list of events has come down from the server. Each one needs to scheduled in the eventQueue.
+        var currentTime = (new Date()).getTime();
+        for (var i = 0; i < data.schedule.length; i += 1) {
+            var currentScheduleItem = data.schedule[i];
+            currentScheduleItem.scheduledTime = currentTime + (i*50);
+            eventQueue.push(currentScheduleItem)
         }
     } else if (data.event === 'sync-addTower') {
         //console.log('msg-rxd: '+data.event);

@@ -9,23 +9,32 @@ class Tower {
         this.type = type;
         this.ownerID = owner;
     };
-    generateRandomSprinkles(count) {
-        var toReturn = [];
-        for (var i = 0; i < count; i++) {
+    generateEvent() {
+        //this method will generate all sorts of events for each type of tower
+
+        //just create 5 sprinkles for now.
+        var sprinkles = [];
+        for (var i = 0; i < 5; i++) {
             var currentRadius = 100 * Math.random();
             var currentDirection = 2 * Math.PI * Math.random();
-            var currentX = this.x + (currentRadius * Math.cos(currentDirection));
-            var currentY = this.y + (currentRadius * Math.sin(currentDirection));
-            toReturn.push(Math.round(currentX));
-            toReturn.push(Math.round(currentY));
+            var currentX = Math.round(this.x + (currentRadius * Math.cos(currentDirection)));
+            var currentY = Math.round(this.y + (currentRadius * Math.sin(currentDirection)));
+            sprinkles.push({
+                x: currentX,
+                y: currentY,
+                radius: 7
+            });
         }
-        return toReturn;
+        return {
+            type: 'sprinklerTower',
+            data: sprinkles
+        };
     }
 };
 
 class Game {
     constructor() {
-        this.players = [];
+        this.players = [new Player('dda2571a-55d9-46d3-96c2-8b984164c904', null), new Player('5afdaeaf-f317-4470-ae6f-33bca53fd0de', null)];
         // create a towers array, for now we auto-generate two towers linked to two players for testing
         this.towers = [new Tower(1, 300, 300, 1, 'dda2571a-55d9-46d3-96c2-8b984164c904'), new Tower(1, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de')];
         this.interval = setInterval(() => {
@@ -33,18 +42,27 @@ class Game {
         }, 250);
     }
     gameLoop() {
-        var sprinkles = [];
-        this.towers.forEach((tower, index) => {
-            var sprinkleData = {
-                ownerID: tower.ownerID,
-                sprinkles: tower.generateRandomSprinkles(1)
-            };
-            sprinkles.push(sprinkleData);
-        });
+        var schedule = [];
+        //Schedule 5 event ops per update. We are currently running 4 updates per sec, so there will be 20 paint ops per sec client side.
+        for (var i = 0; i < 5; i++) {
+            schedule.push(this.generateScheduleItemEvents());
+        }
 
         this.players.forEach((player, index) => {
-            player.playerLoop(sprinkles);
+            player.scheduleEvents(schedule);
         });
+    }
+    generateScheduleItemEvents() {
+        var toReturn = [];
+        this.towers.forEach((tower, index) => {
+            var event = tower.generateEvent();
+            toReturn.push({
+                ownerID: tower.ownerID,
+                type: event.type,
+                data: event.data
+            });
+        });
+        return toReturn;
     }
 }
 
@@ -52,16 +70,19 @@ class Player {
     constructor(id, ws) {
         this.ws = ws;
         this.id = id;
-        this.clr = {};
-        this.clr.r = Utility.rangeInt(0, 255);
-        this.clr.g = Utility.rangeInt(0, 255);
-        this.clr.b = Utility.rangeInt(0, 255);
+        this.clr = {
+            r: Utility.rangeInt(0, 255),
+            g: Utility.rangeInt(0, 255),
+            b: Utility.rangeInt(0, 255),
+        };
     }
-    playerLoop(sprinkles) {
-            this.ws.send(JSON.stringify({
-                event: 'sprinkle',
-                sprinkles: sprinkles
-            }), function() { /* ignore errors */ });
+    scheduleEvents(schedule) {
+            if (this.ws) {
+                this.ws.send(JSON.stringify({
+                    event: 'scheduleEvents',
+                    schedule: schedule
+                }), function() { /* ignore errors */ });
+            }
         }
         // creates a dictionary for sending player info to the client
     toJSON() {
@@ -159,12 +180,10 @@ wss.on('connection', function connection(ws) {
             ws.send(JSON.stringify({
                 event: 'initsyncServer',
                 playerClr: player.clr,
+                playerID: data.playerID,
                 players: sendPlayers,
                 towers: games[0].towers
             }), function() { /* ignore errors */ });
         }
     });
-
-
-
 });
