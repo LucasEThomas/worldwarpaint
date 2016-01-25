@@ -4,17 +4,17 @@ gameServer = function() {
 
 gameServer.ws = null;
 
-// check if cookie exists with player id
-if (Utility.getCookie('pid') !== '') {
-    // cookie exists, so set the player id to match the cookie info
-    player.id = Utility.getCookie('pid');
-} else {
-    // the cookie doesn't exist, so create one with a generated player id
-    document.cookie = 'pid=' + player.id + ';';
-}
-
 //connects to the websocket game server
 gameServer.initialize = function() {
+    // check if cookie exists with player id
+    if (Utility.getCookie('pid') !== '') {
+        // cookie exists, so set the player id to match the cookie info
+        player.id = Utility.getCookie('pid');
+    } else {
+        // the cookie doesn't exist, so create one with a generated player id
+        document.cookie = 'pid=' + player.id + ';';
+    }
+    
     var host = window.document.location.host.replace(/:.*/, '');
     ws = new WebSocket('ws://' + host + ':8081');
     ws.onmessage = gameServer.serverMessage;
@@ -62,6 +62,9 @@ gameServer.serverMessage = function(event) {
         players = data.players;
         // save towers for the game session
         towers = data.towers;
+        //set the player's id (the server could have changed it);
+        player.id = data.playerID;
+        document.cookie = 'pid=' + player.id + ';';
         // display the towers that existed before the client connected
         towers.forEach(function(e, i) {
             // create a sprite to represent each tower from the server
