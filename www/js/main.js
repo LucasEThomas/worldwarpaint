@@ -57,9 +57,6 @@ function update() {
     currentTime = (new Date()).getTime();
     if(eventQueue.length && eventQueue[0].scheduledTime <= currentTime){
         var currentTimeSlot = eventQueue.shift();
-        console.log('event!');
-        console.log('eventQueue.length:'+eventQueue.length);
-        console.log('eventQueue.scheduledTime:'+currentTimeSlot.scheduledTime);
         for(var currentEvent of currentTimeSlot){
             
             //todo, need to break out into another method that decides what to do with each event in the timeSlot
@@ -68,7 +65,6 @@ function update() {
                     gameBoardLayer.drawSprinkle(currentGeometry.x, currentGeometry.y, currentGeometry.radius, {r:255,g:0,b:0});
                 }
             }
-            
         }
         
     }
