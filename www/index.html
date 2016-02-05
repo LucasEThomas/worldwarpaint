@@ -24,17 +24,12 @@
 <body>
    <!-- vertex shader -->
     <script id="2d-vertex-shader" type="x-shader/x-vertex">
-    attribute vec2 a_position; //varies between 0->buffer pixels size
-    //attribute vec2 a_texCoord; //varies between 0->1
+    attribute vec2 a_position; //varies between draw position->draw size (pixelspace)
 
     uniform float u_flipY; //flip along y axis or not
     uniform vec2 u_resolution; //total dest resolution
-    
-    uniform vec2 u_buff_resolution; // buff resolution
-    uniform vec2 u_buff_position; // buff position
-    uniform bool u_vxDrawFromBuffer;
 
-    varying vec2 v_texCoord; //varies between buffer start->buffer end
+    varying vec2 v_texCoord; //varies between draw start->draw end (vectorspace)
 
     void main() {
        // convert the rectangle from pixels to 0.0 to 1.0
@@ -50,15 +45,7 @@
 
        // pass the texCoord to the fragment shader
        // The GPU will interpolate this value between points.
-       if(u_vxDrawFromBuffer){
-           v_texCoord = zeroToOne;
-           //v_texCoord = (u_buff_position + (a_texCoord * u_buff_resolution)) / u_resolution;
-       }
-       else{
-           v_texCoord = zeroToOne;
-           //v_texCoord = (u_buff_position + (a_texCoord * u_buff_resolution)) / u_resolution;
-           //v_texCoord = a_texCoord;
-       }
+       v_texCoord = zeroToOne;
     }
     </script>
     <!-- fragment shader -->
@@ -85,15 +72,15 @@
                 if(colorBuff.a == 1.0){
                     gl_FragColor = colorDest;//default value
                     if(colorDest.a <= 0.0){
-                        gl_FragColor = vec4(colorBuff.rgb, 0.2);
+                        gl_FragColor = vec4(colorBuff.rgb, 0.1);
                     }else if(colorDest.a <= 0.8){
                         if(colorBuff.rgb == colorDest.rgb){
-                            gl_FragColor = vec4(colorBuff.rgb,colorDest.a + 0.2);
+                            gl_FragColor = vec4(colorBuff.rgb,colorDest.a + 0.1);
                             if(gl_FragColor.a > 0.8) {
                                 gl_FragColor = vec4(gl_FragColor.rgb, 0.8);
                             }
                         } else {
-                            gl_FragColor = vec4(colorDest.rgb,colorDest.a - 0.2);
+                            gl_FragColor = vec4(colorDest.rgb,colorDest.a - 0.1);
                         }
                     } else {
                         gl_FragColor = vec4(colorBuff.rgb,0.8);
@@ -108,6 +95,55 @@
              }
         }
     </script>
+    <script id="histogram-fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+
+        // our 2 canvases
+        uniform sampler2D u_textureIn;
+        uniform bool u_initialInput;
+        uniform vec2 u_resolutionIn;
+        
+        uniform vec3 playerClrs[4];
+
+        // the texCoords passed in from the vertex shader.
+        varying vec2 v_texCoord;
+
+        void main() {
+            vec4 colorOut = vec4(0,0,0,0);
+            
+            if(u_initialInput){
+                for(int x=0; x<4; x++){
+                    for(int y=0; y<4; y++){
+                        vec2 currentPixel = vec2(x,y) / u_resolution;
+                        vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4) + currentPixel); // Look up the pixels input texture
+                        colorOut += getPixelIncrementation(colorIn);
+                    }
+                }
+            }
+            else{
+                for(int x=0; x<4; x++){
+                    for(int y=0; y<4; y++){
+                        vec2 currentPixel = vec2(x,y) / u_resolution;
+                        vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4) + currentPixel); // Look up the pixels input texture
+                        colorOut += colorIn * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
+                    }
+                }
+            }
+
+            gl_FragColor = colorOut;
+        }
+        
+        vec4 getPixelIncrementation(vec4 colorIn){
+            vec4 toReturn = vec4(0,0,0,0);
+            for(int i=0; i<4; i++){
+                if(playerClrs[i] == colorIn.rgb){
+                    toReturn[i] = colorIn.a * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
+                }
+            }
+            return toReturn;
+        }
+    </script>
+    
     <script src="js/libs/jquery-2.1.4.js"></script>
     <script src="js/utility.js"></script>
     <script src="js/libs/webgl-utils.js"></script>

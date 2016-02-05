@@ -41,11 +41,11 @@ gameBoardLayer.colorMatch = function(x, y, rgb) {
     return (Math.abs(placeRGB[0] - rgb.r) <= 12 && Math.abs(placeRGB[1] - rgb.g) <= 12 && Math.abs(placeRGB[2] - rgb.b) <= 12);
 }
 
-gameBoardLayer.drawRandomBlob = function(x, y, radius) {
+gameBoardLayer.drawRandomBlob = function(x, y, radius, playerClr) {
     var tension = radius * 0.1;
     var controlPoints = gameBoardLayer.generateBlobControlPoints(x, y, radius, 32);
 
-    gameBoardLayer.setupDraw();
+    gameBoardLayer.setupDraw(playerClr);
     this.gameBoardBuffer.ctx.moveTo(controlPoints[0].x, controlPoints[0].y);
 
     for (var i = 0; i <= controlPoints.length - 1; i++) {
@@ -61,13 +61,13 @@ gameBoardLayer.drawRandomBlob = function(x, y, radius) {
 
         this.gameBoardBuffer.ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, nextPoint.x, nextPoint.y);
     }
-    gameBoardLayer.doDraw();
+    gameBoardLayer.doDraw(Math.round(x-(1.5*radius)),Math.round(y-(1.5*radius)),Math.round((1.5*radius)*2),Math.round((1.5*radius)*2));
 }
 gameBoardLayer.generateBlobControlPoints = function(x, y, radius, count) {
     var toReturn = [];
     for (var i = 0; i < count; i++) {
         var angle = Math.TWOPI * i / count;
-        var randomRadius = radius + radius * Math.getRandomArbitrary(-0.5, 0.5);
+        var randomRadius = radius + radius * Math.getRandomArbitrary(-0.1, 0.1);
         toReturn.push(new Victor(Math.round(x + (randomRadius * Math.cos(angle))), Math.round(y + (randomRadius * Math.sin(angle)))))
     }
     return toReturn;
@@ -209,7 +209,7 @@ var fbo2;
 //}
 
 gameBoardLayer.gameBoardDestination.paint = function(x, y, width, height){
-    var gl = gameBoardLayer.gameBoardDestination.gl
+    var gl = gameBoardLayer.gameBoardDestination.gl;
     //load in the buffer canvas data
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texBuff);
