@@ -19,10 +19,14 @@ class Tower {
             var currentDirection = 2 * Math.PI * Math.random();
             var currentX = Math.round(this.x + (currentRadius * Math.cos(currentDirection)));
             var currentY = Math.round(this.y + (currentRadius * Math.sin(currentDirection)));
+            var currentRadius = Math.round(Math.getRandomArbitrary(5,14));
+            var controlPoints = this.generateBlobControlPoints(currentX, currentY, currentRadius, 32);
             sprinkles.push({
-                x: currentX,
-                y: currentY,
-                radius: Math.round(Math.getRandomArbitrary(5,14))
+                x:currentX,
+                y:currentY,
+                radius:currentRadius,
+                ctrlPts: controlPoints,
+                tension: currentRadius*0.1
             });
         }
         return {
@@ -30,6 +34,18 @@ class Tower {
             data: sprinkles
         };
     }
+    generateBlobControlPoints(x, y, radius, count) {
+    var toReturn = [];
+    for (var i = 0; i < count; i++) {
+        var angle = Math.TWOPI * i / count;
+        var randomRadius = radius + radius * Math.getRandomArbitrary(-0.1, 0.1);
+        toReturn.push({
+            x:Math.round(x + (randomRadius * Math.cos(angle))), 
+            y:Math.round(y + (randomRadius * Math.sin(angle)))
+        })
+    }
+    return toReturn;
+}
 };
 
 class Game {

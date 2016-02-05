@@ -41,6 +41,26 @@ gameBoardLayer.colorMatch = function(x, y, rgb) {
     return (Math.abs(placeRGB[0] - rgb.r) <= 12 && Math.abs(placeRGB[1] - rgb.g) <= 12 && Math.abs(placeRGB[2] - rgb.b) <= 12);
 }
 
+gameBoardLayer.drawBlob = function(x, y, radius, controlPoints, tension, playerClr) {
+    gameBoardLayer.setupDraw(playerClr);
+    this.gameBoardBuffer.ctx.moveTo(controlPoints[0].x, controlPoints[0].y);
+
+    for (var i = 0; i <= controlPoints.length - 1; i++) {
+        var point = new Victor.fromObject(controlPoints[i]);
+        var prevPoint = new Victor.fromObject(controlPoints[(i > 0) ? i - 1 : controlPoints.length - 1]);
+        var nextPoint = new Victor.fromObject(controlPoints[(i + 1) % controlPoints.length]);
+        var nextnextPoint = new Victor.fromObject(controlPoints[(i + 2) % controlPoints.length]);
+
+        var tangent = nextPoint.clone().subtract(prevPoint).normalize().multiplyScalar(tension);
+        var nextTangent = nextnextPoint.clone().subtract(point).normalize().multiplyScalar(tension);
+        var cp1 = point.clone().add(tangent);
+        var cp2 = nextPoint.clone().subtract(nextTangent);
+
+        this.gameBoardBuffer.ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, nextPoint.x, nextPoint.y);
+    }
+    gameBoardLayer.doDraw(Math.round(x-(1.5*radius)),Math.round(y-(1.5*radius)),Math.round((1.5*radius)*2),Math.round((1.5*radius)*2));
+}
+
 gameBoardLayer.drawRandomBlob = function(x, y, radius, playerClr) {
     var tension = radius * 0.1;
     var controlPoints = gameBoardLayer.generateBlobControlPoints(x, y, radius, 32);

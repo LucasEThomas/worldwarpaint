@@ -63,7 +63,7 @@ function update() {
             if(currentEvent.type === 'sprinklerTower'){
                 for(var currentGeometry of currentEvent.data){
                     //gameBoardLayer.drawSprinkle(currentGeometry.x, currentGeometry.y, currentGeometry.radius, {r:255,g:0,b:0});
-                    gameBoardLayer.drawRandomBlob(currentGeometry.x, currentGeometry.y, currentGeometry.radius, getPlayerClr(currentEvent.ownerID));
+                    gameBoardLayer.drawBlob(currentGeometry.x, currentGeometry.y, currentGeometry.radius, currentGeometry.ctrlPts, currentGeometry.tension, getPlayerClr(currentEvent.ownerID));
                 }
             }
         }
