@@ -15,14 +15,14 @@ class Tower {
         //just create 5 sprinkles for now.
         var sprinkles = [];
         for (var i = 0; i < 5; i++) {
-            var currentRadius = 100 * Math.random();
+            var currentRadius = 250 * Math.random();
             var currentDirection = 2 * Math.PI * Math.random();
             var currentX = Math.round(this.x + (currentRadius * Math.cos(currentDirection)));
             var currentY = Math.round(this.y + (currentRadius * Math.sin(currentDirection)));
             sprinkles.push({
                 x: currentX,
                 y: currentY,
-                radius: 7
+                radius: Math.round(Math.getRandomArbitrary(5,14))
             });
         }
         return {
@@ -36,7 +36,7 @@ class Game {
     constructor() {
         this.players = [new Player('dda2571a-55d9-46d3-96c2-8b984164c904', null), new Player('5afdaeaf-f317-4470-ae6f-33bca53fd0de', null)];
         // create a towers array, for now we auto-generate two towers linked to two players for testing
-        this.towers = [new Tower(1, 300, 300, 1, 'dda2571a-55d9-46d3-96c2-8b984164c904'), new Tower(1, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de')];
+        this.towers = [new Tower(1, 600, 300, 1, 'dda2571a-55d9-46d3-96c2-8b984164c904'), new Tower(1, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de')];
         this.interval = setInterval(() => {
             this.gameLoop();
         }, 250);

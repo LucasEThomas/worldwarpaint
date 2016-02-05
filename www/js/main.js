@@ -62,7 +62,8 @@ function update() {
             //todo, need to break out into another method that decides what to do with each event in the timeSlot
             if(currentEvent.type === 'sprinklerTower'){
                 for(var currentGeometry of currentEvent.data){
-                    gameBoardLayer.drawSprinkle(currentGeometry.x, currentGeometry.y, currentGeometry.radius, {r:255,g:0,b:0});
+                    //gameBoardLayer.drawSprinkle(currentGeometry.x, currentGeometry.y, currentGeometry.radius, {r:255,g:0,b:0});
+                    gameBoardLayer.drawRandomBlob(currentGeometry.x, currentGeometry.y, currentGeometry.radius, getPlayerClr(currentEvent.ownerID));
                 }
             }
         }
