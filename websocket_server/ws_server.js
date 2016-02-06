@@ -167,7 +167,7 @@ wss.on('connection', function connection(ws) {
             var dontSend = getPlayerIndex(data.owner);
             console.log(dontSend);
             games[0].players.forEach(function(e, i) {
-                if (dontSend != i) {
+                if (dontSend != i && e.ws) {
                     e.ws.send(JSON.stringify({
                         event: 'sync-addTower',
                         tower: tower

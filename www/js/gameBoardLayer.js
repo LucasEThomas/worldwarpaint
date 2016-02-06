@@ -19,6 +19,8 @@ gameBoardLayer.initialize = function() {
     var textureFrame = new Phaser.Frame(0, 0, 0, game.world.width, game.world.height, 'debug', game.rnd.uuid());
     sprite = game.add.sprite(0, 0, texture, textureFrame);
     sprite.fixedToCamera = false;
+    sprite.inputEnabled = true;
+    sprite.events.onInputUp.add(gameBoardLayer.mouseUp);
 }
 
 gameBoardLayer.mouseUp = function() {
@@ -28,17 +30,22 @@ gameBoardLayer.mouseUp = function() {
             tower.towerPlaced();
         }
     } else {
-        gameBoardLayer.drawRandomBlob(game.input.worldX - 100, game.input.worldY, 50);
-        gameBoardLayer.drawRandomSprinkles(game.input.worldX + 100, game.input.worldY, 50, 20);
-        gameBoardLayer.drawRay(game.input.worldX, game.input.worldY, 200, Math.random() * Math.TWOPI, Math.TWOPI * 0.025);
+        gameBoardLayer.drawRandomBlob(game.input.worldX, game.input.worldY, 50, player.clr);
+        //gameBoardLayer.drawRandomSprinkles(game.input.worldX + 100, game.input.worldY, 50, 20);
+        //gameBoardLayer.drawRay(game.input.worldX, game.input.worldY, 200, Math.random() * Math.TWOPI, Math.TWOPI * 0.025);
     }
 }
 
 gameBoardLayer.gameBoardBuffer; //The game board layer. This is the semi-transparent layer where the players' paint colors are drawn.
 
 gameBoardLayer.colorMatch = function(x, y, rgb) {
+    y = -y+2048;//flip y
+    gl = gameBoardLayer.gameBoardDestination.gl;
     var placeRGB = gameBoardLayer.gameBoardBuffer.ctx.getImageData(x, y, 1, 1).data;
-    return (Math.abs(placeRGB[0] - rgb.r) <= 12 && Math.abs(placeRGB[1] - rgb.g) <= 12 && Math.abs(placeRGB[2] - rgb.b) <= 12);
+    pixelValues = new Uint8Array(4);
+    gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelValues);
+    console.log(pixelValues);
+    return (Math.abs(pixelValues[0] - rgb.r) <= 12 && Math.abs(pixelValues[1] - rgb.g) <= 12 && Math.abs(pixelValues[2] - rgb.b) <= 12);
 }
 
 gameBoardLayer.drawBlob = function(x, y, radius, controlPoints, tension, playerClr) {
