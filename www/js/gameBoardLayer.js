@@ -41,7 +41,6 @@ gameBoardLayer.gameBoardBuffer; //The game board layer. This is the semi-transpa
 gameBoardLayer.colorMatch = function(x, y, rgb) {
     y = -y+2048;//flip y
     gl = gameBoardLayer.gameBoardDestination.gl;
-    var placeRGB = gameBoardLayer.gameBoardBuffer.ctx.getImageData(x, y, 1, 1).data;
     pixelValues = new Uint8Array(4);
     gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelValues);
     console.log(pixelValues);

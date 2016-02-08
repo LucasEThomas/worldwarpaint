@@ -14,8 +14,8 @@ class Tower {
 
         //just create 5 sprinkles for now.
         var sprinkles = [];
-        for (var i = 0; i < 5; i++) {
-            var currentRadius = 250 * Math.random();
+        for (var i = 0; i < 1; i++) {
+            var currentRadius = 100 * Math.random();
             var currentDirection = 2 * Math.PI * Math.random();
             var currentX = Math.round(this.x + (currentRadius * Math.cos(currentDirection)));
             var currentY = Math.round(this.y + (currentRadius * Math.sin(currentDirection)));
