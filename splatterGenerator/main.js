@@ -5,17 +5,17 @@ function drawSplatters() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     for(var x = 0; x<1024; x+=128){
-        for(var y = 0; y<640; y+=128){
+        for(var y = 0; y<768; y+=128){
             drawRandomSplatter(x+64,y+64,56);
         }
     }
     for(var x = 0; x<1024; x+=64){
-        for(var y = 640; y<896; y+=64){
+        for(var y = 768; y<960; y+=64){
             drawRandomSplatter(x+32,y+32,29);
         }
     }
     for(var x = 0; x<1024; x+=32){
-        for(var y = 896; y<1024; y+=32){
+        for(var y = 960; y<1024; y+=32){
             drawRandomSplatter(x+16,y+16,14);
         }
     }
