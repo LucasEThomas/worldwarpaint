@@ -14,7 +14,7 @@ class Tower {
 
         //just create 5 sprinkles for now.
         var sprinkles = [];
-        for (var i = 0; i < 1000; i++) {
+        for (var i = 0; i < 50; i++) {
             var towerRange = 200 * Math.random();
             var randomDirection = 2 * Math.PI * Math.random();
             var splatterX = Math.round(this.x + (towerRange * Math.cos(randomDirection)));
