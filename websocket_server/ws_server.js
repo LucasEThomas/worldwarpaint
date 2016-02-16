@@ -14,7 +14,7 @@ class Tower {
 
         //just create 5 sprinkles for now.
         var sprinkles = [];
-        for (var i = 0; i < 20; i++) {
+        for (var i = 0; i < 1000; i++) {
             var towerRange = 200 * Math.random();
             var randomDirection = 2 * Math.PI * Math.random();
             var splatterX = Math.round(this.x + (towerRange * Math.cos(randomDirection)));
@@ -49,12 +49,21 @@ class Tower {
 
 class Game {
     constructor() {
-        this.players = [new Player('dda2571a-55d9-46d3-96c2-8b984164c904', null), new Player('5afdaeaf-f317-4470-ae6f-33bca53fd0de', null)];
+        this.players = [
+            new Player('dda2571a-55d9-46d3-96c2-8b984164c904', null), 
+            new Player('5afdaeaf-f317-4470-ae6f-33bca53fd0de', null), 
+            new Player('dda2571a-55d9-46d3-96c2-8b984164c905', null)];
         // create a towers array, for now we auto-generate two towers linked to two players for testing
-        this.towers = [new Tower(1, 600, 300, 1, 'dda2571a-55d9-46d3-96c2-8b984164c904'), new Tower(1, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de')];
+        this.towers = [
+            new Tower(1, 600, 300, 1, 'dda2571a-55d9-46d3-96c2-8b984164c904'), 
+            new Tower(1, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
+            new Tower(1, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')];
+        
         this.interval = setInterval(() => {
             this.gameLoop();
         }, 250);
+        this.reverseIterate = false;
+        this.roundRobinOffset = 0;
     }
     gameLoop() {
         var schedule = [];
@@ -69,7 +78,8 @@ class Game {
     }
     generateScheduleItemEvents() {
         var toReturn = [];
-        this.towers.forEach((tower, index) => {
+        
+        this.fairlyIterateThroughTowers((tower)=>{
             var event = tower.generateEvent();
             toReturn.push({
                 ownerID: tower.ownerID,
@@ -77,7 +87,20 @@ class Game {
                 data: event.data
             });
         });
+        
         return toReturn;
+    }
+    fairlyIterateThroughTowers(callback){
+        var tLength = this.towers.length; //cache for clean code and minor speed increase
+        for(var i = 0; i< tLength; i++){
+            var rri = (i+this.roundRobinOffset)%tLength;
+            var tower = this.towers[this.reverseIterate?-rri+tLength-1:rri]
+            callback(tower);
+        }
+        if(this.reverseIterate){
+            this.roundRobinOffset = (this.roundRobinOffset + 1) % tLength;
+        }
+        this.reverseIterate = !this.reverseIterate;
     }
 }
 
