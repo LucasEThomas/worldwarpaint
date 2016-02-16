@@ -24,19 +24,26 @@
 <body>
    <!-- vertex shader -->
     <script id="2d-vertex-shader" type="x-shader/x-vertex">
-    attribute vec2 a_position; //varies between draw position->draw size (pixelspace)
+    attribute vec2 a_outputRects;
+    attribute vec2 a_inputRects;
+    attribute vec4 a_colors;
 
     uniform float u_flipY; //flip along y axis or not
-    uniform vec2 u_resolution; //total dest resolution
+    uniform vec2 u_inResolution; //resolution
+    uniform vec2 u_outResolution; //resolution
 
-    varying vec2 v_texCoord; //varies between draw start->draw end (vectorspace)
+    varying vec2 v_inputCoord;
+    varying vec2 v_outputCoord;
+    varying vec4 v_color;
+    
 
     void main() {
        // convert the rectangle from pixels to 0.0 to 1.0
-       vec2 zeroToOne = a_position / u_resolution;
+       vec2 inputZeroToOne = a_inputRects / u_inResolution;
+       vec2 outputZeroToOne = a_outputRects / u_outResolution;
 
        // convert from 0->1 to 0->2
-       vec2 zeroToTwo = zeroToOne * 2.0;
+       vec2 zeroToTwo = outputZeroToOne * 2.0;
 
        // convert from 0->2 to -1->+1 (clipspace)
        vec2 clipSpace = zeroToTwo - 1.0;
@@ -45,7 +52,10 @@
 
        // pass the texCoord to the fragment shader
        // The GPU will interpolate this value between points.
-       v_texCoord = zeroToOne;
+       v_inputCoord = inputZeroToOne;
+       v_outputCoord = outputZeroToOne;
+       
+       v_color = a_colors;
     }
     </script>
     <!-- fragment shader -->
@@ -60,22 +70,24 @@
         // the texCoords passed in from the vertex shader.
         // note: we're only using 1 set of texCoords which means
         //   we're assuming the canvases are the same size.
-        varying vec2 v_texCoord;
+        varying vec2 v_inputCoord;
+        varying vec2 v_outputCoord;
+        varying vec4 v_color;
 
         void main() {
              // Look up the pixels from buff and dest canvases
-             vec4 colorBuff = texture2D(u_canvasBuff, v_texCoord);
-             vec4 colorDest = texture2D(u_canvasDest, v_texCoord);
+             vec4 colorBuff = texture2D(u_canvasBuff, v_inputCoord);
+             vec4 colorDest = texture2D(u_canvasDest, v_outputCoord);
 
              if(u_fgDrawFromBuffer){
              
-                if(colorBuff.a == 1.0){
+                if(colorBuff.rgb != vec3(0.0,0.0,0.0)){
                     gl_FragColor = colorDest;//default value
                     if(colorDest.a <= 0.0){
-                        gl_FragColor = vec4(colorBuff.rgb, 0.1);
+                        gl_FragColor = vec4(v_color.rgb, 0.1);
                     }else if(colorDest.a <= 0.8){
-                        if(colorBuff.rgb == colorDest.rgb){
-                            gl_FragColor = vec4(colorBuff.rgb,colorDest.a + 0.1);
+                        if(v_color.rgb == colorDest.rgb){
+                            gl_FragColor = vec4(v_color.rgb,colorDest.a + 0.1);
                             if(gl_FragColor.a > 0.8) {
                                 gl_FragColor = vec4(gl_FragColor.rgb, 0.8);
                             }
@@ -83,14 +95,14 @@
                             gl_FragColor = vec4(colorDest.rgb,colorDest.a - 0.1);
                         }
                     } else {
-                        gl_FragColor = vec4(colorBuff.rgb,0.8);
+                        gl_FragColor = vec4(v_color.rgb,0.8);
                     }
                 } else {
                     gl_FragColor = colorDest;
                 }
              }
              else{
-                //todo, antialiasing code probably goes here.
+                //todo, gausian blur code goes here eventually.
                 gl_FragColor =  colorDest;
              }
         }

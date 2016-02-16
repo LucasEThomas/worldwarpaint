@@ -14,19 +14,18 @@ class Tower {
 
         //just create 5 sprinkles for now.
         var sprinkles = [];
-        for (var i = 0; i < 1; i++) {
-            var currentRadius = 100 * Math.random();
-            var currentDirection = 2 * Math.PI * Math.random();
-            var currentX = Math.round(this.x + (currentRadius * Math.cos(currentDirection)));
-            var currentY = Math.round(this.y + (currentRadius * Math.sin(currentDirection)));
-            var currentRadius = Math.round(Math.getRandomArbitrary(5,14));
-            var controlPoints = this.generateBlobControlPoints(currentX, currentY, currentRadius, 32);
+        for (var i = 0; i < 20; i++) {
+            var towerRange = 200 * Math.random();
+            var randomDirection = 2 * Math.PI * Math.random();
+            var splatterX = Math.round(this.x + (towerRange * Math.cos(randomDirection)));
+            var splatterY = Math.round(this.y + (towerRange * Math.sin(randomDirection)));
+            var splatterRadius = Math.round(Math.getRandomArbitrary(5,14));
+            //var controlPoints = this.generateBlobControlPoints(currentX, currentY, currentRadius, 32);
             sprinkles.push({
-                x:currentX,
-                y:currentY,
-                radius:currentRadius,
-                ctrlPts: controlPoints,
-                tension: currentRadius*0.1
+                x:splatterX,
+                y:splatterY,
+                radius:splatterRadius,
+                inputIndex: Math.round(Math.getRandomArbitrary(96,159))
             });
         }
         return {

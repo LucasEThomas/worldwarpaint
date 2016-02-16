@@ -6,11 +6,9 @@ gameBoardLayer.initialize = function() {
     gameBoardLayer.gameBoardBuffer = game.add.bitmapData(game.world.width, game.world.height);
 
     //add it as a sprite object to the actual game so that we can see it.
-    //gameBoardLayerSprite = game.add.sprite(0, 0, this.gameBoardBuffer);
-
+    
     //gameBoardLayerSprite.inputEnabled = true;
     //gameBoardLayerSprite.events.onInputUp.add(gameBoardLayer.mouseUp);
-    
     
     var canvas = document.getElementById('gameboard_canvas');
     var context = canvas.getContext('2d');
@@ -144,6 +142,47 @@ gameBoardLayer.doDraw = function(x,y,width,height) {
     gameBoardLayer.gameBoardBuffer.ctx.clearRect(x,y,width,height);
 }
 
+var stageColors = [];
+var stageInputRects = [];
+var stageOutputRects = [];
+gameBoardLayer.stageSplatter = function(x,y,radius,clr,inputIndex){
+    if(inputIndex < 48){
+        stageInputRects.push({
+            x:(inputIndex%8)*128,
+            y:Math.floor(inputIndex/8)*128,
+            width:128,
+            height:128
+        });
+    }
+    else if(inputIndex < 96){
+        stageInputRects.push({
+            x:(inputIndex%16)*64,
+            y:768+(Math.floor((inputIndex-48)/16)*64),
+            width:64,
+            height:64
+        });
+    }
+    else if(inputIndex < 160){
+        stageInputRects.push({
+            x:(inputIndex%32)*32,
+            y:960+(Math.floor((inputIndex-96)/32)*32),
+            width:32,
+            height:32
+        });
+    }
+    else{
+        console.error("inputIndex out of bounds of spritesheet");
+        return;
+    }
+    stageColors.push(clr);
+    stageOutputRects.push({
+        x:x-radius,
+        y:y-radius,
+        width:radius*2,
+        height:radius*2
+    });
+}
+
 gameBoardLayer.gameBoardDestination = function() {
 
 }
@@ -167,23 +206,36 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
     gl.viewport(0, 0, canvas.width, canvas.height); //set the viewport to the whole display
 
     // look up where the vertex data needs to go.
-    var positionLocation = gl.getAttribLocation(program, "a_position");
+    var inputRectanglesLocation = gl.getAttribLocation(program, "a_inputRects");
+    var outputRectanglesLocation = gl.getAttribLocation(program, "a_outputRects");
+    var colorsLocation = gl.getAttribLocation(program, "a_colors");
     // lookup uniforms
-    resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+    resolutionInLocation = gl.getUniformLocation(program, "u_inResolution");
+    resolutionOutLocation = gl.getUniformLocation(program, "u_outResolution");
     vxDrawFromBufferLocation = gl.getUniformLocation(program, "u_vxDrawFromBuffer");
     fgDrawFromBufferLocation = gl.getUniformLocation(program, "u_fgDrawFromBuffer");
 
     // set the resolution
-    gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+    gl.uniform2f(resolutionInLocation, 1024, 1024);
+    gl.uniform2f(resolutionOutLocation, canvas.width, canvas.height);
 
-    // Create a buffer for the position of the rectangle corners.
-    var buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.enableVertexAttribArray(positionLocation);
-    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
-    // Set a rectangle the same size as the image.
-    gameBoardLayer.gameBoardDestination.setRectangle(gl, 0, 0, canvas.width, canvas.height);
+    // Create a buffer for the position of the input rectangle corners.
+    inputRectangles = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, inputRectangles);
+    gl.enableVertexAttribArray(inputRectanglesLocation);
+    gl.vertexAttribPointer(inputRectanglesLocation, 2, gl.FLOAT, false, 0, 0);
+    
+    // Create a buffer for the position of the input rectangle corners.
+    outputRectangles = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, outputRectangles);
+    gl.enableVertexAttribArray(outputRectanglesLocation);
+    gl.vertexAttribPointer(outputRectanglesLocation, 2, gl.FLOAT, false, 0, 0);
+    
+    // Create a buffer for the colors of the rectangles.
+    bufferColors = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferColors);
+    gl.enableVertexAttribArray(colorsLocation);
+    gl.vertexAttribPointer(colorsLocation, 4, gl.FLOAT, false, 0, 0);
 
     function setupTexture(canvas, textureUnit, program, uniformName) {
         var tex = gl.createTexture();
@@ -204,8 +256,13 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
         return tex;
     }
 
+    var splattersBitmapData = game.make.bitmapData(1024,1024);
+    var splattersImage = game.make.image(0,0, 'splatters');
+    splattersBitmapData.draw(splattersImage);
+    splattersBitmapData.update();
+    var splattersImageData = splattersBitmapData.imageData;
     //setup the textures
-    texBuff = setupTexture(canvas, 0, program, "u_canvasBuff");
+    texBuff = setupTexture(splattersImageData, 0, program, "u_canvasBuff");
     texDest1 = setupTexture(canvas, 1, program, "asdf");
     texDest2 = setupTexture(canvas, 2, program, "asdf");
     u_canvasDestLocation = gl.getUniformLocation(program, "u_canvasDest");
@@ -220,6 +277,10 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texDest2, 0);
 }
+
+var bufferColors;
+var inputRectangles;
+var outputRectangles;
 var resolutionLocation;
 var u_canvasDestLocation;
 var vxDrawFromBufferLocation;
@@ -234,15 +295,20 @@ var fbo2;
 //    drawScene();
 //}
 
-gameBoardLayer.gameBoardDestination.paint = function(x, y, width, height){
+gameBoardLayer.gameBoardDestination.render = function(){
     var gl = gameBoardLayer.gameBoardDestination.gl;
     //load in the buffer canvas data
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texBuff);
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(gameBoardLayer.gameBoardBuffer.ctx.getImageData(x, y, width, height).data));
+    //gl.activeTexture(gl.TEXTURE0);
+    //gl.bindTexture(gl.TEXTURE_2D, texBuff);
+    //gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(gameBoardLayer.gameBoardBuffer.ctx.getImageData(x, y, width, height).data));
     
-    //tell the shader the size to update
-    gameBoardLayer.gameBoardDestination.setRectangle(gl, x, y, width, height);
+    //tell the shader the rectangles and colors to update
+    gameBoardLayer.gameBoardDestination.setInputRectangles(gl, stageInputRects);
+    gameBoardLayer.gameBoardDestination.setOutputRectangles(gl, stageOutputRects);
+    gameBoardLayer.gameBoardDestination.setColors(gl, stageColors);
+    //clear the staging buffers
+    var numOfVertices = stageColors.length * 6;
+    stageColors = []; stageInputRects = []; stageOutputRects = [];
 
     //setup uniforms for combining buffer with destination data
     gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), 1); //flip the y axis
@@ -256,7 +322,7 @@ gameBoardLayer.gameBoardDestination.paint = function(x, y, width, height){
     gl.bindTexture(gl.TEXTURE_2D, texDest1);
     //into framebuffer2
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, numOfVertices);
     
     //now copy result back to to prev texDest1
     gl.uniform1f(vxDrawFromBufferLocation, 0); //render only the destination texture to the screen
@@ -265,28 +331,78 @@ gameBoardLayer.gameBoardDestination.paint = function(x, y, width, height){
     gl.activeTexture(gl.TEXTURE0 + 2);
     gl.bindTexture(gl.TEXTURE_2D, texDest2); //bind the last destination texture as the input to this draw
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1); //set the framebuffer we're rendering into (output)
-    gl.drawArrays(gl.TRIANGLES, 0, 6); //do the draw
+    gl.drawArrays(gl.TRIANGLES, 0, numOfVertices); //do the draw
     
     //render the result to the screen
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); //now, render to the screen not a framebuffer
     gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), -1); //don't flip the y axis for this operation
-    gl.drawArrays(gl.TRIANGLES, 0, 6); //do the draw
+    gl.drawArrays(gl.TRIANGLES, 0, numOfVertices); //do the draw
     
     //PIXI.updateWebGLTexture(gameBoardLayer.baseTexture, game.renderer.gl);
 }
 
-gameBoardLayer.gameBoardDestination.setRectangle = function(gl, x, y, width, height){
-    var x1 = x;
-    var x2 = x + width;
-    var y1 = y;
-    var y2 = y + height;
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-     x1, y1,
-     x2, y1,
-     x1, y2,
-     x1, y2,
-     x2, y1,
-     x2, y2]), gl.STATIC_DRAW);
+gameBoardLayer.gameBoardDestination.setOutputRectangles = function(gl, rectangles){
+    gl.bindBuffer(gl.ARRAY_BUFFER, outputRectangles);
+    var bufferBuilder = [];
+    for(var i = 0; i < rectangles.length; i++){
+        var rectangle = rectangles[i];
+        var x1 = rectangle.x;
+        var x2 = rectangle.x + rectangle.width;
+        var y1 = rectangle.y;
+        var y2 = rectangle.y + rectangle.height;
+        
+        bufferBuilder.push(
+            x1, y1,
+            x2, y1,
+            x1, y2,
+            x1, y2,
+            x2, y1,
+            x2, y2
+        );
+    }
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bufferBuilder), gl.STATIC_DRAW);
+
+}
+gameBoardLayer.gameBoardDestination.setInputRectangles = function(gl, rectangles){
+    gl.bindBuffer(gl.ARRAY_BUFFER, inputRectangles);
+    var bufferBuilder = [];
+    for(var i = 0; i < rectangles.length; i++){
+        var rectangle = rectangles[i];
+        var x1 = rectangle.x;
+        var x2 = rectangle.x + rectangle.width;
+        var y1 = rectangle.y;
+        var y2 = rectangle.y + rectangle.height;
+        
+        bufferBuilder.push(
+            x1, y1,
+            x2, y1,
+            x1, y2,
+            x1, y2,
+            x2, y1,
+            x2, y2
+        );
+    }
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bufferBuilder), gl.STATIC_DRAW);
+}
+
+gameBoardLayer.gameBoardDestination.setColors = function(gl, colors){
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferColors);
+    var bufferBuilder = [];
+    for(var i = 0; i < colors.length; i++){
+        var color = colors[i];
+        var r = color.r/255; 
+        var g = color.g/255; 
+        var b = color.b/255;
+        bufferBuilder.push(
+            r, g, b, 1,
+            r, g, b, 1,
+            r, g, b, 1,
+            r, g, b, 1,
+            r, g, b, 1,
+            r, g, b, 1
+        );
+    }
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bufferBuilder), gl.STATIC_DRAW);
 }
 
 // Counts the pixels of each player's color (taking alpha into account)

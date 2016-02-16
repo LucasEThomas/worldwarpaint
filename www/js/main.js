@@ -16,9 +16,8 @@ function preload() {
     game.load.image('towerBlue3', 'assets/TowerBlue3.png');
     game.load.image('towerBlue4', 'assets/TowerBlue4.png');
     game.load.image('notebookPaper', 'assets/tileableNotebookPaper.png');
+    game.load.image('splatters', 'assets/splatters.png');
     
-    var canvas = document.getElementById("gameboard_canvas");
-    gameBoardLayer.gameBoardDestination.initialize(canvas);
 }
 
 var cursors;
@@ -28,15 +27,18 @@ var backgroundLayerSprite; //The game layer where the unchanging background terr
 var gameBoardLayerSprite;
 
 function create() {
-
+    
+    var canvas = document.getElementById("gameboard_canvas");
+    gameBoardLayer.gameBoardDestination.initialize(canvas);
+    
     //  Modify the world and camera bounds
     game.world.setBounds(0, 0, 2048, 2048);
     $(window).resize(function() { window.resizeGame(); } );
     
     //draw the background layer
     backgroundLayerSprite = game.add.tileSprite(0, 0, 2048, 2048, 'notebookPaper');
-    
     //create the gameboard bitmap data that we can draw stuff to
+
     gameBoardLayer.initialize();
     
     //initialize the connection with the game server.
@@ -63,7 +65,13 @@ function update() {
             if(currentEvent.type === 'sprinklerTower'){
                 for(var currentGeometry of currentEvent.data){
                     //gameBoardLayer.drawSprinkle(currentGeometry.x, currentGeometry.y, currentGeometry.radius, {r:255,g:0,b:0});
-                    gameBoardLayer.drawBlob(currentGeometry.x, currentGeometry.y, currentGeometry.radius, currentGeometry.ctrlPts, currentGeometry.tension, getPlayerClr(currentEvent.ownerID));
+                    //gameBoardLayer.drawBlob(currentGeometry.x, currentGeometry.y, currentGeometry.radius, currentGeometry.ctrlPts, currentGeometry.tension, getPlayerClr(currentEvent.ownerID));
+                    gameBoardLayer.stageSplatter(
+                        currentGeometry.x,
+                        currentGeometry.y,
+                        currentGeometry.radius,
+                        getPlayerClr(currentEvent.ownerID),
+                        currentGeometry.inputIndex);
                 }
             }
         }
@@ -93,7 +101,7 @@ function update() {
 renderQueue = [];
 function render() {
     game.debug.cameraInfo(game.camera, 32, 32);
-
+    gameBoardLayer.gameBoardDestination.render();
 }
 
 function resizeGame() {    
