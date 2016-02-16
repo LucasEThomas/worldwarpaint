@@ -47,6 +47,11 @@ function create() {
     //setup the game input so that it works (I think is what this does)
     cursors = game.input.keyboard.createCursorKeys();
     
+    game.canvas.oncontextmenu = function (e) { 
+        e.preventDefault(); 
+        gameServer.moveHero(game.input.worldX,game.input.worldY);
+    }
+    
     //make the tower buttons!!!
     towerButton.makeButtons();
 }
@@ -81,6 +86,16 @@ function update() {
                     getPlayerClr(currentEvent.ownerID),
                     currentGeometry.inputIndex);
             }
+            else if(currentEvent.type === 'moveTower'){
+                var data = currentEvent.data;
+                towers.forEach((tower,index)=>{
+                    if(tower.id === data.id){
+                        tower.x = data.x;
+                        tower.y = data.y;
+                    }
+                });
+            }
+            
         }
         
     }

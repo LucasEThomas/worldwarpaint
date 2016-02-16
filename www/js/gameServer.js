@@ -60,17 +60,19 @@ gameServer.serverMessage = function(event) {
         player.clr = data.playerClr;
         // save players for the game session
         players = data.players;
-        // save towers for the game session
-        towers = data.towers;
         //set the player's id (the server could have changed it);
         player.id = data.playerID;
         document.cookie = 'pid=' + player.id + ';';
         // display the towers that existed before the client connected
-        towers.forEach(function(e, i) {
+        data.towers.forEach(function(e, i) {
             // create a sprite to represent each tower from the server
-            var tower = game.add.sprite(e.x, e.y, 'towerBlue' + e.type);
+            var tower = game.add.sprite(e.x, e.y, 'towerBlue1'); //+ e.type);
+            tower.id = e.id;
             // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
             tower.anchor.setTo(0.5, 0.5);
+            tower.ownerID = e.ownerID;
+            tower.type = e.type;
+            towers.push(tower);
         });
     } else if (data.event === 'scheduleEvents') {
         //A new list of events has come down from the server. Each one needs to scheduled in the eventQueue.
@@ -104,5 +106,13 @@ gameServer.manualSplatter = function(x, y, radius, owner) {
         y: y,
         radius: radius,
         owner: owner
+    }));
+}
+gameServer.moveHero = function(x, y){
+    ws.send(JSON.stringify({
+        event: 'tower destination',
+        id: 1,
+        x: x,
+        y: y,
     }));
 }

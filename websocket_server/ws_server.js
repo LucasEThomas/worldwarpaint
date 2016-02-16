@@ -8,10 +8,20 @@ class Tower {
         this.y = y;
         this.type = type;
         this.ownerID = owner;
+        if(type === 'hero'){
+            this.destX = x;
+            this.destY = y;
+        }
     };
-    generateEvent() {
+    setDestination(x,y){
+        if(this.type === 'hero'){
+            this.destX = x;
+            this.destY = y;
+        }
+    }
+    generateEvents() {
         //this method will generate all sorts of events for each type of tower
-
+        var toReturn = [];
         //just create 5 sprinkles for now.
         var sprinkles = [];
         for (var i = 0; i < 50; i++) {
@@ -28,10 +38,33 @@ class Tower {
                 inputIndex: Math.round(Math.getRandomArbitrary(96,159))
             });
         }
-        return {
+        toReturn.push({
             type: 'sprinklerTower',
             data: sprinkles
-        };
+        });
+        
+        if(this.type === 'hero' && (this.destX !== this.x || this.destY != this.y)){
+            if(Math.abs(this.x - this.destX) <= 5)
+                this.x = this.destX;
+            else
+                this.x += (this.destX > this.x)?5:-5;
+            
+            if(Math.abs(this.y - this.destY) <= 5)
+                this.y = this.destY;
+            else
+                this.y += (this.destY > this.y)?5:-5;
+            
+            toReturn.push({
+                type: 'moveTower',
+                data: {
+                    x:this.x,
+                    y:this.y,
+                    id:this.id
+                }
+            });
+        }
+        
+        return toReturn;
     }
     generateBlobControlPoints(x, y, radius, count) {
     var toReturn = [];
@@ -55,9 +88,9 @@ class Game {
             new Player('dda2571a-55d9-46d3-96c2-8b984164c905', null)];
         // create a towers array, for now we auto-generate two towers linked to two players for testing
         this.towers = [
-            new Tower(1, 600, 300, 1, 'dda2571a-55d9-46d3-96c2-8b984164c904'), 
-            new Tower(1, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
-            new Tower(1, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')];
+            new Tower(1, 600, 300, 'hero', 'dda2571a-55d9-46d3-96c2-8b984164c904'), 
+            new Tower(2, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
+            new Tower(3, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')];
         this.extraEvents = [];
         
         this.interval = setInterval(() => {
@@ -97,16 +130,27 @@ class Game {
             }]
         });
     }
+    setTowerDestination(x,y,id){
+        this.towers.forEach((tower,index)=>{
+            if(tower.id === id){
+                tower.setDestination(x,y);
+                console.log('id:'+id+' tower found!')
+            }
+        });
+    }
     generateScheduleItemEvents() {
         var toReturn = [];
         
         this.fairlyIterateThroughTowers((tower)=>{
-            var event = tower.generateEvent();
-            toReturn.push({
-                ownerID: tower.ownerID,
-                type: event.type,
-                data: event.data
+            var events = tower.generateEvents();
+            events.forEach((event, index)=>{
+                toReturn.push({
+                    ownerID: tower.ownerID,
+                    type: event.type,
+                    data: event.data
+                });
             });
+
         });
         
         if(this.extraEvents.length){
@@ -225,6 +269,9 @@ wss.on('connection', function connection(ws) {
         } else  if (data.event === 'manual splatter') {
             console.log('event: manual splatter');
             games[0].scheduleSplatter(data.x,data.y,data.radius,data.owner);
+        } else  if (data.event === 'tower destination') {
+            console.log('event: tower destination');
+            games[0].setTowerDestination(data.x,data.y,data.id);
         } else if (data.event === 'initsyncClient') {
             console.log('initsyncClient');
             // initial sync from client
