@@ -97,3 +97,12 @@ gameServer.createTower = function(x, y, type, id, owner) {
         owner: owner
     }));
 }
+gameServer.manualSplatter = function(x, y, radius, owner) {
+    ws.send(JSON.stringify({
+        event: 'manual splatter',
+        x: x,
+        y: y,
+        radius: radius,
+        owner: owner
+    }));
+}

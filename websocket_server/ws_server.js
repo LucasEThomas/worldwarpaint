@@ -58,6 +58,7 @@ class Game {
             new Tower(1, 600, 300, 1, 'dda2571a-55d9-46d3-96c2-8b984164c904'), 
             new Tower(1, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
             new Tower(1, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')];
+        this.extraEvents = [];
         
         this.interval = setInterval(() => {
             this.gameLoop();
@@ -71,9 +72,29 @@ class Game {
         for (var i = 0; i < 5; i++) {
             schedule.push(this.generateScheduleItemEvents());
         }
-
+        
         this.players.forEach((player, index) => {
             player.scheduleEvents(schedule);
+        });
+    }
+    scheduleSplatter(x,y,radius,owner){
+        var inputIndex = 0;
+        if(radius < 16) 
+            inputIndex = Math.round(Math.getRandomArbitrary(96,159));
+        else if(radius < 32) 
+            inputIndex = Math.round(Math.getRandomArbitrary(46,95));
+        else 
+            inputIndex = Math.round(Math.getRandomArbitrary(0,47));
+        
+        this.extraEvents.push({
+            ownerID: owner,
+            type: 'manualSplatter',
+            data: [{
+                x:x,
+                y:y,
+                radius:radius,
+                inputIndex: inputIndex
+            }]
         });
     }
     generateScheduleItemEvents() {
@@ -87,6 +108,11 @@ class Game {
                 data: event.data
             });
         });
+        
+        if(this.extraEvents.length){
+            toReturn.push(...this.extraEvents);
+            this.extraEvents.length = 0;
+        }
         
         return toReturn;
     }
@@ -196,6 +222,9 @@ wss.on('connection', function connection(ws) {
                     }));
                 }
             });
+        } else  if (data.event === 'manual splatter') {
+            console.log('event: manual splatter');
+            games[0].scheduleSplatter(data.x,data.y,data.radius,data.owner);
         } else if (data.event === 'initsyncClient') {
             console.log('initsyncClient');
             // initial sync from client

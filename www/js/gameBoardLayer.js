@@ -27,10 +27,13 @@ gameBoardLayer.mouseUp = function() {
         if (gameBoardLayer.colorMatch(game.input.worldX, game.input.worldY, player.clr)) {
             tower.towerPlaced();
         }
+        else{
+            // stop dragging a new tower
+            towerDrag.destroy();
+            towerDrag = null;
+        }
     } else {
-        gameBoardLayer.drawRandomBlob(game.input.worldX, game.input.worldY, 50, player.clr);
-        //gameBoardLayer.drawRandomSprinkles(game.input.worldX + 100, game.input.worldY, 50, 20);
-        //gameBoardLayer.drawRay(game.input.worldX, game.input.worldY, 200, Math.random() * Math.TWOPI, Math.TWOPI * 0.025);
+        gameServer.manualSplatter(game.input.worldX, game.input.worldY, 50, player.id);
     }
 }
 
