@@ -191,7 +191,8 @@ gameBoardLayer.gameBoardDestination = function() {
 }
 
 gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
-    gameBoardLayer.gameBoardDestination.gl = getWebGLContext(canvas, {preserveDrawingBuffer: true, premultipliedAlpha: false});
+    gameBoardLayer.gameBoardDestination.gl = canvas.getContext("webgl", 
+                 {preserveDrawingBuffer: true, premultipliedAlpha: false});
     var gl = gameBoardLayer.gameBoardDestination.gl
     // Get A WebGL context
     if (!gl) {
