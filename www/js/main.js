@@ -1,6 +1,11 @@
 
-var game = new Phaser.Game($(window).width(), $(window).height(), Phaser.CANVAS, 'phaser_container', { preload: preload, create: create, update: update, render : render });
-
+function startPhaser(playerType){
+    $('#chooserContainer').remove();
+    playerType = 'playerType'
+    game = new Phaser.Game($(window).width(), $(window).height(), Phaser.CANVAS, 'phaser_container', { preload: preload, create: create, update: update, render : render });
+}
+var game;
+var playerType = '';
 
 function preload() {
     game.stage.disableVisibilityChange = true;  
@@ -42,7 +47,7 @@ function create() {
     gameBoardLayer.initialize();
     
     //initialize the connection with the game server.
-    gameServer.initialize();
+    gameServer.initialize(playerType);
 
     //setup the game input so that it works (I think is what this does)
     cursors = game.input.keyboard.createCursorKeys();
