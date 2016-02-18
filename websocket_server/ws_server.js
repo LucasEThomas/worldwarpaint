@@ -1,5 +1,6 @@
 "use strict";
 var Utility = require('./Utility.js');
+var Victor = require('victor');
 
 class Tower {
     constructor(id, x, y, type, owner) {
@@ -26,7 +27,7 @@ class Tower {
         var sprinkles = [];
         for (var i = 0; i < 50; i++) {
             var towerRange = 200 * Math.random();
-            var randomDirection = 2 * Math.PI * Math.random();
+            var randomDirection = Math.TWOPI * Math.random();
             var splatterX = Math.round(this.x + (towerRange * Math.cos(randomDirection)));
             var splatterY = Math.round(this.y + (towerRange * Math.sin(randomDirection)));
             var splatterRadius = Math.round(Math.getRandomArbitrary(5,14));
@@ -43,16 +44,23 @@ class Tower {
             data: sprinkles
         });
         
-        if(this.type === 'hero' && (this.destX !== this.x || this.destY != this.y)){
-            if(Math.abs(this.x - this.destX) <= 5)
+
+        
+        if(this.type === 'hero' && (this.destX !== this.x || this.destY !== this.y)){
+            var currentPoint = new Victor(this.x, this.y);
+            var destPoint = new Victor(this.destX, this.destY);
+            var direction = destPoint.clone().subtract(currentPoint).direction();
+            var distance = currentPoint.distance(destPoint);
+            console.log('x:' + currentPoint.x + ' y:' + currentPoint.y + ' destX:' + destPoint.x + ' destY:' + destPoint.y + ' direction:' + direction + ' distance:' + distance);
+            if(distance <= 5){
                 this.x = this.destX;
-            else
-                this.x += (this.destX > this.x)?5:-5;
-            
-            if(Math.abs(this.y - this.destY) <= 5)
                 this.y = this.destY;
-            else
-                this.y += (this.destY > this.y)?5:-5;
+            }
+            else{
+                var deltaVector = new Victor(5,0).rotate(direction);
+                this.x += deltaVector.x;
+                this.y += deltaVector.y;
+            }
             
             toReturn.push({
                 type: 'moveTower',

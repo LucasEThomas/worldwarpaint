@@ -19,7 +19,8 @@
   ],
   "license": "",
   "dependencies": {
-      "ws": "^0.8.1"
+    "victor": "^1.1.0",
+    "ws": "^0.8.1"
   },
   "devDependencies": {
     "jshint": "^2.8.0"
