@@ -3,10 +3,43 @@
 <html lang="en">
 
 <style type="text/css">
+    @font-face {
+      font-family: Play;
+      src: local("Play sans-serif"),
+           local("Play sans-serif"),
+           url(assets/play-regular.ttf);
+      font-weight: bold;
+    }
     html, body {
+        font-family: 'Play', sans-serif;
         overflow: hidden;
         margin:0;
     }
+    button {
+        font-family: 'Play', sans-serif;
+        height: 150px;
+        width: 150px;
+        font-size: 16pt;
+        margin: 10px;
+    }
+    #chooserContainer {
+        width: 350px;
+        height: 350px;
+
+        position: absolute;
+        top:0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        margin: auto;
+    }
+    #selectPlayer{
+        margin:5px;
+        text-align: center;
+        margin: auto;
+    }
+}
 </style>
 
 <head>
@@ -154,7 +187,6 @@
         }
     </script>
     
-
     <script src="js/libs/jquery-2.1.4.js"></script>
     <script src="js/utility.js"></script>
     <script src="js/libs/webgl-utils.js"></script>
@@ -167,6 +199,7 @@
     <script src="js/towerButton.js"></script>
     <script src="js/tower.js"></script>
     <div id="chooserContainer">
+        <h1 id="selectPlayer">select player type</h1>
         <button type="button" onclick="startPhaser('Commander')">Commander</button>
         <button type="button" onclick="startPhaser('Scout')">Scout</button>
         <button type="button" onclick="startPhaser('Champion')">Champion</button>
