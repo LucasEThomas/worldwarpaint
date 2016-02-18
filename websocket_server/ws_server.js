@@ -51,7 +51,6 @@ class Tower {
             var destPoint = new Victor(this.destX, this.destY);
             var direction = destPoint.clone().subtract(currentPoint).direction();
             var distance = currentPoint.distance(destPoint);
-            console.log('x:' + currentPoint.x + ' y:' + currentPoint.y + ' destX:' + destPoint.x + ' destY:' + destPoint.y + ' direction:' + direction + ' distance:' + distance);
             if(distance <= 5){
                 this.x = this.destX;
                 this.y = this.destY;
