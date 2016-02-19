@@ -20,10 +20,48 @@
         height: 150px;
         width: 150px;
         font-size: 16pt;
-        margin: 10px;
+        display: inline-block;
+        margin: 5px 3px 5px 3px;
+        padding: 0px;
+    }
+    .vertical-text {
+        transform: rotate(90deg);
+        transform-origin: left top 0;
+        margin-left:30px;
+    }
+    #columnTitles {
+        width: 350px;
+        height: 30px;
+    }
+    #columnTitles > h2 {
+        display: inline-block;
+        margin:0px;
+        width: 155px;
+        text-align: center;
+        font-size: 12pt;
+    }
+    #spacer{
+        display: inline-block;
+        width:30px;
+        height:19px;
+    }
+    #rowTitles {
+        display: inline-block;
+        height: 350px;
+        width:30px;
+    }
+    #rowTitles > h2 {
+        height: 155px;
+        font-size: 12pt;
+        text-align: center;
+        display: inline-block;
+    }
+    #buttonsContainer{
+        display: inline-block;
+        width:320px;
     }
     #chooserContainer {
-        width: 350px;
+        width: 390px;
         height: 350px;
 
         position: absolute;
@@ -35,9 +73,10 @@
         margin: auto;
     }
     #selectPlayer{
+        font-size: 32pt;
         margin:5px;
         text-align: center;
-        margin: auto;
+        margin: -75px auto 30px auto;
     }
 }
 </style>
@@ -200,10 +239,21 @@
     <script src="js/tower.js"></script>
     <div id="chooserContainer">
         <h1 id="selectPlayer">select player type</h1>
-        <button type="button" onclick="startPhaser('Commander')">Commander</button>
-        <button type="button" onclick="startPhaser('Scout')">Scout</button>
-        <button type="button" onclick="startPhaser('Champion')">Champion</button>
-        <button type="button" onclick="startPhaser('Archer')">Archer</button>
+        <div id=columnTitles>
+            <div id='spacer'></div>
+            <h2>POWERFULL</h2>
+            <h2>TACTICAL</h2>
+        </div>
+        <div id=rowTitles>
+            <h2 class='vertical-text' style="height:165px">ARCHITECT</h2>
+            <h2 class='vertical-text' style="height:165px">HERO</h2>
+        </div>
+        <div id="buttonsContainer">
+            <button type="button" onclick="startPhaser('Commander')">Commander</button>
+            <button type="button" onclick="startPhaser('Scout')">Scout</button>
+            <button type="button" onclick="startPhaser('Champion')">Champion</button>
+            <button type="button" onclick="startPhaser('Archer')">Archer</button>
+        </div>
     </div>
     <div id="phaser_container"></div>
     <div id="backbuffer" style="display: none;">
