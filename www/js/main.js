@@ -1,7 +1,7 @@
 
 function startPhaser(playerType){
     $('#chooserContainer').remove();
-    playerType = 'playerType'
+    player.type = playerType;
     game = new Phaser.Game($(window).width(), $(window).height(), Phaser.CANVAS, 'phaser_container', { preload: preload, create: create, update: update, render : render });
 }
 var game;
@@ -47,14 +47,15 @@ function create() {
     gameBoardLayer.initialize();
     
     //initialize the connection with the game server.
-    gameServer.initialize(playerType);
+    gameServer.initialize(player.type);
 
     //setup the game input so that it works (I think is what this does)
     cursors = game.input.keyboard.createCursorKeys();
     
     game.canvas.oncontextmenu = function (e) { 
         e.preventDefault(); 
-        gameServer.moveHero(game.input.worldX,game.input.worldY);
+        if(player.type === 'champion' || player.type === 'archer')
+            gameServer.moveHero(game.input.worldX,game.input.worldY);
     }
     
     //make the tower buttons!!!

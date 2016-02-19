@@ -27,6 +27,7 @@ gameServer.initialSync = function(event) {
     console.log('initsyncClient');
     ws.send(JSON.stringify({
         event: 'initsyncClient',
+        playerType: player.type,
         // send player's id
         playerID: player.id
     }));
