@@ -73,7 +73,7 @@ function update() {
         for(var currentEvent of currentTimeSlot){
             
             //todo, need to break out into another method that decides what to do with each event in the timeSlot
-            if(currentEvent.type === 'sprinklerTower'){
+            if(currentEvent.type === 'sprinklerUnit'){
                 for(var currentGeometry of currentEvent.data){
                     gameBoardLayer.stageSplatter(
                         currentGeometry.x,
@@ -92,7 +92,7 @@ function update() {
                     getPlayerClr(currentEvent.ownerID),
                     currentGeometry.inputIndex);
             }
-            else if(currentEvent.type === 'moveTower'){
+            else if(currentEvent.type === 'moveUnit'){
                 var data = currentEvent.data;
                 towers.forEach((tower,index)=>{
                     if(tower.id === data.id){

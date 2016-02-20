@@ -65,7 +65,7 @@ gameServer.serverMessage = function(event) {
         player.id = data.playerID;
         document.cookie = 'pid=' + player.id + ';';
         // display the towers that existed before the client connected
-        data.towers.forEach(function(e, i) {
+        data.units.forEach(function(e, i) {
             // create a sprite to represent each tower from the server
             var tower = game.add.sprite(e.x, e.y, 'towerBlue1'); //+ e.type);
             tower.id = e.id;
@@ -83,7 +83,7 @@ gameServer.serverMessage = function(event) {
             currentScheduleItem.scheduledTime = currentTime + (i*50);
             eventQueue.push(currentScheduleItem)
         }
-    } else if (data.event === 'sync-addTower') {
+    } else if (data.event === 'sync-addUnit') {
         //console.log('msg-rxd: '+data.event);
         var tower = game.add.sprite(data.tower.x, data.tower.y, 'towerBlue' + data.tower.type);
         tower.anchor.setTo(0.5, 0.5);
