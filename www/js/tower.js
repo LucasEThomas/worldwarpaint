@@ -1,8 +1,12 @@
-class tower extends Phaser.sprite{
-    contructor(){
-        
-    }
-}
+var tower = function(){
+    
+};
+
+//class tower extends Phaser.sprite{
+//    contructor(){
+//        
+//    }
+//}
 
 var towerDrag;
 var towers = [];
