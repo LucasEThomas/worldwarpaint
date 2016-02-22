@@ -1,5 +1,7 @@
 "use strict";
-//var Player = require('./player.js');
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+"use strict";
+var Player = require('./player.js');
 //var tower = require('./tower.js');
 
 var player = new Player();
@@ -14,6 +16,7 @@ function startPhaser(playerType) {
         render: render
     });
 }
+    modules.exports = startPhaser;
 var game;
 var playerType = '';
 
@@ -80,7 +83,7 @@ var eventQueue = [];
 
 function update() {
     //if the the time has come for the next item in the queue to be executed, add it to the renderQueue
-    var currentTime = (new Date()).getTime();
+    currentTime = (new Date()).getTime();
     if (eventQueue.length && eventQueue[0].scheduledTime <= currentTime) {
         var currentTimeSlot = eventQueue.shift();
         for (var currentEvent of currentTimeSlot) {
@@ -156,3 +159,14 @@ function resizeGame() {
     game.camera.setSize(width, height);
     game.renderer.resize(width, height);
 }
+},{"./player.js":2}],2:[function(require,module,exports){
+class Player {    
+    constructor() {
+        this.id = Math.generateUUID();
+        this.clr = {};
+        this.type = '';
+    }
+}
+
+module.exports = Player;
+},{}]},{},[1]);
