@@ -101,16 +101,19 @@
     uniform float u_flipY; //flip along y axis or not
     uniform vec2 u_inResolution; //resolution
     uniform vec2 u_outResolution; //resolution
+    uniform mat3 u_matrixa;
 
     varying vec2 v_inputCoord;
     varying vec2 v_outputCoord;
     varying vec4 v_color;
     
-
     void main() {
        // convert the rectangle from pixels to 0.0 to 1.0
        vec2 inputZeroToOne = a_inputRects / u_inResolution;
-       vec2 outputZeroToOne = a_outputRects / u_outResolution;
+       
+       //mat3 asdf = u_matrixa;
+       vec2 position = (u_matrixa * vec3(a_outputRects, 1)).xy;
+       vec2 outputZeroToOne = position / u_outResolution;
 
        // convert from 0->1 to 0->2
        vec2 zeroToTwo = outputZeroToOne * 2.0;

@@ -216,12 +216,29 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
     // lookup uniforms
     resolutionInLocation = gl.getUniformLocation(program, "u_inResolution");
     resolutionOutLocation = gl.getUniformLocation(program, "u_outResolution");
+    matrixLocation = gl.getUniformLocation(program, "u_matrixa");
     vxDrawFromBufferLocation = gl.getUniformLocation(program, "u_vxDrawFromBuffer");
     fgDrawFromBufferLocation = gl.getUniformLocation(program, "u_fgDrawFromBuffer");
 
     // set the resolution
     gl.uniform2f(resolutionInLocation, 1024, 1024);
     gl.uniform2f(resolutionOutLocation, canvas.width, canvas.height);
+    
+    var matrix = [
+        1,0,0,
+        0,1,0,
+        0,0,1
+    ];
+//    var matrix = [ 1.5749999060154207,
+//  -0.12559974542735267,
+//  0,
+//  0.06200493761603486,
+//  0.7775315991721697,
+//  0,
+//  0,
+//  0,
+//  1 ];
+    gl.uniformMatrix3fv(matrixLocation, false, matrix);
 
     // Create a buffer for the position of the input rectangle corners.
     inputRectangles = gl.createBuffer();
@@ -282,6 +299,7 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texDest2, 0);
 }
 
+var matrixLocation;
 var bufferColors;
 var inputRectangles;
 var outputRectangles;
@@ -305,6 +323,7 @@ gameBoardLayer.gameBoardDestination.render = function(){
     //gl.activeTexture(gl.TEXTURE0);
     //gl.bindTexture(gl.TEXTURE_2D, texBuff);
     //gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(gameBoardLayer.gameBoardBuffer.ctx.getImageData(x, y, width, height).data));
+    
     
     //tell the shader the rectangles and colors to update
     gameBoardLayer.gameBoardDestination.setInputRectangles(gl, stageInputRects);
