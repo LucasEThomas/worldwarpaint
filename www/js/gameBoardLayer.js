@@ -224,18 +224,20 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
     gl.uniform2f(resolutionInLocation, 1024, 1024);
     gl.uniform2f(resolutionOutLocation, canvas.width, canvas.height);
     
+    //the transformation matrix that will take the 2d image and squish it to be isometric.
+    //use the matrixGenerator.js node script to generate a matrix for here.
     var matrix = [
         1,0,0,
         0,1,0,
         0,0,1
     ];
-//    var matrix = [ 1.5749999060154207,
-//  -0.12559974542735267,
+//    var matrix = [ 0.9968353835540638,
+//  0.039746754882073625,
 //  0,
-//  0.06200493761603486,
-//  0.7775315991721697,
+//  -0.07949350976414725,
+//  0.4984176917770319,
 //  0,
-//  0,
+//  1024,
 //  0,
 //  1 ];
     gl.uniformMatrix3fv(matrixLocation, false, matrix);
@@ -339,6 +341,13 @@ gameBoardLayer.gameBoardDestination.render = function(){
     gl.uniform1f(vxDrawFromBufferLocation, 1); //combine buffer and destination data
     gl.uniform1f(fgDrawFromBufferLocation, 1); //combine buffer and destination data
 
+    var matrix = [
+        1,0,0,
+        0,1,0,
+        0,0,1
+    ];
+    gl.uniformMatrix3fv(matrixLocation, false, matrix);
+    
     //tell it to write from texDest1
     gl.uniform1i(u_canvasDestLocation, 1);
     gl.activeTexture(gl.TEXTURE0 + 1);
@@ -359,6 +368,16 @@ gameBoardLayer.gameBoardDestination.render = function(){
     //render the result to the screen
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); //now, render to the screen not a framebuffer
     gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), -1); //don't flip the y axis for this operation
+    matrix = [ 0.8944271909999159,
+  0.447213595499958,
+  0,
+  -0.8944271909999159,
+  0.447213595499958,
+  0,
+  0.5,
+  0,
+  1 ];
+    gl.uniformMatrix3fv(matrixLocation, false, matrix);
     gl.drawArrays(gl.TRIANGLES, 0, numOfVertices); //do the draw
     
     //PIXI.updateWebGLTexture(gameBoardLayer.baseTexture, game.renderer.gl);

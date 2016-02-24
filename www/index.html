@@ -104,6 +104,7 @@
     uniform mat3 u_matrixa;
 
     varying vec2 v_inputCoord;
+    varying vec2 v_prevOutputCoord;
     varying vec2 v_outputCoord;
     varying vec4 v_color;
     
@@ -112,8 +113,11 @@
        vec2 inputZeroToOne = a_inputRects / u_inResolution;
        
        //mat3 asdf = u_matrixa;
-       vec2 position = (u_matrixa * vec3(a_outputRects, 1)).xy;
-       vec2 outputZeroToOne = position / u_outResolution;
+       vec2 asdf = a_outputRects / u_outResolution;
+       vec2 outputZeroToOne = (u_matrixa * vec3(asdf, 1)).xy;
+       //vec2 outputZeroToOne = position / u_outResolution;
+       
+        v_prevOutputCoord = a_outputRects / u_outResolution;
 
        // convert from 0->1 to 0->2
        vec2 zeroToTwo = outputZeroToOne * 2.0;
@@ -144,13 +148,14 @@
         // note: we're only using 1 set of texCoords which means
         //   we're assuming the canvases are the same size.
         varying vec2 v_inputCoord;
+        varying vec2 v_prevOutputCoord;
         varying vec2 v_outputCoord;
         varying vec4 v_color;
 
         void main() {
              // Look up the pixels from buff and dest canvases
              vec4 colorBuff = texture2D(u_canvasBuff, v_inputCoord);
-             vec4 colorDest = texture2D(u_canvasDest, v_outputCoord);
+             vec4 colorDest = texture2D(u_canvasDest, v_prevOutputCoord);
 
              if(u_fgDrawFromBuffer){
              
@@ -234,6 +239,7 @@
     <script src="js/libs/webgl-utils.js"></script>
     <script src="js/libs/victor.min.js"></script>
     <script src="js/libs/phaser.js"></script>
+    <script src="js/libs/phaser-plugin-isometric.js"></script>
     <script src="js/player.js"></script>
     <script src="js/gameBoardLayer.js"></script>
     <script src="js/gameServer.js"></script>

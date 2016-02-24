@@ -1,14 +1,19 @@
 "use strict"
 
 function generateMatrix(){
-    var translationMatrix = makeTranslation(1000, 0);
-    var rotationMatrix = makeRotation(45/(180*Math.PI));//rotate 45 degrees
-    var scaleMatrix = makeScale(1.58, 0.78);
+    var translationMatrix = makeTranslation(0.5, 0);
+    var rotationMatrix = makeWrongRotation();//makeRotation(Math.TWOPI*(-1/8));//rotate -45 degrees
+    
+    var ProjectionAngle = Math.atan(0.5);
+    var stretchX = Math.cos(ProjectionAngle);
+    var stretchY = Math.sin(ProjectionAngle);
+    var scaleMatrix = makeScale(stretchX, stretchY);
  
     // Multiply the matrices.
-    var matrix = matrixMultiply(scaleMatrix, rotationMatrix);
+    var matrix = matrixMultiply(rotationMatrix, scaleMatrix);
     matrix = matrixMultiply(matrix, translationMatrix);
     console.log(matrix);
+    console.log('ProjectionAngle:' + ProjectionAngle + ' stretchX:' + stretchX + ' stretchY' + stretchY);
 }
 
 function makeTranslation(tx, ty) {
@@ -22,6 +27,18 @@ function makeTranslation(tx, ty) {
 function makeRotation(angleInRadians) {
   var c = Math.cos(angleInRadians);
   var s = Math.sin(angleInRadians);
+  return [
+    c,-s, 0,
+    s, c, 0,
+    0, 0, 1
+  ];
+}
+
+//the "right" way would be to make a unit circle rotation matrix, however the isometric phaser plugin that we're using
+//uses a non-unit circle rotatation matrix instead, so to make it line up, we do to.
+function makeWrongRotation() {
+  var c = 1;
+  var s = -1;
   return [
     c,-s, 0,
     s, c, 0,
@@ -67,5 +84,7 @@ function matrixMultiply(a, b) {
           a20 * b01 + a21 * b11 + a22 * b21,
           a20 * b02 + a21 * b12 + a22 * b22];
 }
+
+Math.TWOPI = Math.PI * 2;
 
 generateMatrix();

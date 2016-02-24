@@ -67,10 +67,10 @@ gameServer.serverMessage = function(event) {
         // display the towers that existed before the client connected
         data.units.forEach(function(e, i) {
             // create a sprite to represent each tower from the server
-            var tower = game.add.sprite(e.x, e.y, 'towerBlue1'); //+ e.type);
+            var tower = game.add.isoSprite(e.x, e.y, 0, 'towerBlue1' ,0 ,unitsGroup);
             tower.id = e.id;
             // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
-            tower.anchor.setTo(0.5, 0.5);
+            tower.anchor.set(0.5);
             tower.ownerID = e.ownerID;
             tower.type = e.type;
             towers.push(tower);

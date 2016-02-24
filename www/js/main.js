@@ -18,20 +18,25 @@ var game;
 var playerType = '';
 
 function preload() {
+    game.time.advancedTiming = true;
     game.stage.disableVisibilityChange = true;
-    game.stage.backgroundColor = '#007236';
+    game.stage.backgroundColor = '#aaaaaa';
+    game.plugins.add(new Phaser.Plugin.Isometric(game));
+    //game.iso.anchor.setTo(0.5, 0);
 
     game.load.image('background', 'assets/background.jpg');
     game.load.image('blueButton1', 'assets/BlueButton1.png');
     game.load.image('blueButton2', 'assets/BlueButton2.png');
     game.load.image('blueButton3', 'assets/BlueButton3.png');
     game.load.image('blueButton4', 'assets/BlueButton4.png');
+    game.load.image('tower', 'assets/forestPack/tower1x2.png');
     game.load.image('towerBlue1', 'assets/TowerBlue1.png');
     game.load.image('towerBlue2', 'assets/TowerBlue2.png');
     game.load.image('towerBlue3', 'assets/TowerBlue3.png');
     game.load.image('towerBlue4', 'assets/TowerBlue4.png');
     game.load.image('notebookPaper', 'assets/tileableNotebookPaper.png');
     game.load.image('splatters', 'assets/splatters.png');
+    game.load.image('grass', 'assets/exampleGrass.png');
 
 }
 
@@ -41,8 +46,22 @@ var logo2;
 var backgroundLayerSprite; //The game layer where the unchanging background terrain image is drawn.
 var gameBoardLayerSprite;
 
+var terrainGroup;
+var unitsGroup;
 function create() {
 
+    var spawnTiles = function () {
+        var tile;
+        for (var xx = 0; xx < 100; xx += 38) {
+            for (var yy = 0; yy < 100; yy += 38) {
+                // Create a tile using the new game.add.isoSprite factory method at the specified position.
+                // The last parameter is the group you want to add it to (just like game.add.sprite)
+                tile = game.add.isoSprite(xx, yy, 0, 'grass', 0, terrainGroup);
+                tile.anchor.set(0.5, 0);
+            }
+        }
+    }
+    
     var canvas = document.getElementById("gameboard_canvas");
     gameBoardLayer.gameBoardDestination.initialize(canvas);
 
@@ -55,7 +74,7 @@ function create() {
     //draw the background layer
     backgroundLayerSprite = game.add.tileSprite(0, 0, 2048, 2048, 'notebookPaper');
     //create the gameboard bitmap data that we can draw stuff to
-
+    terrainGroup = game.add.group();
     gameBoardLayer.initialize();
 
     //initialize the connection with the game server.
@@ -70,6 +89,10 @@ function create() {
             gameServer.moveHero(game.input.worldX, game.input.worldY);
     }
 
+    unitsGroup = game.add.group();;
+    spawnTiles();
+    game.iso.topologicalSort(terrainGroup);
+    game.iso.topologicalSort(unitsGroup);
     //make the tower buttons!!!
     towerButton.makeButtons();
 }
@@ -140,6 +163,7 @@ var renderQueue = [];
 
 function render() {
     game.debug.cameraInfo(game.camera, 32, 32);
+    game.debug.text('fps:'+ (game.time.fps || '--'),32,115);
     gameBoardLayer.gameBoardDestination.render();
 }
 
