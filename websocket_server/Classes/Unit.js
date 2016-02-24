@@ -32,6 +32,7 @@ class Unit {
             var splatterY = Math.round(this.y + (unitRange * Math.sin(randomDirection)));
             var splatterRadius = Math.round(Math.getRandomArbitrary(5,14));
             //var controlPoints = this.generateBlobControlPoints(currentX, currentY, currentRadius, 32);
+            if(splatterX - splatterRadius > 0 && splatterX + splatterRadius < 2047 && splatterY - splatterRadius > 0 && splatterY + splatterRadius < 2047)
             sprinkles.push({
                 x:splatterX,
                 y:splatterY,
