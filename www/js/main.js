@@ -52,8 +52,8 @@ function create() {
 
     var spawnTiles = function () {
         var tile;
-        for (var xx = 0; xx < 100; xx += 38) {
-            for (var yy = 0; yy < 100; yy += 38) {
+        for (var xx = 0; xx < 1000; xx += 38) {
+            for (var yy = 0; yy < 1000; yy += 38) {
                 // Create a tile using the new game.add.isoSprite factory method at the specified position.
                 // The last parameter is the group you want to add it to (just like game.add.sprite)
                 tile = game.add.isoSprite(xx, yy, 0, 'grass', 0, terrainGroup);
