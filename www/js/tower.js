@@ -34,7 +34,8 @@ tower.towerPlaced = function (placeX, placeY) {
     tower.inputEnabled = true;
 
     // have the sprite centered on the mouse
-    tower.anchor.setTo(0.5, 0.5);
+    console.log(tower.width);
+    tower.anchor.setTo(0.5, 1-((tower.width/4)/tower.height));
 
     // this will be changed in the future
     tower.health = 100;
