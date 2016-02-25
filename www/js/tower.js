@@ -24,14 +24,11 @@ tower.dragCord = function () {
     towerDrag.position.y = game.input.worldY;
 }
 
-tower.towerPlaced = function () {
+tower.towerPlaced = function (placeX, placeY) {
     // create a Phaser sprite object for a new tower
     
     // grab the xy coords
-    var placeX = game.input.worldX;
-    var placeY = game.input.worldY;
-    
-    var tower = game.add.sprite(placeX, placeY, 'towerBlue' + selectedTower);
+    var tower = game.add.isoSprite(placeX, placeY, 0, 'tower' ,0 ,unitsGroup);
 
     // enable input so we can detect when the mouse is clicked while dragging the sprite
     tower.inputEnabled = true;

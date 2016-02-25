@@ -24,9 +24,9 @@ gameBoardLayer.initialize = function() {
 gameBoardLayer.mouseUp = function() {
     //logic for placing towers goes here?
     if (towerDrag) {
-        var point = game.iso.unproject(game.input.activePointer.position);
-        if (gameBoardLayer.colorMatch(point.x, point.y, player.clr)) {
-            tower.towerPlaced();
+        if (gameBoardLayer.colorMatch(game.input.worldX, game.input.worldY, player.clr)) {
+            var point = game.iso.unproject(game.input.activePointer.position);
+            tower.towerPlaced(point.x, point.y);
         }
         else{
             // stop dragging a new tower
@@ -45,9 +45,7 @@ gameBoardLayer.colorMatch = function(x,y, rgb) {
     y = -y+2048;//flip y
     gl = gameBoardLayer.gameBoardDestination.gl;
     pixelValues = new Uint8Array(4);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2);
     gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelValues);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     console.log(pixelValues);
     return (Math.abs(pixelValues[0] - rgb.r) <= 12 && Math.abs(pixelValues[1] - rgb.g) <= 12 && Math.abs(pixelValues[2] - rgb.b) <= 12);
 }
