@@ -156,6 +156,7 @@ function update() {
     if (towerDrag) {
         tower.dragCord();
     }
+    game.iso.simpleSort(unitsGroup);
 
 }
 
