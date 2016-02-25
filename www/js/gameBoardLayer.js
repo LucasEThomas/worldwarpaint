@@ -24,7 +24,8 @@ gameBoardLayer.initialize = function() {
 gameBoardLayer.mouseUp = function() {
     //logic for placing towers goes here?
     if (towerDrag) {
-        if (gameBoardLayer.colorMatch(game.input.worldX, game.input.worldY, player.clr)) {
+        var point = game.iso.unproject(game.input.activePointer.position);
+        if (gameBoardLayer.colorMatch(point.x, point.y, player.clr)) {
             tower.towerPlaced();
         }
         else{
@@ -33,17 +34,20 @@ gameBoardLayer.mouseUp = function() {
             towerDrag = null;
         }
     } else {
-        gameServer.manualSplatter(game.input.worldX, game.input.worldY, 50, player.id);
+        var point = game.iso.unproject(game.input.activePointer.position);
+        gameServer.manualSplatter(point.x, point.y, 50, player.id);
     }
 }
 
 gameBoardLayer.gameBoardBuffer; //The game board layer. This is the semi-transparent layer where the players' paint colors are drawn.
 
-gameBoardLayer.colorMatch = function(x, y, rgb) {
+gameBoardLayer.colorMatch = function(x,y, rgb) {
     y = -y+2048;//flip y
     gl = gameBoardLayer.gameBoardDestination.gl;
     pixelValues = new Uint8Array(4);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2);
     gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelValues);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     console.log(pixelValues);
     return (Math.abs(pixelValues[0] - rgb.r) <= 12 && Math.abs(pixelValues[1] - rgb.g) <= 12 && Math.abs(pixelValues[2] - rgb.b) <= 12);
 }
