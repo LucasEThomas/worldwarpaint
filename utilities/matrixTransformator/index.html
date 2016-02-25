@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<style type="text/css">
+    html, body {
+        margin:10;
+        background:#ccc;
+        color:#333;
+    }
+    canvas, img {
+        border: 2px solid black;
+        width: 256px;
+        height: 256px;
+        background:#fff;
+    }
+    #download {
+        display:block;
+	    cursor:pointer;
+	    color:#333;
+	    padding:3px;
+        text-decoration: underline;
+	}
+	#download:hover {
+	    color:#fff;
+	}
+</style>
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Transform Images</title>
+    <meta name="description" content="imageTransformer">
+    <meta name="author" content="lukeandjosh">
+
+</head>
+
+<body>
+    <!-- vertex shader -->
+    <script src="../libs/webgl-utils.js"></script>
+<!--    <script src="https://rawgit.com/greggman/twgl.js/master/dist/twgl.min.js"></script>-->
+    
+     <!-- vertex shader -->
+    <script id="2d-vertex-shader" type="x-shader/x-vertex">
+    attribute vec2 a_outputRects;
+    attribute vec2 a_inputRects;
+    attribute vec4 a_colors;
+
+    uniform float u_flipY; //flip along y axis or not
+    uniform vec2 u_inResolution; //resolution
+    uniform vec2 u_outResolution; //resolution
+    uniform mat3 u_matrixa;
+
+    varying vec2 v_inputCoord;
+    varying vec2 v_prevOutputCoord;
+    varying vec2 v_outputCoord;
+    varying vec4 v_color;
+    
+    void main() {
+       // convert the rectangle from pixels to 0.0 to 1.0
+       vec2 inputZeroToOne = a_inputRects / u_inResolution;
+       
+       //mat3 asdf = u_matrixa;
+       vec2 asdf = a_outputRects / u_outResolution;
+       vec2 outputZeroToOne = (u_matrixa * vec3(asdf, 1)).xy;
+       //vec2 outputZeroToOne = position / u_outResolution;
+       
+        v_prevOutputCoord = a_outputRects / u_outResolution;
+
+       // convert from 0->1 to 0->2
+       vec2 zeroToTwo = outputZeroToOne * 2.0;
+
+       // convert from 0->2 to -1->+1 (clipspace)
+       vec2 clipSpace = zeroToTwo - 1.0;
+
+       gl_Position = vec4(clipSpace * vec2(1, u_flipY), 0, 1);
+
+       // pass the texCoord to the fragment shader
+       // The GPU will interpolate this value between points.
+       v_inputCoord = inputZeroToOne;
+       v_outputCoord = outputZeroToOne;
+       
+       v_color = a_colors;
+    }
+    </script>
+    <!-- fragment shader -->
+    <script id="2d-fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+
+        // our 2 canvases
+        uniform sampler2D u_canvasBuff;
+        uniform sampler2D u_canvasDest;
+        uniform bool u_fgDrawFromBuffer;
+
+        // the texCoords passed in from the vertex shader.
+        // note: we're only using 1 set of texCoords which means
+        //   we're assuming the canvases are the same size.
+        varying vec2 v_inputCoord;
+        varying vec2 v_prevOutputCoord;
+        varying vec2 v_outputCoord;
+        varying vec4 v_color;
+
+        void main() {
+             // Look up the pixels from buff and dest canvases
+             vec4 colorBuff = texture2D(u_canvasBuff, v_inputCoord);
+             vec4 colorDest = texture2D(u_canvasDest, v_prevOutputCoord);
+
+             gl_FragColor =  colorBuff;
+        }
+    </script>
+    
+    <div style="display:inline-block; width:300px">
+        <p>Input Image</p>
+        <input id="fileChooser" type="file" style="margin-bottom:10px;"/>
+        <img id="inputImage" width="256" height="256"></img>
+    </div>
+    <div style="display:inline-block; width:300px;">
+        <p style="display:inline;">Tranformation Matrix -> </p><button style="display:inline; float:right; margin-right:20px" onclick="applyTransformation();">Run</button>
+        <textarea name="textarea" style="width:280px; height:150px; display:inline; resize:none; margin-top:10px;" id="matrix">[ 0.8944271909999159, 0.447213595499958, 0, &#013;-0.8944271909999159, 0.447213595499958, 0, &#013;0.5, 0, 1 ]</textarea>
+    </div>
+
+    <div style = "display:inline-block; width:260px;">
+        <p style="display:inline">Output Image</p> <a id="download" style="float:right; display:inline">download</a>
+        <canvas id="canvasOutput" width="256" height="256"></canvas>
+    </div>
+    <script src="../libs/jquery-2.1.4.js"></script>
+    <script src="./main.js"></script>
+</body>
+</html>
