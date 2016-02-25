@@ -20,7 +20,7 @@ var playerType = '';
 function preload() {
     game.time.advancedTiming = true;
     game.stage.disableVisibilityChange = true;
-    game.stage.backgroundColor = '#aaaaaa';
+    game.stage.backgroundColor = '#fff';
     game.plugins.add(new Phaser.Plugin.Isometric(game));
     //game.iso.anchor.setTo(0.5, 0);
 
@@ -34,10 +34,9 @@ function preload() {
     game.load.image('towerBlue2', 'assets/TowerBlue2.png');
     game.load.image('towerBlue3', 'assets/TowerBlue3.png');
     game.load.image('towerBlue4', 'assets/TowerBlue4.png');
-    game.load.image('notebookPaper', 'assets/tileableNotebookPaper.png');
+    game.load.image('notebookPaper', 'assets/isometricNotebookPaper.png');
     game.load.image('splatters', 'assets/splatters.png');
     game.load.image('grass', 'assets/exampleGrass.png');
-
 }
 
 var cursors;
@@ -72,7 +71,11 @@ function create() {
     });
 
     //draw the background layer
-    backgroundLayerSprite = game.add.tileSprite(0, 0, 2048, 2048, 'notebookPaper');
+    var tile1 = game.add.tileSprite(0, 0, 2048, 2048, 'notebookPaper');
+    var tile2 = game.add.tileSprite(0, 0, 2048, 2048, 'notebookPaper');
+    tile2.tilePosition.x = 566;
+    tile2.tilePosition.y = 283;
+    
     //create the gameboard bitmap data that we can draw stuff to
     terrainGroup = game.add.group();
     gameBoardLayer.initialize();
