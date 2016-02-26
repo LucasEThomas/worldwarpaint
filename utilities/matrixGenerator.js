@@ -4,7 +4,7 @@ function generateMatrix(){
     var translationMatrix = makeTranslation(0.5, 0);
     var rotationMatrix = makeWrongRotation();//makeRotation(Math.TWOPI*(-1/8));//rotate -45 degrees
     
-    var ProjectionAngle = Math.atan(0.5);
+    var ProjectionAngle = Math.PI / 6;//Math.atan(0.5);
     var stretchX = Math.cos(ProjectionAngle);
     var stretchY = Math.sin(ProjectionAngle);
     var scaleMatrix = makeScale(stretchX, stretchY);

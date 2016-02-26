@@ -370,11 +370,11 @@ gameBoardLayer.gameBoardDestination.render = function(){
     //render the result to the screen
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); //now, render to the screen not a framebuffer
     gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), -1); //don't flip the y axis for this operation
-    matrix = [ 0.8944271909999159,
-  0.447213595499958,
+    matrix = [ 0.8660254037844387,
+  0.49999999999999994,
   0,
-  -0.8944271909999159,
-  0.447213595499958,
+  -0.8660254037844387,
+  0.49999999999999994,
   0,
   0.5,
   0,

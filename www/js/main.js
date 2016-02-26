@@ -46,21 +46,8 @@ var backgroundLayerSprite; //The game layer where the unchanging background terr
 var gameBoardLayerSprite;
 
 var terrainRenderTexture;
-var terrainGroup;
 var unitsGroup;
 function create() {
-
-    var spawnTiles = function () {
-        var tile;
-        for (var xx = 0; xx < 2048; xx += 37) {
-            for (var yy = 0; yy < 2048; yy += 37) {
-                // Create a tile using the new game.add.isoSprite factory method at the specified position.
-                // The last parameter is the group you want to add it to (just like game.add.sprite)
-                tile = game.add.isoSprite(xx, yy, 0, 'grass', 0, terrainGroup);
-                tile.anchor.set(0.5, 0);
-            }
-        }
-    }
     
     var spawnRenderTextureTiles = function () {
         terrainRenderTexture = game.add.renderTexture(2048, 2048, 'terrainBackground');
@@ -110,7 +97,6 @@ function create() {
     }
 
     unitsGroup = game.add.group();
-    //game.iso.topologicalSort(terrainGroup);
     game.iso.topologicalSort(unitsGroup);
     //make the tower buttons!!!
     towerButton.makeButtons();
