@@ -21,7 +21,7 @@ function preload() {
     game.time.advancedTiming = true;
     game.stage.disableVisibilityChange = true;
     game.stage.backgroundColor = '#fff';
-    game.plugins.add(new Phaser.Plugin.Isometric(game));
+    game.plugins.add(new Phaser.Plugin.Isometric(game, undefined, Phaser.Plugin.Isometric.ISOMETRIC));
     //game.iso.anchor.setTo(0.5, 0);
 
     game.load.image('background', 'assets/background.jpg');
