@@ -45,20 +45,37 @@ var logo2;
 var backgroundLayerSprite; //The game layer where the unchanging background terrain image is drawn.
 var gameBoardLayerSprite;
 
+var terrainRenderTexture;
 var terrainGroup;
 var unitsGroup;
 function create() {
 
     var spawnTiles = function () {
         var tile;
-        for (var xx = 0; xx < 1000; xx += 38) {
-            for (var yy = 0; yy < 1000; yy += 38) {
+        for (var xx = 0; xx < 2048; xx += 37) {
+            for (var yy = 0; yy < 2048; yy += 37) {
                 // Create a tile using the new game.add.isoSprite factory method at the specified position.
                 // The last parameter is the group you want to add it to (just like game.add.sprite)
                 tile = game.add.isoSprite(xx, yy, 0, 'grass', 0, terrainGroup);
                 tile.anchor.set(0.5, 0);
             }
         }
+    }
+    
+    var spawnRenderTextureTiles = function () {
+        terrainRenderTexture = game.add.renderTexture(2048, 2048, 'terrainBackground');
+        var tile = game.make.sprite(0,0,'grass');
+        tile.anchor.set(0.5);
+        for (var xx = 0; xx < 2048; xx += 37) {
+            for (var yy = 0; yy < 2048; yy += 37) {
+                // Create a tile using the new game.add.isoSprite factory method at the specified position.
+                // The last parameter is the group you want to add it to (just like game.add.sprite)
+                var point = game.iso.projectXY({x:xx,y:yy,z:0});
+                //console.log(point);
+                terrainRenderTexture.renderXY(tile, point.x, point.y);
+            }
+        }
+        game.add.sprite(0,0,terrainRenderTexture);
     }
     
     var canvas = document.getElementById("gameboard_canvas");
@@ -77,7 +94,7 @@ function create() {
     tile2.tilePosition.y = 283;
     
     //create the gameboard bitmap data that we can draw stuff to
-    terrainGroup = game.add.group();
+    spawnRenderTextureTiles();
     gameBoardLayer.initialize();
 
     //initialize the connection with the game server.
@@ -92,9 +109,8 @@ function create() {
             gameServer.moveHero(game.input.worldX, game.input.worldY);
     }
 
-    unitsGroup = game.add.group();;
-    spawnTiles();
-    game.iso.topologicalSort(terrainGroup);
+    unitsGroup = game.add.group();
+    //game.iso.topologicalSort(terrainGroup);
     game.iso.topologicalSort(unitsGroup);
     //make the tower buttons!!!
     towerButton.makeButtons();
