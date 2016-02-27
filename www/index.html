@@ -163,15 +163,15 @@
                 if(colorBuff.rgb != vec3(0.0,0.0,0.0)){
                     gl_FragColor = colorDest;//default value
                     if(colorDest.a <= 0.0){
-                        gl_FragColor = vec4(v_color.rgb, 0.1);
+                        gl_FragColor = vec4(v_color.rgb, 0.2);
                     }else if(colorDest.a <= 0.8){
                         if(v_color.rgb == colorDest.rgb){
-                            gl_FragColor = vec4(v_color.rgb,colorDest.a + 0.1);
+                            gl_FragColor = vec4(v_color.rgb,colorDest.a + 0.2);
                             if(gl_FragColor.a > 0.8) {
                                 gl_FragColor = vec4(gl_FragColor.rgb, 0.8);
                             }
                         } else {
-                            gl_FragColor = vec4(colorDest.rgb,colorDest.a - 0.1);
+                            gl_FragColor = vec4(colorDest.rgb,colorDest.a - 0.2);
                         }
                     } else {
                         gl_FragColor = vec4(v_color.rgb,0.8);

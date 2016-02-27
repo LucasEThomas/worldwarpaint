@@ -25,12 +25,12 @@ class Unit {
         var toReturn = [];
         //just create 5 sprinkles for now.
         var sprinkles = [];
-        for (var i = 0; i < 50; i++) {
+        for (var i = 0; i < 5; i++) {
             var unitRange = 200 * Math.random();
             var randomDirection = Math.TWOPI * Math.random();
             var splatterX = Math.round(this.x + (unitRange * Math.cos(randomDirection)));
             var splatterY = Math.round(this.y + (unitRange * Math.sin(randomDirection)));
-            var splatterRadius = Math.round(Math.getRandomArbitrary(5,14));
+            var splatterRadius = Math.round(Math.getRandomArbitrary(15,32));
             //var controlPoints = this.generateBlobControlPoints(currentX, currentY, currentRadius, 32);
             if(splatterX - splatterRadius > 0 && splatterX + splatterRadius < 2047 && splatterY - splatterRadius > 0 && splatterY + splatterRadius < 2047)
             sprinkles.push({
