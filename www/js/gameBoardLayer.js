@@ -26,8 +26,7 @@ gameBoardLayer.mouseUp = function() {
     //logic for placing towers goes here?
     if (towerDrag) {
         if (gameBoardLayer.colorMatch(game.input.worldX, game.input.worldY, player.clr)) {
-            var point = game.iso.unproject(game.input.activePointer.position);
-            tower.towerPlaced(point.x, point.y);
+            tower.towerPlaced(towerDrag.isoX, towerDrag.isoY);
         }
         else{
             // stop dragging a new tower

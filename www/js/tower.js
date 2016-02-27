@@ -13,15 +13,18 @@ var towers = [];
 
 
 tower.dragTower = function () {
-    towerDrag = game.add.sprite(0, 0, 'towerBlue' + selectedTower);
+    towerDrag = game.add.isoSprite(0, 0, 0, 'tower' ,0 , unitsGroup);
     towerDrag.inputEnabled = false;
-    towerDrag.anchor.setTo(0.5, 0.5);
-    towerDrag.events.onInputDown.add(this.towerPlaced);
+    towerDrag.anchor.setTo(0.5, 0.84);
+    //towerDrag.snap = 46;
+    towerDrag.alpha = 0.6;
 }
 
 tower.dragCord = function () {
-    towerDrag.position.x = game.input.worldX;
-    towerDrag.position.y = game.input.worldY;
+    var point = game.iso.unproject(game.input.activePointer.position);
+    
+    towerDrag.isoX = point.x - (point.x % 92);
+    towerDrag.isoY = point.y - (point.y % 92);
 }
 
 tower.towerPlaced = function (placeX, placeY) {
@@ -35,7 +38,7 @@ tower.towerPlaced = function (placeX, placeY) {
 
     // have the sprite centered on the mouse
     console.log(tower.width);
-    tower.anchor.setTo(0.5, 1-((tower.width/4)/tower.height));
+    tower.anchor.setTo(0.5, 0.84);
 
     // this will be changed in the future
     tower.health = 100;

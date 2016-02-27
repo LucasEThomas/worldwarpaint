@@ -70,7 +70,7 @@ gameServer.serverMessage = function(event) {
             var tower = game.add.isoSprite(e.x, e.y, 0, 'tower' ,0 ,unitsGroup);
             tower.id = e.id;
             // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
-            tower.anchor.setTo(0.5, 1-((tower.width/4)/tower.height));
+            tower.anchor.setTo(0.5, 0.84);//1-((tower.width/4)/tower.height));
             tower.ownerID = e.ownerID;
             tower.type = e.type;
             towers.push(tower);

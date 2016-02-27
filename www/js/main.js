@@ -153,7 +153,7 @@ function update() {
 
     }
     //bandaid fix for when the browser looses focus and the eventQueue just piles up. Don't wanna memory leak!
-    if (eventQueue.length > 1000) {
+    if (eventQueue.length > 10) {
         eventQueue.length = 0;
     }
 
