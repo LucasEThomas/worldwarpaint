@@ -48,24 +48,37 @@ var gameBoardLayerSprite;
 
 var terrainRenderTexture;
 var unitsGroup;
+
 function create() {
-    
-    var spawnRenderTextureTiles = function () {
+
+    var spawnRenderTextureTiles = function() {
         terrainRenderTexture = game.add.renderTexture(2048, 2048, 'terrainBackground');
+        var noteTile = game.make.sprite(0, 0, 'notebookPaper');
+        noteTile.anchor.set(.5);
+        for (var nx = 0; nx < 4096; nx += 1132) {
+            for (var ny = 0; ny < 4096; ny += 654) {
+                terrainRenderTexture.renderXY(noteTile, nx, ny);
+                terrainRenderTexture.renderXY(noteTile, nx + 1132 / 2, ny + 654 / 2);
+            }
+        }
         for (var xx = 0; xx < 2048; xx += 45) {
             for (var yy = 0; yy < 2048; yy += 45) {
                 // Create a tile using the new game.add.isoSprite factory method at the specified position.
                 // The last parameter is the group you want to add it to (just like game.add.sprite)
-                var tile = (Math.random() < .9) ? game.make.sprite(0,0,'grass1') : game.make.sprite(0,0,'grass2');
+                var tile = (Math.random() < .9) ? game.make.sprite(0, 0, 'grass1') : game.make.sprite(0, 0, 'grass2');
                 tile.anchor.set(0.5);
-                var point = game.iso.projectXY({x:xx,y:yy,z:0});
+                var point = game.iso.projectXY({
+                    x: xx,
+                    y: yy,
+                    z: 0
+                });
                 //console.log(point);
                 terrainRenderTexture.renderXY(tile, point.x, point.y);
             }
         }
-        game.add.sprite(0,0,terrainRenderTexture);
+        game.add.sprite(0, 0, terrainRenderTexture);
     }
-    
+
     var canvas = document.getElementById("gameboard_canvas");
     gameBoardLayer.gameBoardDestination.initialize(canvas);
 
@@ -75,12 +88,6 @@ function create() {
         window.resizeGame();
     });
 
-    //draw the background layer
-    var tile1 = game.add.tileSprite(0, 0, 2048, 2048, 'notebookPaper');
-    var tile2 = game.add.tileSprite(0, 0, 2048, 2048, 'notebookPaper');
-    tile2.tilePosition.x = 566;
-    tile2.tilePosition.y = 283;
-    
     //create the gameboard bitmap data that we can draw stuff to
     spawnRenderTextureTiles();
     gameBoardLayer.initialize();
@@ -170,7 +177,7 @@ var renderQueue = [];
 
 function render() {
     game.debug.cameraInfo(game.camera, 32, 32);
-    game.debug.text('fps:'+ (game.time.fps || '--'),32,115);
+    game.debug.text('fps:' + (game.time.fps || '--'), 32, 115);
     gameBoardLayer.gameBoardDestination.render();
 }
 
