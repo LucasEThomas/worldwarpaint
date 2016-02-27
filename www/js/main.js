@@ -36,7 +36,8 @@ function preload() {
     game.load.image('towerBlue4', 'assets/TowerBlue4.png');
     game.load.image('notebookPaper', 'assets/isometricNotebookPaper.png');
     game.load.image('splatters', 'assets/splatters.png');
-    game.load.image('grass', 'assets/exampleGrass.png');
+    game.load.image('grass1', 'assets/forestPack/grass0x2.png');
+    game.load.image('grass2', 'assets/forestPack/grass1x2.png');
 }
 
 var cursors;
@@ -51,12 +52,12 @@ function create() {
     
     var spawnRenderTextureTiles = function () {
         terrainRenderTexture = game.add.renderTexture(2048, 2048, 'terrainBackground');
-        var tile = game.make.sprite(0,0,'grass');
-        tile.anchor.set(0.5);
-        for (var xx = 0; xx < 2048; xx += 37) {
-            for (var yy = 0; yy < 2048; yy += 37) {
+        for (var xx = 0; xx < 2048; xx += 45) {
+            for (var yy = 0; yy < 2048; yy += 45) {
                 // Create a tile using the new game.add.isoSprite factory method at the specified position.
                 // The last parameter is the group you want to add it to (just like game.add.sprite)
+                var tile = (Math.random() < .9) ? game.make.sprite(0,0,'grass1') : game.make.sprite(0,0,'grass2');
+                tile.anchor.set(0.5);
                 var point = game.iso.projectXY({x:xx,y:yy,z:0});
                 //console.log(point);
                 terrainRenderTexture.renderXY(tile, point.x, point.y);
