@@ -51,7 +51,7 @@ var unitsGroup;
 function create() {
     
     var spawnRenderTextureTiles = function () {
-        terrainRenderTexture = game.add.renderTexture(2048, 2048, 'terrainBackground');
+        terrainRenderTexture = game.add.renderTexture(3548, 2048, 'terrainBackground');
         for (var xx = 0; xx < 2048; xx += 45) {
             for (var yy = 0; yy < 2048; yy += 45) {
                 // Create a tile using the new game.add.isoSprite factory method at the specified position.
@@ -70,14 +70,14 @@ function create() {
     gameBoardLayer.gameBoardDestination.initialize(canvas);
 
     //  Modify the world and camera bounds
-    game.world.setBounds(0, 0, 2048, 2048);
+    game.world.setBounds(0, 0, 3548, 2048);
     $(window).resize(function() {
         window.resizeGame();
     });
 
     //draw the background layer
-    var tile1 = game.add.tileSprite(0, 0, 2048, 2048, 'notebookPaper');
-    var tile2 = game.add.tileSprite(0, 0, 2048, 2048, 'notebookPaper');
+    var tile1 = game.add.tileSprite(0, 0, 3548, 2048, 'notebookPaper');
+    var tile2 = game.add.tileSprite(0, 0, 3548, 2048, 'notebookPaper');
     tile2.tilePosition.x = 566;
     tile2.tilePosition.y = 283;
     

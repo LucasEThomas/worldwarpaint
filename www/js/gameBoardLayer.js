@@ -15,6 +15,7 @@ gameBoardLayer.initialize = function() {
     gameBoardLayer.baseTexture = new PIXI.BaseTexture(canvas);
     var texture = new PIXI.Texture(gameBoardLayer.baseTexture);
     var textureFrame = new Phaser.Frame(0, 0, 0, game.world.width, game.world.height, 'debug', game.rnd.uuid());
+    console.log(game.world.width);
     sprite = game.add.sprite(0, 0, texture, textureFrame);
     sprite.fixedToCamera = false;
     sprite.inputEnabled = true;
@@ -209,7 +210,7 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
     program = createProgram(gl, [vertexShader, fragmentShader]);
     //histogramProgram = createProgram(gl, [vertexShader, histogramShader]);
     gl.useProgram(program);
-    gl.viewport(0, 0, canvas.width, canvas.height); //set the viewport to the whole display
+    gl.viewport(0, 0, 3548, 2048); //set the viewport to the whole display
 
     // look up where the vertex data needs to go.
     var inputRectanglesLocation = gl.getAttribLocation(program, "a_inputRects");
@@ -218,13 +219,14 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
     // lookup uniforms
     resolutionInLocation = gl.getUniformLocation(program, "u_inResolution");
     resolutionOutLocation = gl.getUniformLocation(program, "u_outResolution");
+    resolutionFinalOutLocation = gl.getUniformLocation(program, "u_finalOutResolution");
     matrixLocation = gl.getUniformLocation(program, "u_matrixa");
     vxDrawFromBufferLocation = gl.getUniformLocation(program, "u_vxDrawFromBuffer");
     fgDrawFromBufferLocation = gl.getUniformLocation(program, "u_fgDrawFromBuffer");
 
     // set the resolution
     gl.uniform2f(resolutionInLocation, 1024, 1024);
-    gl.uniform2f(resolutionOutLocation, canvas.width, canvas.height);
+    gl.uniform2f(resolutionOutLocation, 2048, 2048);
     
     //the transformation matrix that will take the 2d image and squish it to be isometric.
     //use the matrixGenerator.js node script to generate a matrix for here.
@@ -286,6 +288,8 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
     splattersBitmapData.draw(splattersImage);
     splattersBitmapData.update();
     var splattersImageData = splattersBitmapData.imageData;
+    
+//    var mapImageData = game.make.bitmapData(2048,2048).imageData;
     //setup the textures
     texBuff = setupTexture(splattersImageData, 0, program, "u_canvasBuff");
     texDest1 = setupTexture(canvas, 1, program, "asdf");
@@ -308,6 +312,9 @@ var bufferColors;
 var inputRectangles;
 var outputRectangles;
 var resolutionLocation;
+var resolutionInLocation;
+var resolutionOutLocation;
+var resolutionFinalOutLocation;
 var u_canvasDestLocation;
 var vxDrawFromBufferLocation;
 var fgDrawFromBufferLocation;
@@ -343,6 +350,7 @@ gameBoardLayer.gameBoardDestination.render = function(){
     gl.uniform1f(vxDrawFromBufferLocation, 1); //combine buffer and destination data
     gl.uniform1f(fgDrawFromBufferLocation, 1); //combine buffer and destination data
 
+    gl.uniform2f(resolutionFinalOutLocation, 2048, 2048);
     var matrix = [
         1,0,0,
         0,1,0,
@@ -370,10 +378,11 @@ gameBoardLayer.gameBoardDestination.render = function(){
     //render the result to the screen
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); //now, render to the screen not a framebuffer
     gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), -1); //don't flip the y axis for this operation
-    matrix = [ 0.8660254037844387,
+    gl.uniform2f(resolutionFinalOutLocation, 3548, 2048);
+    matrix = [ 0.5000000000000001,
   0.49999999999999994,
   0,
-  -0.8660254037844387,
+  -0.5000000000000001,
   0.49999999999999994,
   0,
   0.5,

@@ -5,7 +5,7 @@ function generateMatrix(){
     var rotationMatrix = makeWrongRotation();//makeRotation(Math.TWOPI*(-1/8));//rotate -45 degrees
     
     var ProjectionAngle = Math.PI / 6;//Math.atan(0.5);
-    var stretchX = Math.cos(ProjectionAngle);
+    var stretchX = Math.cos(ProjectionAngle)/ Math.sqrt(3);
     var stretchY = Math.sin(ProjectionAngle);
     var scaleMatrix = makeScale(stretchX, stretchY);
  
