@@ -2,85 +2,6 @@
 
 <html lang="en">
 
-<style type="text/css">
-    @font-face {
-      font-family: Play;
-      src: local("Play sans-serif"),
-           local("Play sans-serif"),
-           url(assets/play-regular.ttf);
-      font-weight: bold;
-    }
-    html, body {
-        font-family: 'Play', sans-serif;
-        overflow: hidden;
-        margin:0;
-    }
-    button {
-        font-family: 'Play', sans-serif;
-        height: 150px;
-        width: 150px;
-        font-size: 16pt;
-        display: inline-block;
-        margin: 5px 3px 5px 3px;
-        padding: 0px;
-    }
-    .vertical-text {
-        transform: rotate(90deg);
-        transform-origin: left top 0;
-        margin-left:30px;
-    }
-    #columnTitles {
-        width: 350px;
-        height: 30px;
-    }
-    #columnTitles > h2 {
-        display: inline-block;
-        margin:0px;
-        width: 155px;
-        text-align: center;
-        font-size: 12pt;
-    }
-    #spacer{
-        display: inline-block;
-        width:30px;
-        height:19px;
-    }
-    #rowTitles {
-        display: inline-block;
-        height: 350px;
-        width:30px;
-    }
-    #rowTitles > h2 {
-        height: 155px;
-        font-size: 12pt;
-        text-align: center;
-        display: inline-block;
-    }
-    #buttonsContainer{
-        display: inline-block;
-        width:320px;
-    }
-    #chooserContainer {
-        width: 390px;
-        height: 350px;
-
-        position: absolute;
-        top:0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-
-        margin: auto;
-    }
-    #selectPlayer{
-        font-size: 32pt;
-        margin:5px;
-        text-align: center;
-        margin: -75px auto 30px auto;
-    }
-}
-</style>
-
 <head>
     <meta charset="utf-8">
 
@@ -88,7 +9,7 @@
     <meta name="description" content="worldwarpaint">
     <meta name="author" content="lukeandjosh">
     <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
-    <!--  <link rel="stylesheet" href="css/styles.css?v=1.0">-->
+      <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -236,6 +157,7 @@
     </script>
     
     <script src="js/libs/jquery-2.1.4.js"></script>
+    <script src="js/libs/angular.min.js"></script>
     <script src="js/utility.js"></script>
     <script src="js/libs/webgl-utils.js"></script>
     <script src="js/libs/victor.min.js"></script>
@@ -247,22 +169,55 @@
     <script src="js/main.js"></script>
     <script src="js/towerButton.js"></script>
     <script src="js/tower.js"></script>
-    <div id="chooserContainer">
-        <h1 id="selectPlayer">select player type</h1>
-        <div id=columnTitles>
-            <div id='spacer'></div>
-            <h2>POWERFUL</h2>
-            <h2>TACTICAL</h2>
-        </div>
-        <div id=rowTitles>
-            <h2 class='vertical-text' style="height:165px">ARCHITECT</h2>
-            <h2 class='vertical-text' style="height:165px">HERO</h2>
-        </div>
-        <div id="buttonsContainer">
-            <button type="button" onclick="startPhaser('commander');">Commander</button>
-            <button type="button" onclick="startPhaser('engineer');">Engineer</button>
-            <button type="button" onclick="startPhaser('champion');">Champion</button>
-            <button type="button" onclick="startPhaser('archer');">Archer</button>
+    <div ng-app="">
+        <div id="setupContainer">
+            <div id="colorsContainer">
+                <h1>select team color</h1>
+                <div id="colorsRadiosContainer">
+                    <input class="blue" id="radioBlue" type="radio" name="field" value="blue">
+                        <label for="radioBlue"></label>
+                    <input class="teal" id="radioTeal" type="radio" name="field" value="option">
+                        <label for="radioTeal"></label>
+                    <input class="white" id="radioWhite" type="radio" name="field" value="option">
+                        <label for="radioWhite"></label>
+                    <input class="yellow" id="radioYellow" type="radio" name="field" value="option">
+                        <label for="radioYellow"></label>
+                    <input class="orange" id="radioOrange" type="radio" name="field" value="option">
+                        <label for="radioOrange"></label>
+                    <input class="red" id="radioRed" type="radio" name="field" value="option">
+                        <label for="radioRed"></label>
+                    <input class="magenta" id="radioMagenta" type="radio" name="field" value="option">
+                        <label for="radioMagenta"></label>
+                    <input class="violet" id="radioViolet" type="radio" name="field" value="option">
+                        <label for="radioViolet"></label>
+                </div>
+            </div>
+            <div id="chooserContainer">
+                <h1>select player type</h1>
+                <div id="columnTitles">
+                    <div id='spacer'></div>
+                    <h2>POWERFUL</h2>
+                    <h2>TACTICAL</h2>
+                </div>
+                <div id=rowTitles>
+                    <h2 class='vertical-text' style="height:165px">ARCHITECT</h2>
+                    <h2 class='vertical-text' style="height:165px">HERO</h2>
+                </div>
+                <div id="gameModesRadiosContainer">
+                    <input class="playerType" id="radioCommander" type="radio" name="field2" value="option">
+                        <label for="radioCommander"></label>
+                    <input class="playerType" id="radioEngineer" type="radio" name="field2" value="option">
+                        <label for="radioEngineer"></label>
+                    <input class="playerType" id="radioChampion" type="radio" name="field2" value="option">
+                        <label for="radioChampion"></label>
+                    <input class="playerType" id="radioArcher" type="radio" name="field2" value="option">
+                        <label for="radioArcher"></label>
+                </div>
+            </div>
+            <div id="playersContainer">
+                <h1>team stuff</h1>
+                <button type="button" onclick="startPhaser('champion');">start game</button>
+            </div>
         </div>
     </div>
     <div id="phaser_container"></div>

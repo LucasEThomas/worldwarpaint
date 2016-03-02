@@ -5,7 +5,7 @@
 var player = new Player();
 
 function startPhaser(playerType) {
-    $('#chooserContainer').remove();
+    $('#setupContainer').remove();
     player.type = playerType;
     game = new Phaser.Game($(window).width(), $(window).height(), Phaser.CANVAS, 'phaser_container', {
         preload: preload,

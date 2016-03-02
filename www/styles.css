@@ -1,0 +1,186 @@
+@font-face {
+    font-family: Play;
+    src: local("Play sans-serif"), local("Play sans-serif"), url(assets/play-regular.ttf);
+    font-weight: bold;
+}
+
+html,
+body {
+    font-family: 'Play', sans-serif;
+    overflow: hidden;
+    margin: 0;
+}
+
+button {
+    font-family: 'Play', sans-serif;
+    float:right;
+    height: 50px;
+    width: 150px;
+    font-size: 16pt;
+    display: inline-block;
+    margin: 5px 3px 5px 3px;
+    padding: 0px;
+}
+
+.vertical-text {
+    transform: rotate(90deg);
+    transform-origin: left top 0;
+    margin-left: 30px;
+}
+
+#columnTitles {
+    width: 350px;
+    height: 30px;
+}
+
+#columnTitles > h2 {
+    display: inline-block;
+    margin: 0px;
+    width: 155px;
+    text-align: center;
+    font-size: 12pt;
+}
+
+#spacer {
+    display: inline-block;
+    width: 30px;
+    height: 19px;
+}
+
+#rowTitles {
+    display: inline-block;
+    height: 350px;
+    width: 30px;
+}
+
+#rowTitles > h2 {
+    height: 155px;
+    font-size: 12pt;
+    text-align: center;
+    display: inline-block;
+}
+
+#gameModesRadiosContainer {
+    display: inline-block;
+    width: 320px;
+}
+
+#chooserContainer {
+    display: inline-block;
+    width: 390px;
+    float: left;
+}
+
+h1 {
+    font-size: 32pt;
+    /* margin: 5px; */
+    text-align: center;
+    margin: 15px auto 30px auto;
+}
+
+input[type=radio]{
+  display: none;
+}
+input[type=radio] + label {
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    padding-left: -25px;
+    margin-right: -15px;
+    font-size: 13px;
+}
+input[type=radio] + label:before {
+    content: "";
+    display: inline-block;
+ 
+    width: 150px;
+    height: 150px;
+ 
+    margin-right: 15px;
+    left: 0;
+    bottom: 1px;
+    background-color: #aaa;
+    background-image: linear-gradient(rgb(240,240,240),rgb(224,224,224));
+    border-radius: 8px;
+}
+
+input[type=radio].blue + label:before {
+    background-image: linear-gradient(#4186EF,#2166CF);
+}
+input[type=radio].blue:checked + label:before {
+    background-image: linear-gradient(#2166CF, #4186EF);
+}
+input[type=radio].teal + label:before {
+    background-image: linear-gradient(#57C5B8,#37A598);
+}
+input[type=radio].teal:checked + label:before {
+    background-image: linear-gradient(#37A598,#57C5B8);
+}
+input[type=radio].white + label:before {
+    background-image: linear-gradient(#3C3042,#1C1022);
+}
+input[type=radio].white:checked + label:before {
+    background-image: linear-gradient(#1C1022,#3C3042);
+}
+input[type=radio].yellow + label:before {
+    background-image: linear-gradient(#ECC82F,#CCA80F);
+}
+input[type=radio].yellow:checked + label:before {
+    background-image: linear-gradient(#CCA80F,#ECC82F);
+}
+input[type=radio].orange + label:before {
+    background-image: linear-gradient(#F28B31,#D26B11);
+}
+input[type=radio].orange:checked + label:before {
+    background-image: linear-gradient(#D26B11,#F28B31);
+}
+input[type=radio].red + label:before {
+    background-image: linear-gradient(#EB4D4D,#CB2D2D);
+}
+input[type=radio].red:checked + label:before {
+    background-image: linear-gradient(#CB2D2D,#EB4D4D);
+}
+input[type=radio].magenta + label:before {
+    background-image: linear-gradient(#EC53AC,#CC338C);
+}
+input[type=radio].magenta:checked + label:before {
+    background-image: linear-gradient(#CC338C,#EC53AC);
+}
+input[type=radio].violet + label:before {
+    background-image: linear-gradient(#9950B4,#793094);
+}
+input[type=radio].violet:checked + label:before {
+    background-image: linear-gradient(#793094,#9950B4);
+}
+
+input[type=radio]:checked + label:before {
+    background-image: linear-gradient(rgb(224,224,224),rgb(240,240,240));
+}
+#colorsContainer {
+    display: inline-block;
+    width: 400px;
+    float: left;
+}
+
+#colorsRadiosContainer {
+    /* display: inline-block; */
+    width: 325px;
+    /* height: 350px; */
+    margin: auto;
+}
+
+#playersContainer {
+    display: inline-block;
+    width: 390px;
+    float: left;
+}
+
+.playerType {
+    font-family: 'Play', sans-serif;
+    height: 150px;
+    width: 150px;
+    font-size: 16pt;
+    display: inline-block;
+    margin: 5px 3px 5px 3px;
+    padding: 0px;
+}
