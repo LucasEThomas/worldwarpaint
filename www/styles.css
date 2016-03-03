@@ -184,3 +184,38 @@ input[type=radio]:checked + label:before {
     margin: 5px 3px 5px 3px;
     padding: 0px;
 }
+
+.teamContainer {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 5px;
+}
+
+.playerContainer {
+    display: flex;
+    justify-content: space-between;
+    height: 20px;
+    padding: 5px;
+}
+
+.playersContainer {
+    flex-grow: 1;
+    display: inline-block;
+    align-self: center;
+}
+
+.playerReady {
+    align-self: flex-end;
+    width: 70px;
+    text-align: right;
+}
+
+.playerListType {
+    align-self: center;
+    width: 1px;
+}
+
+.playerName {
+    align-self: flex-start;
+    width: 1px;
+}

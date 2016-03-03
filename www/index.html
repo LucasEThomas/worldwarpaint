@@ -169,7 +169,7 @@
     <script src="js/main.js"></script>
     <script src="js/towerButton.js"></script>
     <script src="js/tower.js"></script>
-    <div ng-app="">
+    <div ng-app="worldwarpaint" ng-controller="room">
         <div id="setupContainer">
             <div id="colorsContainer">
                 <h1>select team color</h1>
@@ -214,10 +214,62 @@
                         <label for="radioArcher"></label>
                 </div>
             </div>
+            <script>
+                var myApp = angular.module('worldwarpaint', []);
+
+                myApp.controller('room', ['$scope', function($scope) {
+                    $scope.teams = [
+                        {
+                            players:[
+                                {name:'player1', type:'Engineer', ready:true}, 
+                                {name:'player2', type:'Champion', ready:true}, 
+                                {name:'player3', type:'Archer', ready:true}],
+                            color:'#4455BB'
+                        },
+                        {
+                            players:[
+                                {name:'player4', type:'Commander', ready:false},
+                                {name:'player5', type:'Commander', ready:true},
+                                {name:'player6', type:'Engineer', ready:true},
+                                {name:'player7', type:'Champion', ready:true},
+                                {name:'player8', type:'Archer', ready:true},
+                                {name:'player9', type:'Archer', ready:true}],
+                            color:'#44FF99'},
+                    ];
+                    $scope.styleGreen = {
+                        color:'#44FF44'
+                    }
+                    $scope.styleRed = {
+                        color:'#FF4400'
+                    }
+
+                }]);
+            </script>
             <div id="playersContainer">
-                <h1>team stuff</h1>
-                <button type="button" onclick="startPhaser('champion');">start game</button>
+                <h1>teams roster</h1>
+                <div ng-repeat="team in teams" class="teamContainer">
+                    <svg width="50" height="{{20 + team.players.length * 30}}">
+                        <svg preserveAspectRatio="xMinYMid meet" viewBox="0 0 30 30" width="30" height="100%">
+                            <rect x="0" y="0" rx="2" ry="2" width="30" height="30" style="fill:{{team.color}};" />
+                        </svg>
+                        <line x1="35" y1="2" x2="50" y2="2" style="stroke:#505050;stroke-width:4" />
+                        <line x1="38" y1="2" x2="38" y2="100%" style="stroke:#505050;stroke-width:6" />
+                        <g transform="translate(0,{{20 + team.players.length * 30}})"><g transform="scale(1,-1)">
+                            <line x1="35" y1="2" x2="50" y2="2" style="stroke:#505050;stroke-width:4" />
+                        </g></g>
+                            
+<                   </svg>
+                    <div class="playersContainer">
+                        <div ng-repeat="player in team.players" class="playerContainer">
+                            <span class="playerName">{{player.name}}</span>
+                            <span class="playerListType">{{player.type}}</span>
+                            <span class="playerReady" ng-style="{{(player.ready)?styleGreen:styleRed}}">{{(player.ready)?'ready':'not ready'}}</span>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
+            <button type="button" onclick="startPhaser('champion');">READY</button>
         </div>
     </div>
     <div id="phaser_container"></div>
