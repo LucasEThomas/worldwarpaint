@@ -1,0 +1,31 @@
+{
+  "name": "worldwarpaintroomserver",
+  "version": "0.0.1",
+  "description": "The room server for world war paint.",
+  "private": true,
+  "scripts": {
+    "start": "node room_server.js",
+    "monitor": "nodemon room_server.js",
+    "deploy": "gcloud preview app deploy room_server.yaml",
+    "lint": "jshint --exclude-path=.gitignore .",
+    "test": "npm run lint"
+  },
+  "author": "Velocirapps",
+  "contributors": [
+    {
+      "name": "Lucas Thomas",
+      "email": ""
+    }
+  ],
+  "license": "",
+  "dependencies": {
+    "victor": "^1.1.0",
+    "ws": "^0.8.1"
+  },
+  "devDependencies": {
+    "jshint": "^2.8.0"
+  },
+  "engines": {
+    "node": ">=0.12.7"
+  }
+}

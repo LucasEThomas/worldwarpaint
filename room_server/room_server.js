@@ -5,7 +5,18 @@ var Game = require('./Classes/Game.js');
 var Player = require('./Classes/Player.js');
 var Unit = require('./Classes/Unit.js');
 
-var games = [];
+var rooms = [];
+
+var teamClrs = {
+    blue: '#4186EF', 
+    teal: '#57C5B8', 
+    white: '#3C3042',
+    yello: '#ECC82F',
+    orange: '#F28B31', 
+    red: '#EB4D4D', 
+    magenta: '#EC53AC', 
+    violet: '#9950B4'
+};
 
 //for now we're just going to have one game and all players (clients) will join it
 games[0] = new Game();

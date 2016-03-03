@@ -1,12 +1,12 @@
 {
-  "name": "worldwarpaintwebsocket",
+  "name": "worldwarpaintgameserver",
   "version": "0.0.1",
-  "description": "The web socket server for world war paint.",
+  "description": "The game server for world war paint.",
   "private": true,
   "scripts": {
-    "start": "node ws_server.js",
-    "monitor": "nodemon ws_server.js",
-    "deploy": "gcloud preview app deploy ws_server.yaml",
+    "start": "node game_server.js",
+    "monitor": "nodemon game_server.js",
+    "deploy": "gcloud preview app deploy game_server.yaml",
     "lint": "jshint --exclude-path=.gitignore .",
     "test": "npm run lint"
   },

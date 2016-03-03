@@ -29,7 +29,8 @@ gameServer.initialSync = function(event) {
         event: 'initsyncClient',
         playerType: player.type,
         // send player's id
-        playerID: player.id
+        playerID: player.id,
+        playerClr: player.clr
     }));
 };
 

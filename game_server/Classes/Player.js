@@ -2,14 +2,10 @@
 var Utility = require('../Utility.js');
 
 class Player {
-    constructor(id, ws) {
+    constructor(id, ws, clr) {
         this.ws = ws;
         this.id = id;
-        this.clr = {
-            r: Utility.rangeInt(0, 255),
-            g: Utility.rangeInt(0, 255),
-            b: Utility.rangeInt(0, 255),
-        };
+        this.clr = clr;
     }
     scheduleEvents(schedule) {
             if (this.ws) {
