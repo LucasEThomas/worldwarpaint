@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>A*</title>
+    <meta name="description" content="A* Visualization">
+    <meta name="author" content="viznev">
+    
+    <style type="text/css">
+        #atable {
+            table-layout: fixed;
+            width: 100%;
+        }
+        
+        #atable td {
+            width: 30px;
+            height: 20px;
+            text-align: center;
+        }
+        
+        .empty {
+            background-color: ghostwhite;
+        }
+        
+        .start {
+            background-color: greenyellow;
+        }
+        
+        .end {
+            background-color: red;
+        }
+        
+        .path {
+            background-color: aqua;
+        }
+        
+        .neighbor {
+            background-color: aquamarine;
+        }
+        
+        .ignore {
+            background-color: dimgray;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div id="atable"></div>
+    
+    <script src="../libs/jquery-2.1.4.js"></script>
+    <script src="../../www/js/utility.js"></script>
+    <script src="./main.js"></script>
+</body>
+
+</html>
