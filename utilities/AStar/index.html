@@ -8,7 +8,7 @@
     <title>A*</title>
     <meta name="description" content="A* Visualization">
     <meta name="author" content="viznev">
-    
+
     <style type="text/css">
         #atable {
             table-layout: fixed;
@@ -44,15 +44,25 @@
         .ignore {
             background-color: dimgray;
         }
+        
+        #stepNumber {
+            width: 30px;
+        }
     </style>
 </head>
 
 <body>
-    
+    <label for="stepNumber">Node Steps: </label>
+    <input type="number" id="stepNumber" value="10" />
+    <button id="stepNode">Step Node</button>&nbsp;|&nbsp;
+    <label for="stepTimer">Step Timer:</label>
+    <input type="number" id="stepTimer" value="5" style="width: 60px;" />
+    <button id="stepNodeTimerToggle">Run</button>&nbsp;&nbsp;
+    <br />
     <div id="atable"></div>
-    
+
     <script src="../libs/jquery-2.1.4.js"></script>
-    <script src="../../www/js/utility.js"></script>
+    <script src="./utility.js"></script>
     <script src="./main.js"></script>
 </body>
 
