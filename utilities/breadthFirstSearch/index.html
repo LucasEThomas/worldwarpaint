@@ -5,22 +5,11 @@
 <head>
     <meta charset="utf-8">
 
-    <title>A*</title>
-    <meta name="description" content="A* Visualization">
+    <title>Breadth-first Search</title>
+    <meta name="description" content="Breadth-first search visualization">
     <meta name="author" content="viznev">
 
     <style type="text/css">
-        #atable {
-            table-layout: fixed;
-            width: 100%;
-        }
-        
-        #atable td {
-            width: 30px;
-            height: 20px;
-            text-align: center;
-        }
-        
         .empty {
             background-color: ghostwhite;
         }
@@ -44,25 +33,26 @@
         .ignore {
             background-color: dimgray;
         }
-        
-        #stepNumber {
-            width: 30px;
-        }
     </style>
 </head>
 
 <body>
     <label for="stepNumber">Node Steps: </label>
-    <input type="number" id="stepNumber" value="10" />
+    <input type="number" id="stepNumber" value="13" />
     <button id="stepNode">Step Node</button>&nbsp;|&nbsp;
     <label for="stepTimer">Step Timer:</label>
-    <input type="number" id="stepTimer" value="5" style="width: 60px;" />
+    <input type="number" id="stepTimer" value="100" style="width: 60px;" />
     <button id="stepNodeTimerToggle">Run</button>&nbsp;&nbsp;
     <br />
-    <div id="atable"></div>
+
+    <div style="position: relative;">
+        <canvas id="canvas" width="1536" height="1536" style="width: 1536px; height: 1536px; position: absolute; left: 32; top: 12px; z-index: 0;"></canvas>
+        <canvas id="canvas2" width="1536" height="1536" style="width: 1536px; height: 1536px; position: absolute; left: 32; top: 12px; z-index: 1;"></canvas>
+    </div>
 
     <script src="../libs/jquery-2.1.4.js"></script>
     <script src="./utility.js"></script>
+    <script src="./canvas.js"></script>
     <script src="./main.js"></script>
 </body>
 

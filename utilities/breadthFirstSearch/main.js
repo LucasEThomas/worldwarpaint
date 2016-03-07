@@ -1,3 +1,18 @@
+// this is a Breadth-first Search algorithm
+// this is NOT an A* algorithm
+
+/* Visualization Legend:
+//      Green           -   Starting Node
+//      Red             -   End/Goal Node
+//      Grey            -   Node Not Evaluated (Evaluation #0)
+//      AquaMarine      -   Node Evaluated as a Neighbor Node (Evaluation #1)
+//      Red Outline     -   Next Node to be Fully Evaluated (Evaluation #2a)
+//      Aqua            -   Node Fully Evaluated (Explored) (Evaluation #2b)
+//      Arrow Direction -   Base of arrow is coming from the Node (which is Aqua/Eval#2b by now) that evaulated the Node w/ the arrow as a
+//                              Neighbor Node (the Node w/ the arrow is at least at Evaluation #1)
+*/
+
+
 $(document).ready(function() {
     // this holds the array of nodes
     var nodes = [];
@@ -6,8 +21,8 @@ $(document).ready(function() {
     var map = [];
 
     // set size of grid
-    var xSize = 21; // horizontal
-    var ySize = 21; // vertical
+    var xSize = 41; // horizontal
+    var ySize = 41; // vertical
 
     // generate the nodes list
     for (var y = 0; y < ySize + 1; y++) {
@@ -30,6 +45,7 @@ $(document).ready(function() {
     };
     // same random node, but formatted for the search algorithm
     var startNode = [startNodeDict.x, startNodeDict.y];
+    drawSquare(startNode[0], startNode[1], '#0f0');
 
     // pick a random end node for the map dict
     var endNodeDict = {
@@ -38,13 +54,14 @@ $(document).ready(function() {
     };
     // same random node, but formatted for the search algorithm
     var endNode = [endNodeDict.x, endNodeDict.y];
+    drawSquare(endNode[0], endNode[1], '#f00');
 
     // set the map node values so they can be colored by the drawMap function
     map[startNodeDict.y][startNodeDict.x] = 1;
     map[endNodeDict.y][endNodeDict.x] = 2;
 
     // draw the map
-    drawMap(map);
+    //drawMap(map);
 
     $('#stepNode').click(function() {
         // how many times to step through?
@@ -77,9 +94,11 @@ $(document).ready(function() {
         if (nodeTimer) {
             clearInterval(nodeTimer);
             nodeTimer = undefined;
+            $('#stepNode').removeAttr('disabled');
         } else {
             nodeTimer = setInterval(function() {
                 checkStopSearching();
+                $('#stepNode').attr('disabled', 'disabled');
                 stepNodeSearch();
             }, $('#stepTimer').val());
         }
@@ -90,11 +109,13 @@ $(document).ready(function() {
 
     $('#stepNeighbor').click(function() {
         // step through the search algorithm once but only for a single neighbor of a single node
+        // not implemented
         stepNeighborSearch();
     });
 
     $('#stepAll').click(function() {
         // step through the search algorithm until the end node is reached
+        // not implemented
         allSearch();
     });
 
@@ -123,7 +144,7 @@ $(document).ready(function() {
         // iterate through each direction
         dirs.forEach(function(dir, ind, arr) {
             // get the possible neighbor's coordinates
-            var neighbor = [node[0] + dir[0], node[1] + dir[1]];
+            var neighbor = [node[0] + dir[0], node[1] + dir[1], ind];
             // if neighbor coordinates are within map bounds
             if (0 <= neighbor[0] && neighbor[0] <= xSize && 0 <= neighbor[1] && neighbor[1] <= ySize) {
                 result.push(neighbor);
@@ -142,15 +163,18 @@ $(document).ready(function() {
             // break the search if the current node is the same as the end node
             if (currentNode.equals(endNode)) {
                 // make sure the class for the end node is set to the end class
-                $('#c' + endNode[0] + 'r' + endNode[1]).attr("class", "end");
+                //$('#c' + endNode[0] + 'r' + endNode[1]).attr("class", "end");
                 // empty the queue as we've found the end
                 frontier = [];
                 // stop the function process
                 return;
+            } else if (!currentNode.equals(startNode)) {
+                drawSquare(currentNode[0], currentNode[1], 'aqua');
             }
 
             // iterate through each neighbor
             neighbors(currentNode).forEach(function(next, ind, arr) {
+                var direction = next.pop();
                 // if next is not in came_from (not in the search path)
                 if (came_from[next] !== null && came_from[next] === undefined) {
                     // add next node to queue
@@ -159,13 +183,19 @@ $(document).ready(function() {
                     came_from[next] = currentNode;
                     // if the neighbor node is not the end, set the cell to class neighbor
                     if (!next.equals(endNode)) {
-                        $('#c' + next[0] + 'r' + next[1]).attr("class", "path");
+                        //$('#c' + next[0] + 'r' + next[1]).attr("class", "path");
+                        drawSquare(next[0], next[1], 'aquamarine');
+                        drawDirArrow(next[0], next[1], direction);
                         map[next[1]][next[0]] = 3;
                     }
                 }
             });
         }
-        console.log(came_from);
+
+        // highlight next node in queue
+        if (frontier.length > 0) {
+            highlightNode(frontier[0][0], frontier[0][1]);
+        }
     }
 
     // redraw entire map
@@ -206,7 +236,7 @@ $(document).ready(function() {
 });
 
 //--------------------------------------------------------------
-
+// found this online, makes comparing two arrays very easy
 // Warn if overriding existing method
 if (Array.prototype.equals)
     console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");

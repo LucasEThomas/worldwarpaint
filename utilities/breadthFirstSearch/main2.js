@@ -1,3 +1,5 @@
+// can delete this, mostly test code and probably fairly buggy
+// main.js is the result of the testing in this file
 $(document).ready(function() {
     // this is an array of nodes, format is [[x0,y0],[x0,y1], ...]
     var nodes = [];
