@@ -165,11 +165,13 @@
     <script src="js/libs/phaser-plugin-isometric.js"></script>
     <script src="js/player.js"></script>
     <script src="js/gameBoardLayer.js"></script>
-    <script src="js/gameServer.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/gameServer.js"></script>
+    <script src="js/roomServer.js"></script>
+    
     <script src="js/towerButton.js"></script>
     <script src="js/tower.js"></script>
-    <div ng-app="worldwarpaint" ng-controller="room">
+    <div ng-app="WorldWarPaintApp" ng-controller="RoomController">
         <div id="setupContainer">
             <div id="colorsContainer">
                 <h1>select team color</h1>
@@ -214,43 +216,12 @@
                         <label for="radioArcher"></label>
                 </div>
             </div>
-            <script>
-                var myApp = angular.module('worldwarpaint', []);
-
-                myApp.controller('room', ['$scope', function($scope) {
-                    $scope.teams = [
-                        {
-                            players:[
-                                {name:'player1', type:'Engineer', ready:true}, 
-                                {name:'player2', type:'Champion', ready:true}, 
-                                {name:'player3', type:'Archer', ready:true}],
-                            color:'#4455BB'
-                        },
-                        {
-                            players:[
-                                {name:'player4', type:'Commander', ready:false},
-                                {name:'player5', type:'Commander', ready:true},
-                                {name:'player6', type:'Engineer', ready:true},
-                                {name:'player7', type:'Champion', ready:true},
-                                {name:'player8', type:'Archer', ready:true},
-                                {name:'player9', type:'Archer', ready:true}],
-                            color:'#44FF99'},
-                    ];
-                    $scope.styleGreen = {
-                        color:'#44FF44'
-                    }
-                    $scope.styleRed = {
-                        color:'#FF4400'
-                    }
-
-                }]);
-            </script>
             <div id="playersContainer">
-                <h1>teams roster</h1>
+                <h1>teams:{{numberOfTeams}} players:{{numberOfPlayers}}</h1>
                 <div ng-repeat="team in teams" class="teamContainer">
                     <svg width="50" height="{{20 + team.players.length * 30}}">
                         <svg preserveAspectRatio="xMinYMid meet" viewBox="0 0 30 30" width="30" height="100%">
-                            <rect x="0" y="0" rx="4" ry="4" width="30" height="30" style="fill:{{team.color}};" />
+                            <rect x="0" y="0" rx="4" ry="4" width="30" height="30" style="fill:{{team.clr}};" />
                         </svg>
                         <line x1="35" y1="2" x2="50" y2="2" style="stroke:#505050;stroke-width:4" />
                         <line x1="38" y1="2" x2="38" y2="100%" style="stroke:#505050;stroke-width:6" />

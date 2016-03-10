@@ -2,6 +2,23 @@
 //var Player = require('./player.js');
 //var tower = require('./tower.js');
 
+var wwpAngularApp = angular.module('WorldWarPaintApp', []);
+
+wwpAngularApp.controller('RoomController', ['$scope', '$rootScope', 'RoomServerService', function($scope, $rootScope, RoomServerService) {
+    $rootScope.teams = [];
+    $rootScope.teams = [];
+    $rootScope.teams = [];
+    
+    $scope.styleGreen = {
+        color:'#44FF44'
+    }
+    $scope.styleRed = {
+        color:'#FF4400'
+    }
+
+}]);
+
+
 var player = new Player();
 
 function startPhaser(playerType) {

@@ -1,8 +1,4 @@
 module.exports = {
-    rangeInt: function(min, max) {
-        return Math.round(Math.random() * (max - min) + min);
-
-    },
     hexToRgb: function(hex) {
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
         var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -30,20 +26,12 @@ Utility = function() {
 
 };
 
+Math.rangeInt = function(min,max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 Math.getRandomArbitrary = function(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-Math.generateUUID = function() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0,
-            v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-};
-
 Math.TWOPI = Math.PI*2;
-
-Math.calcDistance = function(x1, y1, x2, y2){
-    return Math.sqrt((x1-x2)^2+(y1-y2)^2);
-};
