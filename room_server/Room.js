@@ -43,15 +43,11 @@ class Room {
         
         var onDisconnect = (player) => {
             this.playerDisconnected(player.id);
-            console.log('client disconnected');
-            console.log(this.players);
         };
         
         var newPlayer = new Player(id, ws, onUpdate, onChangeRoom, onDisconnect);
         this.players.push(newPlayer);
         newPlayer.sendMultiPlayersData(this.buildMultiPlayersData());
-        console.log('client connected');
-        console.log(this.players);
     }
     pushUpdatedPlayer(updatedPlayer){
         //iterate through all players and tell them to send the new data through their sockets
@@ -68,9 +64,7 @@ class Room {
     }
     playerDisconnected(playerId){
         //remove player from array
-        this.players = this.players.filter(function(v) {
-            return v.id !== playerId;
-        });
+        this.players = this.players.filter((v)=>v.id !== playerId);
     }
     buildMultiPlayersData(){
         var toReturn = [];

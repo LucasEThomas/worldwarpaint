@@ -1,11 +1,11 @@
 "use strict";
-var Utility = require('../Utility.js');
 var Victor = require('victor');
 var Player = require('./Player.js');
 var Unit = require('./Unit.js');
+var uuid = require('node-uuid');
 
 class Game {
-    constructor() {
+    constructor(){
         this.players = [
             new Player('dda2571a-55d9-46d3-96c2-8b984164c904', null), 
             new Player('5afdaeaf-f317-4470-ae6f-33bca53fd0de', null), 
@@ -23,7 +23,40 @@ class Game {
         this.reverseIterate = false;
         this.roundRobinOffset = 0;
     }
-    gameLoop() {
+    addNewPlayer(ws){
+        // make a unique uuid
+        var id = uuid.v4();
+        var clr = this.pickRandomColor();
+        
+        var newPlayer = new Player(id, ws, clr, this.onInitSync, this.onDisconnect, this.onNewTower, this.onManualSplatter, this.onUnitDestination);
+        this.players.push(newPlayer);
+    }
+    
+    onInitSync(player){
+        // send players to connecting client
+        var sendPlayers = this.players.filter((current)=>current.id!==player.id).map((current)=>current.toJSON());
+        this.initSyncServer(sendPlayers, this.units);
+    }
+    onDisconnect(player){
+        //remove player from players array
+        this.players = this.players.filter((v)=>v.id !== player.id);
+    }
+    onNewTower(player, x, y, type, ownerId){
+        var unit = new Unit(uuid.v4(), x, y, type, ownerId);
+        this.units.push(unit);
+        // push the new unit to other players
+        this.players.forEach(function(currentPlayer, index) {
+            currentPlayer.addUnit(unit);
+        });
+    }
+    onManualSplatter(player, x, y, radius, ownerId){
+        this.scheduleSplatter(x, y, radius, ownerId);
+    }
+    onUnitDestination(player, id, x, y){
+        this.setUnitDestination(x, y, id);
+    }
+    
+    gameLoop(){
         var schedule = [];
         //Schedule 5 event ops per update. We are currently running 4 updates per sec, so there will be 20 paint ops per sec client side.
         for (var i = 0; i < 5; i++) {
@@ -95,6 +128,24 @@ class Game {
             this.roundRobinOffset = (this.roundRobinOffset + 1) % tLength;
         }
         this.reverseIterate = !this.reverseIterate;
+    }
+    convertColorNameToColor(name){
+        var colorsDict = {
+            blue: '#4186EF', 
+            teal: '#57C5B8', 
+            white: '#3C3042',
+            yellow: '#ECC82F',
+            orange: '#F28B31', 
+            red: '#EB4D4D', 
+            magenta: '#EC53AC', 
+            violet: '#9950B4'
+        };
+        return colorsDict[name];
+    }
+    pickRandomColor(){
+        var colors = ['blue', 'teal', 'white', 'yellow', 'orange', 'red', 'magenta', 'violet'];
+        var chosenColor = colors[Math.rangeInt(0,colors.length-1)];
+        return this.convertColorNameToColor(chosenColor);
     }
 }
 
