@@ -1,7 +1,7 @@
 {
-  "name": "worldwarpaint",
+  "name": "worldwarpaintappserver",
   "version": "0.0.1",
-  "description": "A game where you must place towers and paint everything.",
+  "description": "The app server for world war paint.",
   "private": true,
   "scripts": {
     "start": "node app_server.js",
@@ -19,13 +19,14 @@
   ],
   "license": "",
   "dependencies": {
-      "express": "^4.13.3",
-      "ws": "^0.8.1"
+    "express": "^4.13.4",
+    "node-uuid": "^1.4.7",
+    "ws": "^0.8.1"
   },
   "devDependencies": {
     "jshint": "^2.8.0"
   },
   "engines": {
-    "node": ">=0.12.7"
+    "node": ">=5.8.0"
   }
 }

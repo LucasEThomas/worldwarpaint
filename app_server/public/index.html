@@ -1,31 +1,251 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <style>
-      body {
-        font-family: Tahoma, Geneva, sans-serif;
-      }
-      div {
-        display: inline;
-      }
-    </style>
-    <script>
-      function updateStats(memuse) {
-        document.getElementById('rss').innerHTML = memuse.rss;
-        document.getElementById('heapTotal').innerHTML = memuse.heapTotal;
-        document.getElementById('heapUsed').innerHTML = memuse.heapUsed;
-      }
-      var host = window.document.location.host.replace(/:.*/, '');
-      var ws = new WebSocket('ws://' + host + ':8081');
-      ws.onmessage = function (event) {
-        updateStats(JSON.parse(event.data));
-      };
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>World War Paint</title>
+    <meta name="description" content="worldwarpaint">
+    <meta name="author" content="lukeandjosh">
+    <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
+      <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+   <!-- vertex shader -->
+    <script id="2d-vertex-shader" type="x-shader/x-vertex">
+    attribute vec2 a_outputRects;
+    attribute vec2 a_inputRects;
+    attribute vec4 a_colors;
+
+    uniform float u_flipY; //flip along y axis or not
+    uniform vec2 u_inResolution; //resolution
+    uniform vec2 u_outResolution; //resolution
+    uniform vec2 u_finalOutResolution; //resolution
+    uniform mat3 u_matrixa;
+
+    varying vec2 v_inputCoord;
+    varying vec2 v_prevOutputCoord;
+    varying vec2 v_outputCoord;
+    varying vec4 v_color;
+    
+    void main() {
+       // convert the rectangle from pixels to 0.0 to 1.0
+       vec2 inputZeroToOne = a_inputRects / u_inResolution;
+       
+       //mat3 asdf = u_matrixa;
+       vec2 asdf = a_outputRects / u_outResolution;
+       vec2 outputZeroToOne = (u_matrixa * vec3(asdf, 1)).xy;
+       //vec2 outputZeroToOne = position / u_outResolution;
+       
+        v_prevOutputCoord = a_outputRects / u_outResolution;
+
+       // convert from 0->1 to 0->2
+       vec2 zeroToTwo = outputZeroToOne * 2.0;
+
+       // convert from 0->2 to -1->+1 (clipspace)
+       vec2 clipSpace = zeroToTwo - 1.0;
+
+       gl_Position = vec4(clipSpace * vec2(1, u_flipY), 0, 1);
+
+       // pass the texCoord to the fragment shader
+       // The GPU will interpolate this value between points.
+       v_inputCoord = inputZeroToOne;
+       v_outputCoord = outputZeroToOne;
+       
+       v_color = a_colors;
+    }
     </script>
-  </head>
-  <body>
-    <strong>Server Stats</strong><br>
-    RSS: <div id='rss'></div><br>
-    Heap total: <div id='heapTotal'></div><br>
-    Heap used: <div id='heapUsed'></div><br>
-  </body>
+    <!-- fragment shader -->
+    <script id="2d-fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+
+        // our 2 canvases
+        uniform sampler2D u_canvasBuff;
+        uniform sampler2D u_canvasDest;
+        uniform bool u_fgDrawFromBuffer;
+
+        // the texCoords passed in from the vertex shader.
+        // note: we're only using 1 set of texCoords which means
+        //   we're assuming the canvases are the same size.
+        varying vec2 v_inputCoord;
+        varying vec2 v_prevOutputCoord;
+        varying vec2 v_outputCoord;
+        varying vec4 v_color;
+
+        void main() {
+             // Look up the pixels from buff and dest canvases
+             vec4 colorBuff = texture2D(u_canvasBuff, v_inputCoord);
+             vec4 colorDest = texture2D(u_canvasDest, v_prevOutputCoord);
+
+             if(u_fgDrawFromBuffer){
+             
+                if(colorBuff.rgb != vec3(0.0,0.0,0.0)){
+                    gl_FragColor = colorDest;//default value
+                    if(colorDest.a <= 0.0){
+                        gl_FragColor = vec4(v_color.rgb, 0.2);
+                    }else if(colorDest.a <= 0.8){
+                        if(v_color.rgb == colorDest.rgb){
+                            gl_FragColor = vec4(v_color.rgb,colorDest.a + 0.2);
+                            if(gl_FragColor.a > 0.8) {
+                                gl_FragColor = vec4(gl_FragColor.rgb, 0.8);
+                            }
+                        } else {
+                            gl_FragColor = vec4(colorDest.rgb,colorDest.a - 0.2);
+                        }
+                    } else {
+                        gl_FragColor = vec4(v_color.rgb,0.8);
+                    }
+                } else {
+                    gl_FragColor = colorDest;
+                }
+             }
+             else{
+                //todo, gausian blur code goes here eventually.
+                gl_FragColor =  colorDest;
+             }
+        }
+    </script>
+    <script id="histogram-fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+
+        // our 2 canvases
+        uniform sampler2D u_textureIn;
+        uniform bool u_initialInput;
+        uniform vec2 u_resolutionIn;
+        
+        uniform vec3 playerClrs[4];
+
+        // the texCoords passed in from the vertex shader.
+        varying vec2 v_texCoord;
+
+        void main() {
+            vec4 colorOut = vec4(0,0,0,0);
+            
+            if(u_initialInput){
+                for(int x=0; x<4; x++){
+                    for(int y=0; y<4; y++){
+                        vec2 currentPixel = vec2(x,y) / u_resolution;
+                        vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4) + currentPixel); // Look up the pixels input texture
+                        colorOut += getPixelIncrementation(colorIn);
+                    }
+                }
+            }
+            else{
+                for(int x=0; x<4; x++){
+                    for(int y=0; y<4; y++){
+                        vec2 currentPixel = vec2(x,y) / u_resolution;
+                        vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4) + currentPixel); // Look up the pixels input texture
+                        colorOut += colorIn * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
+                    }
+                }
+            }
+
+            gl_FragColor = colorOut;
+        }
+        
+        vec4 getPixelIncrementation(vec4 colorIn){
+            vec4 toReturn = vec4(0,0,0,0);
+            for(int i=0; i<4; i++){
+                if(playerClrs[i] == colorIn.rgb){
+                    toReturn[i] = colorIn.a * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
+                }
+            }
+            return toReturn;
+        }
+    </script>
+    
+    <script src="js/libs/jquery-2.1.4.js"></script>
+    <script src="js/libs/angular.min.js"></script>
+    <script src="js/utility.js"></script>
+    <script src="js/libs/webgl-utils.js"></script>
+    <script src="js/libs/victor.min.js"></script>
+    <script src="js/libs/phaser.js"></script>
+    <script src="js/libs/phaser-plugin-isometric.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/gameBoardLayer.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/gameServer.js"></script>
+    <script src="js/roomServer.js"></script>
+    
+    <script src="js/towerButton.js"></script>
+    <script src="js/tower.js"></script>
+    <div ng-app="WorldWarPaintApp" ng-controller="RoomController">
+        <div id="setupContainer">
+            <div id="colorsContainer">
+                <h1>select team color</h1>
+                <div id="colorsRadiosContainer">
+                    <input class="blue" id="radioBlue" type="radio" name="field" value="blue">
+                        <label for="radioBlue"></label>
+                    <input class="teal" id="radioTeal" type="radio" name="field" value="option">
+                        <label for="radioTeal"></label>
+                    <input class="white" id="radioWhite" type="radio" name="field" value="option">
+                        <label for="radioWhite"></label>
+                    <input class="yellow" id="radioYellow" type="radio" name="field" value="option">
+                        <label for="radioYellow"></label>
+                    <input class="orange" id="radioOrange" type="radio" name="field" value="option">
+                        <label for="radioOrange"></label>
+                    <input class="red" id="radioRed" type="radio" name="field" value="option">
+                        <label for="radioRed"></label>
+                    <input class="magenta" id="radioMagenta" type="radio" name="field" value="option">
+                        <label for="radioMagenta"></label>
+                    <input class="violet" id="radioViolet" type="radio" name="field" value="option">
+                        <label for="radioViolet"></label>
+                </div>
+            </div>
+            <div id="chooserContainer">
+                <h1>select player type</h1>
+                <div id="columnTitles">
+                    <div id='spacer'></div>
+                    <h2>POWERFUL</h2>
+                    <h2>TACTICAL</h2>
+                </div>
+                <div id=rowTitles>
+                    <h2 class='vertical-text' style="height:165px">ARCHITECT</h2>
+                    <h2 class='vertical-text' style="height:165px">HERO</h2>
+                </div>
+                <div id="gameModesRadiosContainer">
+                    <input class="playerType" id="radioCommander" type="radio" name="field2" value="option">
+                        <label for="radioCommander"></label>
+                    <input class="playerType" id="radioEngineer" type="radio" name="field2" value="option">
+                        <label for="radioEngineer"></label>
+                    <input class="playerType" id="radioChampion" type="radio" name="field2" value="option">
+                        <label for="radioChampion"></label>
+                    <input class="playerType" id="radioArcher" type="radio" name="field2" value="option">
+                        <label for="radioArcher"></label>
+                </div>
+            </div>
+            <div id="playersContainer">
+                <h1>teams:{{numberOfTeams}} players:{{numberOfPlayers}}</h1>
+                <div ng-repeat="team in teams" class="teamContainer">
+                    <svg width="50" height="{{20 + team.players.length * 30}}">
+                        <svg preserveAspectRatio="xMinYMid meet" viewBox="0 0 30 30" width="30" height="100%">
+                            <rect x="0" y="0" rx="4" ry="4" width="30" height="30" style="fill:{{team.clr}};" />
+                        </svg>
+                        <line x1="35" y1="2" x2="50" y2="2" style="stroke:#505050;stroke-width:4" />
+                        <line x1="38" y1="2" x2="38" y2="100%" style="stroke:#505050;stroke-width:6" />
+                        <svg preserveAspectRatio="xMaxYMax meet" viewBox="0 0 50 4" width="100%" height="100%">
+                            <line x1="35" y1="2" x2="50" y2="2" style="stroke:#505050;stroke-width:4" />
+                        </svg>
+                        
+<                   </svg>
+                    <div class="playersContainer">
+                        <div ng-repeat="player in team.players" class="playerContainer">
+                            <span class="playerName">{{player.name}}</span>
+                            <span class="playerListType">{{player.type}}</span>
+                            <span class="playerReady" ng-style="{{(player.ready)?styleGreen:styleRed}}">{{(player.ready)?'ready':'not ready'}}</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <button type="button" onclick="startPhaser('champion');">READY</button>
+        </div>
+    </div>
+    <div id="phaser_container"></div>
+    <div id="backbuffer" style="display: none;">
+        <canvas id="gameboard_canvas" style="border: none;" width="3548" height="2048"></canvas>
+    </div>
+</body>
 </html>
