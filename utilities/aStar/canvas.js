@@ -78,7 +78,7 @@ function highlightNode(x, y) {
 function initialPopulation(w, h) {
     for (var x = 0; x < w; x++) {
         for (var y = 0; y < h; y++) {
-            drawSquare(x, y, '#ddd');
+            drawSquare(x, y, '#eee');
         }
     }
 }
@@ -96,8 +96,8 @@ function getGraphPos(canvas, event) {
     var mousePos = getMousePos(canvas, event);
 
     // translate mouse coordinates to grid coordinates
-    var gridX = Math.ceil(mousePos.x / 36) - 1;
-    var gridY = Math.ceil(mousePos.y / 36) - 1;
-    
+    var gridX = Math.ceil(mousePos.x / (cellSize + borderSize)) - 1;
+    var gridY = Math.ceil(mousePos.y / (cellSize + borderSize)) - 1;
+
     return [gridX, gridY];
 }

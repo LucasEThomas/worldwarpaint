@@ -1,10 +1,16 @@
+"use strict";
+
 $(document).ready(function() {
 
-    // disable place buttons while algorithm is running or when algorithm has started
-    // except allow the reset button to stop the algorithm and reset the map
+    /* TODO
+    - disable place buttons while algorithm is running or when algorithm has started
+    - except allow the reset button to stop the algorithm and reset the map
+    */
 
     var gridWidth = 36;
     var gridHeight = 18;
+
+    var graph = new NodeGraph(gridWidth, gridHeight);
 
     var startNode = undefined; // the start node coords
     var endNode = undefined; // the end node coords
@@ -14,7 +20,21 @@ $(document).ready(function() {
     var came_from; // track the path
     var cost_so_far; // track the path cost
 
+    var nodes = [];
+    var nodeWeights = [];
+
+    for (var x = 0; x < gridWidth; x++) {
+        for (var y = 0; y < gridHeight; y++) {
+            nodes.push([x, y]);
+            nodeWeights[[x, y]] = 0;
+        }
+    }
+
+    graph.setNodes(nodes);
+    graph.setWeights(nodeWeights);
+
     function aStar_init() {
+
         // reset global vars
         frontier = [];
         came_from = [];
@@ -28,7 +48,11 @@ $(document).ready(function() {
 
     }
 
+    var costTier = ['#eee', '#ddd', '#ccc', '#bbb', '#aaa', '#999'];
+
     function aStar_searchAll() {
+        aStar_init();
+
         var frontier = [];
         frontier.push(startNode);
         var came_from = [];
@@ -43,8 +67,10 @@ $(document).ready(function() {
                 console.log('Found End Node - STOP Searching');
                 break;
             }
-            
-            
+
+            graph.neighbors(currentNode).forEach(function(val, ind, arr) {
+                var new_cost = cost_so_far[currentNode] + graph.cost(val);
+            });
 
             /*
             for next in graph.neighbors(current):
@@ -66,7 +92,7 @@ $(document).ready(function() {
     // NOT THE FINAL FUNCTION, only a test for full A*
     $('#stepNodeTimerToggle').click(function() {
         if (startNode && endNode) {
-            console.log('Starting A*...');
+            //console.log('Starting A*...');
             aStar_searchAll();
         } else {
             console.log('Set a start node and an end node');
@@ -119,7 +145,7 @@ $(document).ready(function() {
 
                         // unmark the previous start node on the canvas
                         if (startNode) {
-                            drawSquare(startNode[0], startNode[1], '#ddd');
+                            drawSquare(startNode[0], startNode[1], '#eee');
                         }
 
                         // set the start node to the new position
@@ -143,7 +169,7 @@ $(document).ready(function() {
 
                         // unmark the previous end node on the canvas
                         if (endNode) {
-                            drawSquare(endNode[0], endNode[1], "#ddd");
+                            drawSquare(endNode[0], endNode[1], "#eee");
                         }
 
                         // set the end node to the new position
@@ -160,23 +186,51 @@ $(document).ready(function() {
                         drawSquare(clickPos[0], clickPos[1], 'black');
                         break;
                     case 4:
+                        if (startNode) {
+                            if (startNode.equals(clickPos)) {
+                                break;
+                            }
+                        } else if (endNode) {
+                            if (endNode.equals(clickPos)) {
+                                break;
+                            }
+                        }
                         // reset the algorithm since the map has changed
                         aStar_init();
 
-                        console.log('[*]    Increase path cost at: ' + clickPos);
+                        //console.log('[*]    Increase path cost at: ' + clickPos);
                         // get currrent node cost
-
+                        var curCost = graph.cost(clickPos);
+                        if (curCost < 5) {
+                            graph.setCost(clickPos, curCost + 1);
+                            drawSquare(clickPos[0], clickPos[1], costTier[curCost + 1]);
+                        }
                         break;
                 }
                 break;
                 // \/ right mouse click \/
             case 3:
                 if (placeObj === 4) {
+                    if (startNode) {
+                        if (startNode.equals(clickPos)) {
+                            break;
+                        }
+                    } else if (endNode) {
+                        if (endNode.equals(clickPos)) {
+                            break;
+                        }
+                    }
                     // reset the algorithm since the map has changed
                     aStar_init();
 
                     // decrease weight of path
-                    console.log('[*]    Decrease path cost at: ' + clickPos);
+                    //console.log('[*]    Decrease path cost at: ' + clickPos);
+                    // get currrent node cost
+                    var curCost = graph.cost(clickPos);
+                    if (curCost > 0) {
+                        graph.setCost(clickPos, curCost - 1);
+                        drawSquare(clickPos[0], clickPos[1], costTier[curCost - 1]);
+                    }
                 }
                 break;
         }
