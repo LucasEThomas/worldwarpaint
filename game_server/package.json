@@ -1,31 +1,32 @@
 {
-  "name": "worldwarpaintgameserver",
-  "version": "0.0.1",
-  "description": "The game server for world war paint.",
-  "private": true,
-  "scripts": {
-    "start": "node game_server.js",
-    "monitor": "nodemon game_server.js",
-    "deploy": "gcloud preview app deploy game_server.yaml",
-    "lint": "jshint --exclude-path=.gitignore .",
-    "test": "npm run lint"
-  },
-  "author": "Velocirapps",
-  "contributors": [
-    {
-      "name": "Lucas Thomas",
-      "email": ""
+    "name": "worldwarpaintgameserver",
+    "version": "0.0.1",
+    "description": "The game server for world war paint.",
+    "private": true,
+    "scripts": {
+        "start": "node game_server.js",
+        "monitor": "nodemon game_server.js",
+        "deploy": "gcloud preview app deploy game_server.yaml",
+        "lint": "jshint --exclude-path=.gitignore .",
+        "test": "npm run lint"
+    },
+    "author": "Velocirapps",
+    "contributors": [
+        {
+            "name": "Lucas Thomas",
+            "email": ""
     }
   ],
-  "license": "",
-  "dependencies": {
-    "victor": "^1.1.0",
-    "ws": "^0.8.1"
-  },
-  "devDependencies": {
-    "jshint": "^2.8.0"
-  },
-  "engines": {
-    "node": ">=0.12.7"
-  }
+    "license": "",
+    "dependencies": {
+        "victor": "^1.1.0",
+        "ws": "^0.8.1",
+        "node-uuid": "^1.4.7"
+    },
+    "devDependencies": {
+        "jshint": "^2.8.0"
+    },
+    "engines": {
+        "node": ">=0.12.7"
+    }
 }

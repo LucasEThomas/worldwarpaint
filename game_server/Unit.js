@@ -1,5 +1,4 @@
 "use strict";
-var Utility = require('../Utility.js');
 var Victor = require('victor');
 
 class Unit {
