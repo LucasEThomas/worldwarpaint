@@ -44,7 +44,8 @@ function getExternalIp(cb) {
   };
 
   request(options, function(err, resp, body){
-    if(err || resp.statusCode !== 200) {
+    if(err || resp.statusCode !== 200 || !/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/.test(body)) {
+        
       console.log('Error while talking to metadata server, assuming localhost');
       return cb('localhost');
     }

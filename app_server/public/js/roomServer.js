@@ -62,7 +62,7 @@ wwpAngularApp.service('RoomServerService', ['$rootScope', function($scope) {
     };
     
     //ajax get the thingy
-    $.get( 'http://'+host+'/externalip', function( data ) {
+    $.get( 'http://'+host+((host==='localhost')?':8080':'')+'/externalip', function( data ) {
         // Create our websocket object with the address to the websocket
         service.ws = new WebSocket('ws://' + data + ':8181');
         service.ws.onmessage = onmessage;
