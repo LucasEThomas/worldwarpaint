@@ -219,7 +219,7 @@
             <div id="playersContainer">
                 <h1>teams:{{numberOfTeams}} players:{{numberOfPlayers}}</h1>
                 <div ng-repeat="team in teams" class="teamContainer">
-                    <svg width="50" height="{{20 + team.players.length * 30}}">
+                    <svg width="50" height="0" ng-attr-height="{{20 + team.players.length * 30}}">
                         <svg preserveAspectRatio="xMinYMid meet" viewBox="0 0 30 30" width="30" height="100%">
                             <rect x="0" y="0" rx="4" ry="4" width="30" height="30" style="fill:{{team.clr}};" />
                         </svg>
