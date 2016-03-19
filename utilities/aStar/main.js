@@ -151,104 +151,7 @@ $(document).ready(function() {
         }
     }
 
-    function aStar_stepOrg() {
-        // if there is still an item in the queue
-        if (frontier.length > 0) {
-            // grab the first node in the queue (highest priority is lowest number)
-            var current = frontier.shift();
-
-            // if the current node is the end node
-            if (current.equals(endNode)) {
-                console.log('Found End Node - STOP Searching');
-                // disable the search buttons
-                //$('#stepNodeTimerToggle').attr('disabled', 'disabled');
-                // break the search
-                frontier = [];
-                return;
-            } else if (!current.equals(startNode)) {
-                drawSquare(current[0], current[1], 'aqua');
-            }
-
-            graph.neighbors(current).forEach(function(next, ind, arr) {
-                console.log('  Iterate Neighbor: ' + next);
-                var new_cost = cost_so_far[current] + graph.cost(next);
-                console.log('    New Cost: ' + new_cost);
-                if (!cost_so_far[next] || new_cost < cost_so_far[next]) {
-                    console.log('    In cost_so_far: ' + cost_so_far[next]);
-                    console.log('    New Cost less than cost so far: ' + (new_cost < cost_so_far[next]));
-                    console.log('    Heuristic return: ' + heuristic(endNode, next));
-                    var priority = new_cost + heuristic(endNode, next);
-                    console.log('    Priority: ' + priority);
-                    console.log('Frontier: ');
-                    console.table(frontier);
-                    frontier.splice(priority, 0, next);
-                    console.log('Frontier Spliced: ');
-                    console.table(frontier);
-
-                    if (!next.equals(endNode) && came_from[next] === undefined && !next.equals(startNode)) {
-                        drawSquare(next[0], next[1], 'aquamarine');
-                    }
-
-                    came_from[next] = current;
-                }
-            });
-        }
-    }
-
     var costTier = ['#eee', '#ddd', '#ccc', '#bbb', '#aaa', '#999'];
-
-    function aStar_searchAll() {
-        aStar_init();
-
-        var frontier = [];
-        frontier.push(startNode);
-        var came_from = [];
-        var cost_so_far = [];
-        came_from[startNode] = null;
-        cost_so_far[startNode] = 0;
-
-        while (frontier.length > 0) {
-            var currentNode = frontier.shift();
-
-            if (currentNode.equals(endNode)) {
-                console.log('Found End Node - STOP Searching');
-                break;
-            } else if (!currentNode.equals(startNode)) {
-                drawSquare(currentNode[0], currentNode[1], 'aqua');
-            }
-
-            graph.neighbors(currentNode).forEach(function(next, ind, arr) {
-                console.log("Neighbor: " + next);
-                var new_cost = cost_so_far[currentNode] + graph.cost(next);
-                console.log('   New cost: ' + new_cost);
-                if (!cost_so_far[next] || new_cost < cost_so_far[next]) {
-                    console.log("   Not in cost so far OR the new cost (" + new_cost + ") is less than cost_so_far (" + cost_so_far[next] + ")");
-                    cost_so_far[next] = new_cost;
-                    var priority = new_cost + heuristic(endNode, next);
-                    console.log('   Priority: ' + priority);
-                    frontier.splice(priority, 0, next);
-
-                    if (!next.equals(endNode) && came_from[next] === undefined && !next.equals(startNode)) {
-                        drawSquare(next[0], next[1], 'aquamarine');
-                    }
-
-                    came_from[next] = currentNode;
-                    console.log(came_from[next]);
-                }
-            });
-
-            /*
-            for next in graph.neighbors(current):
-                new_cost = cost_so_far[current] + graph.cost(current, next)
-                if next not in cost_so_far or new_cost < cost_so_far[next]:
-                    cost_so_far[next] = new_cost
-                    priority = new_cost + heuristic(goal, next)
-                    frontier.put(next, priority)
-                    came_from[next] = current
-            */
-        }
-        // return came_from, cost_so_far
-    }
 
     function heuristic(a, b) {
         return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
@@ -272,19 +175,26 @@ $(document).ready(function() {
         return false;
     }
 
+    function checkStartEnd() {
+        if (startNode && endNode && not_run === true) {
+            $('#stepNode').removeAttr('disabled');
+            $('#stepNodeTimerToggle').removeAttr('disabled');
+        }
+    }
+
     $('#stepNode').click(function() {
         if (startNode && endNode) {
-
             var stepNumber = $('#stepNumber').val();
             stepNumber = stepNumber > 0 ? stepNumber : 1;
+
+            if (not_run) {
+                aStar_init();
+            }
 
             stepNumber = (!checkStopSearching()) ? stepNumber : 0;
 
             for (var i = 0; i < stepNumber; i++) {
-                if (not_run) {
-                    aStar_init();
-                    aStar_step()
-                } else {
+                if (!checkStopSearching()) {
                     aStar_step();
                 }
             }
@@ -315,6 +225,14 @@ $(document).ready(function() {
         })
     });
 
+    $('#randomObstacles').click(function() {
+        makeObstacles();
+    });
+
+    $('#randomWeights').click(function() {
+        makeWeights();
+    });
+
     // resize the canvas
     function resetCanvas() {
         $('canvas').each(function(i, e) {
@@ -329,9 +247,33 @@ $(document).ready(function() {
         });
     }
 
-    // disable search buttons
-    function disableSearching() {
+    // random obstacles
+    function makeObstacles() {
+        for (var x = 0; x < gridWidth; x++) {
+            for (var y = 0; y < gridHeight; y++) {
+                if (![x, y].equals(startNode) && ![x, y].equals(endNode) && graph.cost([x, y]) !== 999999 && graph.cost([x, y]) === 0) {
+                    if (Math.random() < .1) {
+                        drawSquare(x, y, '#000');
+                        graph.setCost([x, y], 999999);
+                    }
+                }
+            }
+        }
+    }
 
+    // random weights
+    function makeWeights() {
+        for (var x = 0; x < gridWidth; x++) {
+            for (var y = 0; y < gridHeight; y++) {
+                if (![x, y].equals(startNode) && ![x, y].equals(endNode) && graph.cost([x, y]) !== 999999 && graph.cost([x, y]) === 0) {
+                    if (Math.random() < .08) {
+                        var weight = Math.floor(Math.random() * (6 - 1)) + 1
+                        drawSquare(x, y, costTier[weight]);
+                        graph.setCost([x, y], weight);
+                    }
+                }
+            }
+        }
     }
 
     // call resetCanvas on page load
@@ -341,7 +283,7 @@ $(document).ready(function() {
     // 0 = nothing
     // 1 = start
     // 2 = end
-    // 3 = inpassable object
+    // 3 = inpassable object (it's actually passable as a last resort)
     // 4 = weighted path (e.g. mountain, river, etc.)
     */
     var placeObj = 0;
@@ -361,8 +303,6 @@ $(document).ready(function() {
                                 break;
                             }
                         }
-                        // reset the algorithm since the map has changed
-                        //aStar_init();
 
                         // unmark the previous start node on the canvas
                         if (startNode) {
@@ -377,6 +317,7 @@ $(document).ready(function() {
 
                         // turn off start object placement
                         placeObj = 0;
+                        checkStartEnd();
                         break;
                     case 2:
                         // disallow placing over start node
@@ -385,8 +326,6 @@ $(document).ready(function() {
                                 break;
                             }
                         }
-                        // reset the algorithm since the map has changed
-                        //aStar_init();
 
                         // unmark the previous end node on the canvas
                         if (endNode) {
@@ -399,12 +338,16 @@ $(document).ready(function() {
                         drawSquare(clickPos[0], clickPos[1], 'crimson');
                         // turn off end object placement
                         placeObj = 0;
+                        checkStartEnd();
                         break;
                     case 3:
-                        // reset the algorithm since the map has changed
-                        //aStar_init();
-                        graph.setCost(clickPos, 999999);
-                        drawSquare(clickPos[0], clickPos[1], 'black');
+                        if (graph.cost(clickPos) === 999999) {
+                            graph.setCost(clickPos, 0);
+                            drawSquare(clickPos[0], clickPos[1], '#eee');
+                        } else {
+                            graph.setCost(clickPos, 999999);
+                            drawSquare(clickPos[0], clickPos[1], 'black');
+                        }
                         break;
                     case 4:
                         if (startNode) {
@@ -416,10 +359,7 @@ $(document).ready(function() {
                                 break;
                             }
                         }
-                        // reset the algorithm since the map has changed
-                        //aStar_init();
 
-                        //console.log('[*]    Increase path cost at: ' + clickPos);
                         // get currrent node cost
                         var curCost = graph.cost(clickPos);
                         if (curCost < 5) {
@@ -441,11 +381,8 @@ $(document).ready(function() {
                             break;
                         }
                     }
-                    // reset the algorithm since the map has changed
-                    //aStar_init();
 
                     // decrease weight of path
-                    //console.log('[*]    Decrease path cost at: ' + clickPos);
                     // get currrent node cost
                     var curCost = graph.cost(clickPos);
                     if (curCost > 0) {
@@ -517,7 +454,33 @@ $(document).ready(function() {
 
     // reset the pathfinding
     $('#resetMap').click(function() {
+        // first reset the canvas
+        resetCanvas();
 
+        // then reset everything else
+        not_run = true; // this will force aStar_init() to run
+
+        // now redraw with the current map values
+        for (var x = 0; x < gridWidth; x++) {
+            for (var y = 0; y < gridHeight; y++) {
+                if ([x, y].equals(startNode)) {
+                    drawSquare(x, y, 'chartreuse');
+                    graph.setCost([x, y], 0);
+                } else if ([x, y].equals(endNode)) {
+                    drawSquare(x, y, 'crimson');
+                    graph.setCost([x, y], 0);
+                } else if (graph.cost([x, y]) === 999999) {
+                    drawSquare(x, y, 'black');
+                } else if (graph.cost([x, y]) > 0) {
+                    drawSquare(x, y, costTier[graph.cost([x, y])]);
+                }
+            }
+        }
+
+        $('#stepNodeTimerToggle').removeAttr('disabled');
+        $('#stepNode').removeAttr('disabled');
+        $('#stepTimer').removeAttr('disabled');
+        $('#stepNumber').removeAttr('disabled');
     });
 
 });
