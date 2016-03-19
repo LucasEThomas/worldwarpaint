@@ -21,6 +21,7 @@
   "dependencies": {
     "express": "^4.13.4",
     "node-uuid": "^1.4.7",
+    "request": "^2.69.0",
     "ws": "^0.8.1"
   },
   "devDependencies": {

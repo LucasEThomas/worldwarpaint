@@ -1,0 +1,7 @@
+runtime: nodejs
+vm: true
+api_version: 1
+
+network:
+  forwarded_ports: ["8181"]
+  instance_tag: "websocket-server"

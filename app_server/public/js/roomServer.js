@@ -3,27 +3,8 @@ wwpAngularApp.service('RoomServerService', ['$rootScope', function($scope) {
     var service = {};
     // Create our websocket object with the address to the websocket
     var host = window.document.location.host.replace(/:.*/, '');
-    var ws = new WebSocket('ws://' + host + ':8082');
-    ws.onmessage = gameServer.serverMessage;
-    ws.onopen = gameServer.initialSync;
+    service.ws = {};
     
-    ws.onopen = function(){  
-        console.log("Room server socket opened!");
-    };
-    
-    ws.onmessage = function(message) {
-        var data = JSON.parse(message.data);
-        if(data.event === 'setPlayerData'){
-            setPlayer(data.player);
-        }
-        else if(data.event === 'setMutliPlayersData'){
-            console.log('setMutliPlayersData');
-            console.log(data.players);
-            data.players.forEach((currentPlayer, index)=>{
-                setPlayer(currentPlayer);
-            });
-        }
-    };
 
     //here, we set the player into the array pattern that the angular controller understands
     function setPlayer(player) {
@@ -62,8 +43,34 @@ wwpAngularApp.service('RoomServerService', ['$rootScope', function($scope) {
         });
     }
     
+    var onopen = function(){
+        console.log("Room server socket opened!");
+    };
+    
+    var onmessage = function(message) {
+        var data = JSON.parse(message.data);
+        if(data.event === 'setPlayerData'){
+            setPlayer(data.player);
+        }
+        else if(data.event === 'setMutliPlayersData'){
+            console.log('setMutliPlayersData');
+            console.log(data.players);
+            data.players.forEach((currentPlayer, index)=>{
+                setPlayer(currentPlayer);
+            });
+        }
+    };
+    
+    //ajax get the thingy
+    $.get( 'http://'+host+'/externalip', function( data ) {
+        // Create our websocket object with the address to the websocket
+        service.ws = new WebSocket('ws://' + data + ':8181');
+        service.ws.onmessage = onmessage;
+        service.ws.onopen = onopen;
+    });
+    
     service.setPlayerData = function(name, clr, type, ready) {
-        ws.send(JSON.stringify({
+        service.ws.send(JSON.stringify({
             event: 'setPlayerData',
             name: name,
             clr: clr,
