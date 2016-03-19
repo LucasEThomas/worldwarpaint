@@ -15,8 +15,14 @@ $(document).ready(function() {
     var startNode = undefined; // the start node coords
     var endNode = undefined; // the end node coords
 
+    // the queue sort operation
+    var queueSort = function(a, b) {
+        return a.priority - b.priority
+    };
+
     // create global vars
     var frontier; // the queue
+    var queue;
     var came_from; // track the path
     var cost_so_far; // track the path cost
 
@@ -33,19 +39,160 @@ $(document).ready(function() {
     graph.setNodes(nodes);
     graph.setWeights(nodeWeights);
 
+    var ctod = function(node, priority) {
+        // coordinate node to dictionary node (required for queue)
+        var dict = {
+            priority: priority,
+            node: node
+        };
+        return dict;
+    };
+
     function aStar_init() {
+        console.log('Initializing A*...');
 
         // reset global vars
+        console.log('   Resetting global vars...');
         frontier = [];
+        queue = new PriorityQueue({
+            comparator: queueSort
+        });
         came_from = [];
         cost_so_far = [];
+        came_from[startNode] = null;
+        cost_so_far[startNode] = 0;
 
         // setup the first node
+        console.log('   Pushing start node into the queue...');
+        queue.queue(ctod(startNode, 0));
         frontier.push(startNode);
+        not_run = false;
+
+        console.log('Initialization complete');
     }
 
     function aStar_step() {
+        console.log('Step through the queue...');
+        // if the queue is not empty
+        if (queue.length > 0) {
+            console.log('   Get the first item...');
+            // grab the first node in the queue
+            var currentNode = queue.dequeue().node;
 
+            if (currentNode.equals(endNode)) {
+                console.log('Found end node - STOP searching');
+                queue.clear();
+
+                // since we've reached the end, draw the path
+                var iterate = endNode;
+                while (!iterate.equals(startNode)) {
+                    if (!iterate.equals(endNode)) {
+                        // get direction of other node
+                        var dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+                        // create a variable to store neighbor nodes
+                        var result = [];
+                        // iterate through each direction
+                        dirs.forEach(function(dir, ind, arr) {
+                            // get the possible neighbor's coordinates
+                            var neighbor = [iterate[0] + dir[0], iterate[1] + dir[1]];
+                            console.log('Iterate: ' + iterate + ', ' + neighbor);
+                            if (came_from[iterate].equals(neighbor)) {
+                                drawDirArrow(iterate[0], iterate[1], ind);
+                            }
+                        });
+                    }
+                    iterate = came_from[iterate];
+                }
+
+                return;
+            } else if (!currentNode.equals(startNode)) {
+                drawSquare(currentNode[0], currentNode[1], 'aqua');
+            }
+
+            // iterate through the node's neighbors
+            console.log('   Iterate Neighbors:');
+            graph.neighbors(currentNode).forEach(function(next, ind, arr) {
+                console.log('       Neighbor: ' + next);
+
+                // get cost to use neighbor
+                var new_cost = cost_so_far[currentNode] + graph.cost(next);
+
+                console.log('         Cost: ' + new_cost);
+
+                // if the neighbor has not been evaluated or the new cost is less than the cost so far using the neighbor
+                if (cost_so_far[next] === undefined || new_cost < cost_so_far[next]) {
+                    console.log('         Not evaluated OR better cost than previous evaluation');
+
+                    // update the cost to use the neighbor so far
+                    cost_so_far[next] = new_cost;
+
+                    // get the priority value of the path through the neighbor
+                    var priority = new_cost + heuristic(endNode, next);
+
+                    console.log('         Priority: ' + priority);
+
+                    // add the neighbor to the queue
+                    queue.queue(ctod(next, priority));
+
+                    // paint the neighbor on the map
+                    if (!next.equals(endNode) && came_from[next] === undefined && !next.equals(startNode) && graph.cost(next) < 999) {
+                        drawSquare(next[0], next[1], 'aquamarine');
+                    }
+
+                    // track node path
+                    came_from[next] = currentNode;
+                }
+            });
+        }
+
+        if (queue.length > 0) {
+            var peek = queue.peek().node;
+            highlightNode(peek[0], peek[1]);
+        }
+    }
+
+    function aStar_stepOrg() {
+        // if there is still an item in the queue
+        if (frontier.length > 0) {
+            // grab the first node in the queue (highest priority is lowest number)
+            var current = frontier.shift();
+
+            // if the current node is the end node
+            if (current.equals(endNode)) {
+                console.log('Found End Node - STOP Searching');
+                // disable the search buttons
+                //$('#stepNodeTimerToggle').attr('disabled', 'disabled');
+                // break the search
+                frontier = [];
+                return;
+            } else if (!current.equals(startNode)) {
+                drawSquare(current[0], current[1], 'aqua');
+            }
+
+            graph.neighbors(current).forEach(function(next, ind, arr) {
+                console.log('  Iterate Neighbor: ' + next);
+                var new_cost = cost_so_far[current] + graph.cost(next);
+                console.log('    New Cost: ' + new_cost);
+                if (!cost_so_far[next] || new_cost < cost_so_far[next]) {
+                    console.log('    In cost_so_far: ' + cost_so_far[next]);
+                    console.log('    New Cost less than cost so far: ' + (new_cost < cost_so_far[next]));
+                    console.log('    Heuristic return: ' + heuristic(endNode, next));
+                    var priority = new_cost + heuristic(endNode, next);
+                    console.log('    Priority: ' + priority);
+                    console.log('Frontier: ');
+                    console.table(frontier);
+                    frontier.splice(priority, 0, next);
+                    console.log('Frontier Spliced: ');
+                    console.table(frontier);
+
+                    if (!next.equals(endNode) && came_from[next] === undefined && !next.equals(startNode)) {
+                        drawSquare(next[0], next[1], 'aquamarine');
+                    }
+
+                    came_from[next] = current;
+                }
+            });
+        }
     }
 
     var costTier = ['#eee', '#ddd', '#ccc', '#bbb', '#aaa', '#999'];
@@ -66,10 +213,28 @@ $(document).ready(function() {
             if (currentNode.equals(endNode)) {
                 console.log('Found End Node - STOP Searching');
                 break;
+            } else if (!currentNode.equals(startNode)) {
+                drawSquare(currentNode[0], currentNode[1], 'aqua');
             }
 
-            graph.neighbors(currentNode).forEach(function(val, ind, arr) {
-                var new_cost = cost_so_far[currentNode] + graph.cost(val);
+            graph.neighbors(currentNode).forEach(function(next, ind, arr) {
+                console.log("Neighbor: " + next);
+                var new_cost = cost_so_far[currentNode] + graph.cost(next);
+                console.log('   New cost: ' + new_cost);
+                if (!cost_so_far[next] || new_cost < cost_so_far[next]) {
+                    console.log("   Not in cost so far OR the new cost (" + new_cost + ") is less than cost_so_far (" + cost_so_far[next] + ")");
+                    cost_so_far[next] = new_cost;
+                    var priority = new_cost + heuristic(endNode, next);
+                    console.log('   Priority: ' + priority);
+                    frontier.splice(priority, 0, next);
+
+                    if (!next.equals(endNode) && came_from[next] === undefined && !next.equals(startNode)) {
+                        drawSquare(next[0], next[1], 'aquamarine');
+                    }
+
+                    came_from[next] = currentNode;
+                    console.log(came_from[next]);
+                }
             });
 
             /*
@@ -86,17 +251,68 @@ $(document).ready(function() {
     }
 
     function heuristic(a, b) {
-        return Math.abs(a[0] - b[0]) + abs(a[1] - b[1]);
+        return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
     }
 
-    // NOT THE FINAL FUNCTION, only a test for full A*
-    $('#stepNodeTimerToggle').click(function() {
+    var not_run = true;
+
+    function checkStopSearching() {
+        if (queue !== undefined) {
+            if (queue.length === 0) {
+                $('#stepNodeTimerToggle').attr('disabled', 'disabled');
+                $('#stepNodeTimerToggle').text('Run');
+                $('#stepNode').attr('disabled', 'disabled');
+                $('#stepTimer').attr('disabled', 'disabled');
+                $('#stepNumber').attr('disabled', 'disabled');
+                clearInterval(nodeTimer);
+                nodeTimer = undefined;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    $('#stepNode').click(function() {
         if (startNode && endNode) {
-            //console.log('Starting A*...');
-            aStar_searchAll();
+
+            var stepNumber = $('#stepNumber').val();
+            stepNumber = stepNumber > 0 ? stepNumber : 1;
+
+            stepNumber = (!checkStopSearching()) ? stepNumber : 0;
+
+            for (var i = 0; i < stepNumber; i++) {
+                if (not_run) {
+                    aStar_init();
+                    aStar_step()
+                } else {
+                    aStar_step();
+                }
+            }
         } else {
             console.log('Set a start node and an end node');
         }
+    });
+
+    var nodeTimer;
+
+    $('#stepNodeTimerToggle').click(function() {
+        if (not_run) {
+            aStar_init();
+        }
+        if (nodeTimer) {
+            clearInterval(nodeTimer);
+            nodeTimer = undefined;
+            $('#stepNode').removeAttr('disabled');
+        } else {
+            nodeTimer = setInterval(function() {
+                checkStopSearching();
+                $('#stepNode').attr('disabled', 'disabled');
+                aStar_step();
+            }, $('#stepTimer').val());
+        }
+        $(this).text(function(i, text) {
+            return text === "Run" ? "Stop" : "Run";
+        })
     });
 
     // resize the canvas
@@ -111,6 +327,11 @@ $(document).ready(function() {
             $(this).width(newWidth).height(newHeight);
             initialPopulation(gridWidth, gridHeight);
         });
+    }
+
+    // disable search buttons
+    function disableSearching() {
+
     }
 
     // call resetCanvas on page load
@@ -141,7 +362,7 @@ $(document).ready(function() {
                             }
                         }
                         // reset the algorithm since the map has changed
-                        aStar_init();
+                        //aStar_init();
 
                         // unmark the previous start node on the canvas
                         if (startNode) {
@@ -165,7 +386,7 @@ $(document).ready(function() {
                             }
                         }
                         // reset the algorithm since the map has changed
-                        aStar_init();
+                        //aStar_init();
 
                         // unmark the previous end node on the canvas
                         if (endNode) {
@@ -181,8 +402,8 @@ $(document).ready(function() {
                         break;
                     case 3:
                         // reset the algorithm since the map has changed
-                        aStar_init();
-
+                        //aStar_init();
+                        graph.setCost(clickPos, 999999);
                         drawSquare(clickPos[0], clickPos[1], 'black');
                         break;
                     case 4:
@@ -196,7 +417,7 @@ $(document).ready(function() {
                             }
                         }
                         // reset the algorithm since the map has changed
-                        aStar_init();
+                        //aStar_init();
 
                         //console.log('[*]    Increase path cost at: ' + clickPos);
                         // get currrent node cost
@@ -221,7 +442,7 @@ $(document).ready(function() {
                         }
                     }
                     // reset the algorithm since the map has changed
-                    aStar_init();
+                    //aStar_init();
 
                     // decrease weight of path
                     //console.log('[*]    Decrease path cost at: ' + clickPos);
@@ -294,17 +515,9 @@ $(document).ready(function() {
         placeObj = 4;
     });
 
-    // reset everything (so we don't have to reload the page)
+    // reset the pathfinding
     $('#resetMap').click(function() {
-        console.log('[*] Reset Everything');
-        // set object being placed to nothing
-        placeObj = 0;
 
-        // re-initialize (reset) A*
-        aStar_init();
-
-        // do more stuff here to reset everything
-        resetCanvas();
     });
 
 });

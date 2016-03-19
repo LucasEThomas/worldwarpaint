@@ -30,33 +30,33 @@ function highlightNode(x, y) {
     ctx.stroke();
 }
 
-/*function drawDirArrow(x, y, dir) {
+function drawDirArrow(x, y, dir) {
     var startLine = [0, 0];
     var endLine = [0, 0];
     switch (dir) {
         // I wish you could disable switch/case fall-through...
-        case 0:
+        case 2:
             // right
             fromX = borderSize + x * (cellSize + 2) + 4;
             fromY = borderSize + y * (cellSize + 2) + (cellSize / 2);
             toX = borderSize + x * (cellSize + 2) + (cellSize - 4);
             toY = borderSize + y * (cellSize + 2) + (cellSize / 2);
             break;
-        case 1:
+        case 3:
             // down
             fromX = borderSize + x * (cellSize + 2) + (cellSize / 2);
             fromY = borderSize + y * (cellSize + 2) + 4;
             toX = borderSize + x * (cellSize + 2) + (cellSize / 2);
             toY = borderSize + y * (cellSize + 2) + (cellSize - 4);
             break;
-        case 2:
+        case 0:
             // left
             fromX = borderSize + x * (cellSize + 2) + (cellSize - 4);
             fromY = borderSize + y * (cellSize + 2) + (cellSize / 2);
             toX = borderSize + x * (cellSize + 2) + 4;
             toY = borderSize + y * (cellSize + 2) + (cellSize / 2);
             break;
-        case 3:
+        case 1:
             // up
             fromX = borderSize + x * (cellSize + 2) + (cellSize / 2);
             fromY = borderSize + y * (cellSize + 2) + (cellSize - 4);
@@ -73,7 +73,7 @@ function highlightNode(x, y) {
     lay2.moveTo(toX, toY);
     lay2.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
     lay2.stroke();
-}*/
+}
 
 function initialPopulation(w, h) {
     for (var x = 0; x < w; x++) {

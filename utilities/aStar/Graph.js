@@ -25,7 +25,7 @@ class NodeGraph {
     }
 
     boundable(node) {
-        return 0 <= node[0] && node[0] < this.width && 0 <= node[1] && node[1] < this.height;
+        return 0 <= node[0] && node[0] <= this.width && 0 <= node[1] && node[1] <= this.height;
     }
 
     passable(node) {

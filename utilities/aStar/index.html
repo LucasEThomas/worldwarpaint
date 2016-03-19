@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
 
-    <title>Breadth-first Search</title>
+    <title>A* Search</title>
     <meta name="description" content="A* search visualization">
     <meta name="author" content="viznev">
     <style type="text/css">
@@ -28,10 +28,10 @@
 
 <body>
     <label for="stepNumber">Node Steps: </label>
-    <input type="number" id="stepNumber" value="13" />
+    <input type="number" id="stepNumber" value="5" />
     <button id="stepNode">Step Node</button>&nbsp;|&nbsp;
     <label for="stepTimer">Step Timer:</label>
-    <input type="number" id="stepTimer" value="100" style="width: 60px;" />
+    <input type="number" id="stepTimer" value="10" style="width: 60px;" />
     <button id="stepNodeTimerToggle">Run</button>&nbsp;&nbsp;
     <br />
     <button id="placeNothing">(`) Turn Off Placing</button>
@@ -50,6 +50,7 @@
     <script src="../libs/jquery-2.1.4.js"></script>
     <script src="./canvas.js"></script>
     <script src="./Graph.js"></script>
+    <script src="./PriorityQueue.js"></script>
     <script src="./main.js"></script>
 </body>
 
