@@ -13,10 +13,10 @@ class Player {
         this.onUnitDestination = onUnitDestination;
 
         if (ws) {
-            ws.on('close', function() {
+            ws.on('close', ()=>{
                 this.onDisconnect(this);
             });
-            ws.on('message', function(data, flags) {
+            ws.on('message', (data, flags)=>{
                 this.messageRxvd(JSON.parse(data));
             });
         }
@@ -35,7 +35,7 @@ class Player {
     }
 
     initSyncServer(players, units) {
-        ws.send(JSON.stringify({
+        this.ws.send(JSON.stringify({
             event: 'initsyncServer',
             playerClr: this.clr,
             playerID: this.id,

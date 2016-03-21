@@ -46,6 +46,9 @@ var getPlayerClr = function(id) {
             return players[key].clr;
         }
     }
+    console.log('player not found!')
+    return {r:1.0,g:1.0,b:1.0};
+
 }
 
 //this event happens whenever new game data comes down from the server
