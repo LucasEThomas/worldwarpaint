@@ -10,7 +10,6 @@ class Game {
             new Player('dda2571a-55d9-46d3-96c2-8b984164c904', null, Utility.hexToRgb(this.pickRandomColor())), 
             new Player('5afdaeaf-f317-4470-ae6f-33bca53fd0de', null, Utility.hexToRgb(this.pickRandomColor())), 
             new Player('dda2571a-55d9-46d3-96c2-8b984164c905', null, Utility.hexToRgb(this.pickRandomColor()))];
-        //console.log(this.players);
         // create a units array, for now we auto-generate two units linked to two players for testing
         this.units = [
             new Unit(1, 600, 300, 'hero', 'dda2571a-55d9-46d3-96c2-8b984164c904'), 
@@ -47,7 +46,6 @@ class Game {
         
         var newPlayer = new Player(id, ws, clr, onInitSyncLoc, onDisconnectLoc, onNewTowerLoc, onManualSplatterLoc, onUnitDestinationLoc);
         this.players.push(newPlayer);
-        console.log(this.players);
     }
     
     onInitSync(player){
@@ -109,7 +107,6 @@ class Game {
         this.units.forEach((unit,index)=>{
             if(unit.id === id){
                 unit.setDestination(x,y);
-                console.log('id:'+id+' unit found!')
             }
         });
     }
