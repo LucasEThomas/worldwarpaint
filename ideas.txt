@@ -9,3 +9,4 @@ worldwarpaint ideas (anything goes in here)
 * the more land you control the faster your paint streams in
 * paint wells are a strategic point
 * Players can accumulate cards and build decks (towers / abilities / powerups). Each card is assigned a point value, and players are matched with each other based on the similarity of their deck's total calculated point value. Cards can be won through missions, and bought for $$$$! :)
+* capture the flag mode (flags scattered around, must "capture" for your team, engineers can possibly move them around in advanced game mode version. Also have fog of war so you have to go find the flags with heroes)
