@@ -142,7 +142,7 @@ function create() {
     unitsGroup = game.add.group();
     game.iso.topologicalSort(unitsGroup);
     //make the tower buttons!!!
-    towerButton.makeButtons();
+    
 }
 
 var keyboardScrollSpeed = 16;

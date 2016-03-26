@@ -72,6 +72,7 @@ gameServer.serverMessage = function(event) {
         gameBoardLayer.initialize();
         unitsGroup = game.add.group();
         game.iso.topologicalSort(unitsGroup);
+        towerButton.makeButtons();
 
         // set player color
         player.clr = data.playerClr;
