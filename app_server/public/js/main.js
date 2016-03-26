@@ -1,6 +1,7 @@
 "use strict";
 //var Player = require('./player.js');
 //var tower = require('./tower.js');
+//var Map = require('./Map.js');
 
 var wwpAngularApp = angular.module('WorldWarPaintApp', []);
 
@@ -8,18 +9,19 @@ wwpAngularApp.controller('RoomController', ['$scope', '$rootScope', 'RoomServerS
     $rootScope.teams = [];
     $rootScope.teams = [];
     $rootScope.teams = [];
-    
+
     $scope.styleGreen = {
-        color:'#44FF44'
+        color: '#44FF44'
     }
     $scope.styleRed = {
-        color:'#FF4400'
+        color: '#FF4400'
     }
 
 }]);
 
 
 var player = new Player();
+var map = new Map();
 
 function startPhaser(playerType) {
     $('#setupContainer').remove();
@@ -55,6 +57,20 @@ function preload() {
     game.load.image('splatters', 'assets/splatters.png');
     game.load.image('grass1', 'assets/forestPack/grass0x2.png');
     game.load.image('grass2', 'assets/forestPack/grass1x2.png');
+
+    // load game map assets (grass, water, items that don't need depth)
+    game.load.image('mGrass0', 'assets/forestPack/grass0x2.png'); // 0
+    game.load.image('mGrass1', 'assets/forestPack/grass1x2.png'); // 1
+    game.load.image('mWater0', 'assets/forestPack/water0x2.png'); // 2
+    game.load.image('mWater1', 'assets/forestPack/water1x2.png'); // 3
+    game.load.image('mWater2', 'assets/forestPack/water2x2.png'); // 4
+    game.load.image('mWater3', 'assets/forestPack/water3x2.png'); // 5
+    game.load.image('mWater4', 'assets/forestPack/water5x2.png'); // 6
+
+    // load game object assets (houses, trees, items that will have a value or needs depth on the map level) 0 is nothing
+    game.load.image('mTree0', 'assets/forestPack/tree3x2.png'); // 1
+    game.load.image('mTree1', 'assets/forestPack/tree1x2.png'); // 2
+    game.load.image('mTree2', 'assets/forestPack/tree2x2.png'); // 3
 }
 
 var cursors;
@@ -95,7 +111,7 @@ function create() {
         }
         game.add.sprite(0, 0, terrainRenderTexture);
     }
-
+    
     var canvas = document.getElementById("gameboard_canvas");
     gameBoardLayer.gameBoardDestination.initialize(canvas);
 
@@ -106,10 +122,12 @@ function create() {
     });
 
     //create the gameboard bitmap data that we can draw stuff to
-    spawnRenderTextureTiles();
-    gameBoardLayer.initialize();
+    //spawnRenderTextureTiles();
 
-    //initialize the connection with the game server.
+
+    //initialize the connection with the game server
+    // this will trigger the exchange of initial sync data between the server and client
+    // the map will be generated/rendered upon receipt of the map data from the server
     gameServer.initialize(player.type);
 
     //setup the game input so that it works (I think is what this does)

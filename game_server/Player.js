@@ -34,13 +34,15 @@ class Player {
         }
     }
 
-    initSyncServer(players, units) {
+    initSyncServer(players, units, map) {
         this.wsSend({
             event: 'initsyncServer',
             playerClr: this.clr,
             playerID: this.id,
             players: players,
-            units: units
+            units: units,
+            terrainMap: map.terrainMap
+            //objectMap: map.objectMap // houses, trees, etc (anything with depth)
         });
     }
     addUnit(unit) {

@@ -14,7 +14,7 @@ gameServer.initialize = function() {
         // the cookie doesn't exist, so create one with a generated player id
         document.cookie = 'pid=' + player.id + ';';
     }
-    
+
     var host = window.document.location.host.replace(/:.*/, '');
     ws = new WebSocket('ws://' + host + ':8081');
     ws.onmessage = gameServer.serverMessage;
@@ -47,7 +47,11 @@ var getPlayerClr = function(id) {
         }
     }
     console.log('player not found!')
-    return {r:1.0,g:1.0,b:1.0};
+    return {
+        r: 1.0,
+        g: 1.0,
+        b: 1.0
+    };
 
 }
 
@@ -56,11 +60,18 @@ gameServer.serverMessage = function(event) {
     data = JSON.parse(event.data);
     //var blobPosition = new Victor(data.x, data.y);
     //gameBoardLayer.drawRandomBlob(data.x, data.y, 10);
-    
+
     // this is part of the initial sync, when the server sends init data to the client
     if (data.event === 'initsyncServer') {
         console.log('msg-rxd: initsyncServer');
         // server response to initialsyncClient
+
+        // create map
+        map.renderTerrainTexture(data.terrainMap);
+        gameBoardLayer.initialize();
+        unitsGroup = game.add.group();
+        game.iso.topologicalSort(unitsGroup);
+
         // set player color
         player.clr = data.playerClr;
         // save players for the game session
@@ -71,10 +82,10 @@ gameServer.serverMessage = function(event) {
         // display the towers that existed before the client connected
         data.units.forEach(function(e, i) {
             // create a sprite to represent each tower from the server
-            var tower = game.add.isoSprite(e.x, e.y, 0, 'tower' ,0 ,unitsGroup);
+            var tower = game.add.isoSprite(e.x, e.y, 0, 'tower', 0, unitsGroup);
             tower.id = e.id;
             // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
-            tower.anchor.setTo(0.5, 0.84);//1-((tower.width/4)/tower.height));
+            tower.anchor.setTo(0.5, 0.84); //1-((tower.width/4)/tower.height));
             tower.ownerID = e.ownerID;
             tower.type = e.type;
             towers.push(tower);
@@ -84,7 +95,7 @@ gameServer.serverMessage = function(event) {
         var currentTime = (new Date()).getTime();
         for (var i = 0; i < data.schedule.length; i += 1) {
             var currentScheduleItem = data.schedule[i];
-            currentScheduleItem.scheduledTime = currentTime + (i*50);
+            currentScheduleItem.scheduledTime = currentTime + (i * 50);
             eventQueue.push(currentScheduleItem)
         }
     } else if (data.event === 'sync-addUnit') {
@@ -113,7 +124,7 @@ gameServer.manualSplatter = function(x, y, radius, owner) {
         owner: owner
     }));
 }
-gameServer.moveHero = function(x, y){
+gameServer.moveHero = function(x, y) {
     ws.send(JSON.stringify({
         event: 'tower destination',
         id: 1,
