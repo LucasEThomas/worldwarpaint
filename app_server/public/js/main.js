@@ -62,10 +62,10 @@ function preload() {
     game.load.image('mGrass0', 'assets/forestPack/grass0x2.png'); // 0
     game.load.image('mGrass1', 'assets/forestPack/grass1x2.png'); // 1
     game.load.image('mWater0', 'assets/forestPack/water0x2.png'); // 2
-    game.load.image('mWater1', 'assets/forestPack/water1x2.png'); // 3
-    game.load.image('mWater2', 'assets/forestPack/water2x2.png'); // 4
+    game.load.image('mWater1', 'assets/forestPack/water2x2.png'); // 3
+    game.load.image('mWater2', 'assets/forestPack/water5x2.png'); // 4
     game.load.image('mWater3', 'assets/forestPack/water3x2.png'); // 5
-    game.load.image('mWater4', 'assets/forestPack/water5x2.png'); // 6
+    game.load.image('mWater4', 'assets/forestPack/water1x2.png'); // 6
 
     // load game object assets (houses, trees, items that will have a value or needs depth on the map level) 0 is nothing
     game.load.image('mTree0', 'assets/forestPack/tree3x2.png'); // 1

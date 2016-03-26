@@ -67,6 +67,7 @@ gameServer.serverMessage = function(event) {
         // server response to initialsyncClient
 
         // create map
+        console.table(data.terrainMap);
         map.renderTerrainTexture(data.terrainMap);
         gameBoardLayer.initialize();
         unitsGroup = game.add.group();
