@@ -28,8 +28,9 @@ class Map {
                 // The last parameter is the group you want to add it to (just like game.add.sprite)
                 //var tile = (Math.random() < .9) ? game.make.sprite(0, 0, 'grass1') : game.make.sprite(0, 0, 'grass2');
                 var coordVal = terrain[gridY][gridX];
+                var gTile = game.make.sprite(0, 0, 'mGrass0');
                 switch (coordVal) {
-                    case 0:
+                    default:
                         var tile = game.make.sprite(0, 0, 'mGrass0');
                         break;
 
@@ -59,11 +60,13 @@ class Map {
 
                 }
                 tile.anchor.set(0.5);
+                gTile.anchor.set(0.5);
                 var point = game.iso.projectXY({
                     x: xx,
                     y: yy,
                     z: 0
                 });
+                terrainRenderTexture.renderXY(gTile, point.x, point.y);
                 terrainRenderTexture.renderXY(tile, point.x, point.y);
                 gridY++;
             }

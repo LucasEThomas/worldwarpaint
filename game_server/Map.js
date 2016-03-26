@@ -23,9 +23,43 @@ class Map {
             }
         }
 
+        function rAV(myArray) {
+            return myArray[Math.floor(Math.random() * myArray.length)];
+        }
+
+        var xBorders = [0, this.mapWidth - 1];
+        var yBorders = [0, this.mapHeight - 1];
+
+        // pick a startNode
+        var startX = Math.rangeInt(0, this.mapWidth - 1);
+        var startY = 0;
+        if (startX === 0 || startX === this.mapWidth - 1) {
+            // pick any startY
+            startY = Math.rangeInt(0, this.mapHeight - 1);
+        } else {
+            // pick an end or startY on the border only (0 or this.mapWidth - 1)
+            startY = rAV(yBorders);
+        }
+        var startNode = [startX, startY];
+
+        // pick an endNode
+        var endX = Math.rangeInt(0, this.mapWidth - 1);
+        var endY = 0;
+        if (endX === 0 || endX === this.mapWidth - 1) {
+            // pick any endY
+            endY = Math.rangeInt(0, this.mapHeight - 1);
+        } else {
+            // pick an endY on the border only (0 or this.mapWidth - 1)
+            endY = (startY === 0) ? this.mapHeight - 1 : 0;
+        }
+        var endNode = [endX, endY];
+        
+        console.log(startNode);
+        console.log(endNode);
+
         // pick start/end nodes for the river
-        var startNode = [Math.rangeInt(0, this.mapWidth - 1), Math.rangeInt(0, this.mapHeight - 1)];
-        var endNode = [Math.rangeInt(0, this.mapWidth - 1), Math.rangeInt(0, this.mapHeight - 1)];
+        /*var startNode = [Math.rangeInt(0, this.mapWidth - 1), Math.rangeInt(0, this.mapHeight - 1)];
+        var endNode = [Math.rangeInt(0, this.mapWidth - 1), Math.rangeInt(0, this.mapHeight - 1)];*/
         var timeOut = 128; // try this many times to find a suitable end node (in this case one that doesn't equal the startNode coords)
         while (endNode.equals(startNode)) {
             if (timeOut === 0) {
@@ -64,56 +98,19 @@ class Map {
         */
 
         function assignVal(one, two) {
-            var oneVal;
-            var twoVal;
-            switch (one) {
-                case 0:
-                    oneVal = 0;
-                    break;
 
-                case 1:
-                    oneVal = 1;
-                    break;
+            var comp = (1 << one) + (16 << two);
 
-                case 2:
-                    oneVal = 2;
-                    break;
-
-                case 3:
-                    oneVal = 4;
-                    break;
-            }
-
-            switch (two) {
-                case 0:
-                    twoVal = 8;
-                    break;
-
-                case 1:
-                    twoVal = 16;
-                    break;
-
-                case 2:
-                    twoVal = 32;
-                    break;
-
-                case 3:
-                    twoVal = 64;
-                    break;
-            }
-
-            var comp = oneVal + twoVal;
-
-            if (comp === 8 || comp === 68) {
+            if (comp === 17 || comp === 136) {
                 // right to top join
                 return 3;
-            } else if (comp === 34 || comp === 17) {
+            } else if (comp === 34 || comp === 68) {
                 // left to bottom join
                 return 4;
-            } else if (comp === 32 || comp === 65) {
+            } else if (comp === 65 || comp === 130) {
                 // right to bottom join
                 return 5;
-            } else if (comp === 10 || comp === 20) {
+            } else if (comp === 20 || comp === 40) {
                 // left to top join
                 return 6;
             } else {
@@ -216,7 +213,7 @@ class Map {
         // pass the nodes and their weights to the graph
         graph.setNodes(nodes);
         graph.setWeights(nodeWeights);
-        
+
         // generate a bunch of random weights to create a fake random flow for the river
         for (var x = 0; x < this.mapWidth; x++) {
             for (var y = 0; y < this.mapHeight; y++) {
