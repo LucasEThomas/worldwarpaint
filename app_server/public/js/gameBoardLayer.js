@@ -220,8 +220,7 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
     resolutionOutLocation = gl.getUniformLocation(program, "u_outResolution");
     resolutionFinalOutLocation = gl.getUniformLocation(program, "u_finalOutResolution");
     matrixLocation = gl.getUniformLocation(program, "u_matrixa");
-    vxDrawFromBufferLocation = gl.getUniformLocation(program, "u_vxDrawFromBuffer");
-    fgDrawFromBufferLocation = gl.getUniformLocation(program, "u_fgDrawFromBuffer");
+    drawMode = gl.getUniformLocation(program, "u_drawMode");
 
     // set the resolution
     gl.uniform2f(resolutionInLocation, 1024, 1024);
@@ -282,15 +281,23 @@ gameBoardLayer.gameBoardDestination.initialize = function(canvas) {
         return tex;
     }
 
+    var wildFlowersBitmapData = game.make.bitmapData(2048,2048);
+    var wildFlowersImage = game.make.image(0,0, 'wildFlowerNoise');
+    wildFlowersBitmapData.draw(wildFlowersImage);
+    wildFlowersBitmapData.update();
+    var wildFlowersImageData = wildFlowersBitmapData.imageData;
+    
     var splattersBitmapData = game.make.bitmapData(1024,1024);
     var splattersImage = game.make.image(0,0, 'splatters');
     splattersBitmapData.draw(splattersImage);
     splattersBitmapData.update();
     var splattersImageData = splattersBitmapData.imageData;
     
+    
 //    var mapImageData = game.make.bitmapData(2048,2048).imageData;
     //setup the textures
     texBuff = setupTexture(splattersImageData, 0, program, "u_canvasBuff");
+    texMask = setupTexture(wildFlowersImageData, 3, program, "u_wildFlowersMask");
     texDest1 = setupTexture(canvas, 1, program, "asdf");
     texDest2 = setupTexture(canvas, 2, program, "asdf");
     u_canvasDestLocation = gl.getUniformLocation(program, "u_canvasDest");
@@ -315,8 +322,8 @@ var resolutionInLocation;
 var resolutionOutLocation;
 var resolutionFinalOutLocation;
 var u_canvasDestLocation;
-var vxDrawFromBufferLocation;
-var fgDrawFromBufferLocation;
+var drawMode;
+var texMask;
 var texBuff;
 var texDest1;
 var texDest2;
@@ -346,8 +353,7 @@ gameBoardLayer.gameBoardDestination.render = function(){
     //setup uniforms for combining buffer with destination data
     gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), 1); //flip the y axis
     //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); //todo use this instead
-    gl.uniform1f(vxDrawFromBufferLocation, 1); //combine buffer and destination data
-    gl.uniform1f(fgDrawFromBufferLocation, 1); //combine buffer and destination data
+    gl.uniform1i(drawMode, 0); //combine buffer and destination data
 
     gl.uniform2f(resolutionFinalOutLocation, 2048, 2048);
     var matrix = [
@@ -365,9 +371,8 @@ gameBoardLayer.gameBoardDestination.render = function(){
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2);
     gl.drawArrays(gl.TRIANGLES, 0, numOfVertices);
     
-    //now copy result back to to prev texDest1
-    gl.uniform1f(vxDrawFromBufferLocation, 0); //render only the destination texture to the screen
-    gl.uniform1f(fgDrawFromBufferLocation, 0); //render only the destination texture to the screen
+    //now copy result back to to prev texDest1drawMode
+    gl.uniform1i(drawMode, 1); //copy
     gl.uniform1i(u_canvasDestLocation, 2);
     gl.activeTexture(gl.TEXTURE0 + 2);
     gl.bindTexture(gl.TEXTURE_2D, texDest2); //bind the last destination texture as the input to this draw
@@ -375,14 +380,15 @@ gameBoardLayer.gameBoardDestination.render = function(){
     gl.drawArrays(gl.TRIANGLES, 0, numOfVertices); //do the draw
     
     //render the result to the screen
+    gl.uniform1i(drawMode, 2); //render output
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); //now, render to the screen not a framebuffer
     gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), -1); //don't flip the y axis for this operation
     gl.uniform2f(resolutionFinalOutLocation, 3548, 2048);
-    matrix = [ 0.5000000000000001,
-  0.49999999999999994,
+    matrix = [ 0.5,
+  0.5,
   0,
-  -0.5000000000000001,
-  0.49999999999999994,
+  -0.5,
+  0.5,
   0,
   0.5,
   0,

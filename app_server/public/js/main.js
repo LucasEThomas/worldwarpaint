@@ -55,6 +55,7 @@ function preload() {
     game.load.image('towerBlue4', 'assets/TowerBlue4.png');
     game.load.image('notebookPaper', 'assets/isometricNotebookPaper.png');
     game.load.image('splatters', 'assets/splatters.png');
+    game.load.image('wildFlowerNoise', 'assets/wildFlowerNoise.png');
     game.load.image('grass1', 'assets/forestPack/grass0x2.png');
     game.load.image('grass2', 'assets/forestPack/grass1x2.png');
 

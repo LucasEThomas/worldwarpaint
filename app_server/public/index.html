@@ -64,7 +64,8 @@
         // our 2 canvases
         uniform sampler2D u_canvasBuff;
         uniform sampler2D u_canvasDest;
-        uniform bool u_fgDrawFromBuffer;
+        uniform sampler2D u_wildFlowersMask;
+        uniform int u_drawMode;
 
         // the texCoords passed in from the vertex shader.
         // note: we're only using 1 set of texCoords which means
@@ -77,9 +78,10 @@
         void main() {
              // Look up the pixels from buff and dest canvases
              vec4 colorBuff = texture2D(u_canvasBuff, v_inputCoord);
+             vec4 colorMask = texture2D(u_wildFlowersMask, v_prevOutputCoord);
              vec4 colorDest = texture2D(u_canvasDest, v_prevOutputCoord);
 
-             if(u_fgDrawFromBuffer){
+             if(u_drawMode == 0){ //do splatter computation
              
                 if(colorBuff.rgb != vec3(0.0,0.0,0.0)){
                     gl_FragColor = colorDest;//default value
@@ -101,9 +103,17 @@
                     gl_FragColor = colorDest;
                 }
              }
-             else{
+             else if(u_drawMode == 1){ //do copy
+                gl_FragColor = colorDest;
+             }
+             else if(u_drawMode == 2){//output
                 //todo, gausian blur code goes here eventually.
-                gl_FragColor =  colorDest;
+                //gl_FragColor = colorDest;
+                //gl_FragColor = vec4(colorDest.rgb - colorMask.r * 0.2, colorDest.a * ((colorMask.g * 0.7) + (colorMask.b * 0.3))); //ew gross!
+                //gl_FragColor = vec4(colorDest.rgb, colorDest.a * ((colorMask.g * 0.6) + (colorMask.b * 0.4)) * 1.5); //noise. No Highlights
+                //gl_FragColor = vec4(colorDest.rgb + colorMask.b * 0.2, colorDest.a + colorMask.b * 0.2); 
+                gl_FragColor = vec4(colorDest.rgb + colorMask.r * 0.1, ((colorDest.a * (1.0 - colorMask.g)) + ((colorDest.a >= 0.1)?colorMask.r * 0.2:0.0))); //grass blades and flowers
+                //gl_FragColor = vec4(colorDest.rgb, ((colorDest.a * (1.0 - colorMask.g))));
              }
         }
     </script>
