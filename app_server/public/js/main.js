@@ -214,7 +214,9 @@ var renderQueue = [];
 function render() {
     game.debug.cameraInfo(game.camera, 32, 32);
     game.debug.text('fps:' + (game.time.fps || '--'), 32, 115);
-    gameBoardLayer.gameBoardDestination.render();
+    if(stageColors.length){
+        gameBoardLayer.gameBoardDestination.render();
+    }
 }
 
 function resizeGame() {
