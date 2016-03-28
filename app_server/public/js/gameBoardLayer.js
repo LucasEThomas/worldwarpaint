@@ -384,15 +384,11 @@ gameBoardLayer.gameBoardDestination.render = function(){
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); //now, render to the screen not a framebuffer
     gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), -1); //don't flip the y axis for this operation
     gl.uniform2f(resolutionFinalOutLocation, 3548, 2048);
-    matrix = [ 0.5,
-  0.5,
-  0,
-  -0.5,
-  0.5,
-  0,
-  0.5,
-  0,
-  1 ];
+    matrix = [ 
+         0.5,  0.5, 0,
+        -0.5,  0.5, 0,
+         0.5,  0,   1 
+    ];
     gl.uniformMatrix3fv(matrixLocation, false, matrix);
     gl.drawArrays(gl.TRIANGLES, 0, numOfVertices); //do the draw
     
