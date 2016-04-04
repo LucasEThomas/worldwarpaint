@@ -1,10 +1,10 @@
 "use strict";
 
 class Player {    
-    constructor() {
-        this.id = Math.generateUUID();
+    constructor(type, id) {
+        this.id = id || Math.generateUUID();
         this.clr = {};
-        this.type = '';
+        this.type = type;
     }
 }
 

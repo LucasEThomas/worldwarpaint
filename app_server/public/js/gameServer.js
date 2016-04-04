@@ -7,13 +7,13 @@ gameServer.ws = null;
 //connects to the websocket game server
 gameServer.initialize = function() {
     // check if cookie exists with player id
-    if (Utility.getCookie('pid') !== '') {
-        // cookie exists, so set the player id to match the cookie info
-        player.id = Utility.getCookie('pid');
-    } else {
-        // the cookie doesn't exist, so create one with a generated player id
-        document.cookie = 'pid=' + player.id + ';';
-    }
+//    if (Utility.getCookie('pid') !== '') {
+//        // cookie exists, so set the player id to match the cookie info
+//        player.id = Utility.getCookie('pid');
+//    } else {
+//        // the cookie doesn't exist, so create one with a generated player id
+//        document.cookie = 'pid=' + player.id + ';';
+//    }
 
     var host = window.document.location.host.replace(/:.*/, '');
     ws = new WebSocket('ws://' + host + ':8081');
@@ -24,13 +24,12 @@ gameServer.initialize = function() {
 
 // send any init info to the server on start
 gameServer.initialSync = function(event) {
-    console.log('initsyncClient');
     ws.send(JSON.stringify({
         event: 'initsyncClient',
-        playerType: player.type,
+        playerType: game.player.type,
         // send player's id
-        playerID: player.id,
-        playerClr: player.clr
+        playerID: game.player.id,
+        playerClr: game.player.clr
     }));
 };
 
@@ -63,28 +62,22 @@ gameServer.serverMessage = function(event) {
 
     // this is part of the initial sync, when the server sends init data to the client
     if (data.event === 'initsyncServer') {
-        console.log('msg-rxd: initsyncServer');
         // server response to initialsyncClient
 
-        // create map
-        console.table(data.terrainMap);
-        map.renderTerrainTexture(data.terrainMap);
-        gameBoardLayer.initialize();
-        unitsGroup = game.add.group();
-        game.iso.topologicalSort(unitsGroup);
-        towerButton.makeButtons();
+        // draw map
+        game.terrainRenderTexture.renderTerrainTexture(data.terrainMap);
 
         // set player color
-        player.clr = data.playerClr;
+        game.player.clr = data.playerClr;
         // save players for the game session
         players = data.players;
         //set the player's id (the server could have changed it);
-        player.id = data.playerID;
-        document.cookie = 'pid=' + player.id + ';';
+        game.player.id = data.playerID;
+        document.cookie = 'pid=' + game.player.id + ';';
         // display the towers that existed before the client connected
         data.units.forEach(function(e, i) {
             // create a sprite to represent each tower from the server
-            var tower = game.add.isoSprite(e.x, e.y, 0, 'tower', 0, unitsGroup);
+            var tower = game.add.isoSprite(e.x, e.y, 0, 'tower', 0, game.unitsGroup);
             tower.id = e.id;
             // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
             tower.anchor.setTo(0.5, 0.84); //1-((tower.width/4)/tower.height));
@@ -98,10 +91,9 @@ gameServer.serverMessage = function(event) {
         for (var i = 0; i < data.schedule.length; i += 1) {
             var currentScheduleItem = data.schedule[i];
             currentScheduleItem.scheduledTime = currentTime + (i * 50);
-            eventQueue.push(currentScheduleItem)
+            game.eventQueue.push(currentScheduleItem)
         }
     } else if (data.event === 'sync-addUnit') {
-        //console.log('msg-rxd: '+data.event);
         var tower = game.add.sprite(data.tower.x, data.tower.y, 'towerBlue' + data.tower.type);
         tower.anchor.setTo(0.5, 0.5);
     }

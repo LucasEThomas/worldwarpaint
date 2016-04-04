@@ -1,4 +1,5 @@
-wwpAngularApp.service('RoomServerService', ['$rootScope', function($scope) {
+
+angular.module('services.roomServer', []).factory('roomServer', ['$rootScope', function($rootScope) {
     // We return this object to anything injecting our service
     var service = {};
     // Create our websocket object with the address to the websocket
@@ -9,20 +10,20 @@ wwpAngularApp.service('RoomServerService', ['$rootScope', function($scope) {
     //here, we set the player into the array pattern that the angular controller understands
     function setPlayer(player) {
         
-        $scope.$apply(() => {
+        $rootScope.$apply(() => {
             //remove all instances of the player (there should never be more than one)
-            $scope.teams.forEach((currentTeam,index)=>{
+            $rootScope.teams.forEach((currentTeam,index)=>{
                 currentTeam.players = currentTeam.players.filter((currentPlayer)=>currentPlayer.id !== player.id);
             });
             //find the team of the player's color
-            var playersTeam = $scope.teams.find((d)=>d.clr === player.clr);
+            var playersTeam = $rootScope.teams.find((d)=>d.clr === player.clr);
             //if there is no team of the player's color, create it
             if(!playersTeam){
                 playersTeam = {
                     players:[],
                     clr:player.clr
                 }
-                $scope.teams.push(playersTeam);
+                $rootScope.teams.push(playersTeam);
             }
             //add the player to its team
             playersTeam.players.push(
@@ -32,19 +33,19 @@ wwpAngularApp.service('RoomServerService', ['$rootScope', function($scope) {
             var typeSortOrder = ['Commander', 'Engineer', 'Champion', 'Archer'];
             playersTeam.players.sort((a,b)=>typeSortOrder.indexOf(a.type) - typeSortOrder.indexOf(b.type));
             //remove any empty teams
-            $scope.teams = $scope.teams.filter((currentTeam)=>currentTeam.players.length > 0);
+            $rootScope.teams = $rootScope.teams.filter((currentTeam)=>currentTeam.players.length > 0);
             //sort teams by color
             var colorsSortOrder = ['#4186EF', '#57C5B8', '#3C3042', '#ECC82F', '#F28B31', '#EB4D4D', '#EC53AC', '#9950B4'];
-            $scope.teams.sort((a,b)=>colorsSortOrder.indexOf(a.clr) - colorsSortOrder.indexOf(b.clr));
+            $rootScope.teams.sort((a,b)=>colorsSortOrder.indexOf(a.clr) - colorsSortOrder.indexOf(b.clr));
             //calculate totals for display
-            $scope.numberOfTeams = $scope.teams.length;
-            $scope.numberOfPlayers = ($scope.numberOfTeams)?$scope.teams.map((e)=>e.players.length).reduce((total, current)=>total + current):0;
+            $rootScope.numberOfTeams = $rootScope.teams.length;
+            $rootScope.numberOfPlayers = ($rootScope.numberOfTeams)?$rootScope.teams.map((e)=>e.players.length).reduce((total, current)=>total + current):0;
             
         });
     }
     
     var onopen = function(){
-        console.log("Room server socket opened!");
+//        console.log("Room server socket opened!");
     };
     
     var onmessage = function(message) {
@@ -53,8 +54,6 @@ wwpAngularApp.service('RoomServerService', ['$rootScope', function($scope) {
             setPlayer(data.player);
         }
         else if(data.event === 'setMutliPlayersData'){
-            console.log('setMutliPlayersData');
-            console.log(data.players);
             data.players.forEach((currentPlayer, index)=>{
                 setPlayer(currentPlayer);
             });
