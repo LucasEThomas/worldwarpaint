@@ -7,13 +7,13 @@ gameServer.ws = null;
 //connects to the websocket game server
 gameServer.initialize = function() {
     // check if cookie exists with player id
-//    if (Utility.getCookie('pid') !== '') {
-//        // cookie exists, so set the player id to match the cookie info
-//        player.id = Utility.getCookie('pid');
-//    } else {
-//        // the cookie doesn't exist, so create one with a generated player id
-//        document.cookie = 'pid=' + player.id + ';';
-//    }
+    //    if (Utility.getCookie('pid') !== '') {
+    //        // cookie exists, so set the player id to match the cookie info
+    //        player.id = Utility.getCookie('pid');
+    //    } else {
+    //        // the cookie doesn't exist, so create one with a generated player id
+    //        document.cookie = 'pid=' + player.id + ';';
+    //    }
 
     var host = window.document.location.host.replace(/:.*/, '');
     ws = new WebSocket('ws://' + host + ':8081');
@@ -94,8 +94,13 @@ gameServer.serverMessage = function(event) {
             game.eventQueue.push(currentScheduleItem)
         }
     } else if (data.event === 'sync-addUnit') {
-        var tower = game.add.sprite(data.tower.x, data.tower.y, 'towerBlue' + data.tower.type);
-        tower.anchor.setTo(0.5, 0.5);
+        var tower = game.add.isoSprite(data.unit.x, data.unit.y, 0, 'tower', 0, game.unitsGroup);
+        tower.id = data.unit.id;
+        // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
+        tower.anchor.setTo(0.5, 0.84); //1-((tower.width/4)/tower.height));
+        tower.ownerID = data.unit.ownerID;
+        tower.type = data.unit.type;
+        towers.push(tower);
     }
 }
 

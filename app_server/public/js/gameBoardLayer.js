@@ -10,9 +10,7 @@ class GameBoardLayer {
         this.sprite = game.add.sprite(0, 0, texture, textureFrame);
         this.sprite.fixedToCamera = false;
         this.sprite.inputEnabled = true;
-        this.sprite.events.onInputUp.add(this.mouseUp);
-        
-        
+        this.sprite.events.onInputUp.add(()=>this.mouseUp());
         
         this.stageOutputColors = [];
         this.stageInputRects = [];
@@ -21,7 +19,7 @@ class GameBoardLayer {
     mouseUp() {
         //logic for placing towers goes here?
         if (towerDrag) {
-            if (this.gameBoardGraphics(game.input.worldX, game.input.worldY, player.clr)) {
+            if (this.gameBoardGraphics.colorMatch(game.input.worldX, game.input.worldY, game.player.clr)) {
                 tower.towerPlaced(towerDrag.isoX, towerDrag.isoY);
             } else {
                 // stop dragging a new tower
