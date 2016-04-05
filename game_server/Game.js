@@ -57,7 +57,7 @@ class Game {
     }
     onDisconnect(player) {
         //remove player from players array
-        this.players = this.players.filter((v) => v.id !== player.id);
+        //this.players = this.players.filter((v) => v.id !== player.id);
     }
     onNewTower(player, x, y, type, ownerId) {
         var unit = new Unit(uuid.v4(), x, y, type, ownerId);

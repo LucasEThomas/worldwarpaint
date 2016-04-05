@@ -15,6 +15,7 @@ class Player {
         if (ws) {
             ws.on('close', ()=>{
                 this.onDisconnect(this);
+                this.ws = null;
             });
             ws.on('message', (data, flags)=>{
                 this.messageRxvd(JSON.parse(data));
