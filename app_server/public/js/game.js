@@ -71,7 +71,7 @@ class Game extends Phaser.Game {
         game.canvas.oncontextmenu = function(e) {
             e.preventDefault();
             if (player.type === 'champion' || player.type === 'archer')
-                gameServer.moveHero(game.input.worldX, game.input.worldY);
+                this.gameServer.moveHero(game.input.worldX, game.input.worldY);
         }
 
         //create the four layers
@@ -87,7 +87,7 @@ class Game extends Phaser.Game {
         //initialize the connection with the game server
         // this will trigger the exchange of initial sync data between the server and client
         // the map will be generated/rendered upon receipt of the map data from the server
-        gameServer.initialize(this.player.type);
+        this.gameServer = new gameServer(this.player.type);
     }
     childUpdate() {
         //if the the time has come for the next item in the queue to be executed, add it to the render queue

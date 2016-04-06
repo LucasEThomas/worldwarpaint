@@ -50,7 +50,7 @@ tower.towerPlaced = function (placeX, placeY) {
 //    towers.push(tower);
 
     // tell the server we created a new tower
-    gameServer.createTower(placeX, placeY, selectedTower, tower.id, game.player.id);
+    game.gameServer.createTower(placeX, placeY, selectedTower, tower.id, game.player.id);
 
     // stop dragging a new tower
     towerDrag.destroy();

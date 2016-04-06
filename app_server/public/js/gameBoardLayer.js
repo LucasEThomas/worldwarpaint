@@ -28,7 +28,7 @@ class GameBoardLayer {
             }
         } else {
             var point = game.iso.unproject(game.input.activePointer.position);
-            gameServer.manualSplatter(point.x, point.y, 50, game.player.id);
+            game.gameServer.manualSplatter(point.x, point.y, 50, game.player.id);
         }
     }
 
