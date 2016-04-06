@@ -1,8 +1,5 @@
 class gameServer {
     constructor() {
-        var players = []; // holds the players for this client's session
-        var towers = []; // holds the towers for this client's session
-
         var host = window.document.location.host.replace(/:.*/, '');
         this.ws = new WebSocket('ws://' + host + ':8081');
         this.ws.onopen = (e) => this.initialSync(e);
@@ -36,7 +33,7 @@ class gameServer {
             // set player color
             game.player.clr = data.playerClr;
             // save players for the game session
-            this.players = data.players;
+            game.players = data.players;
             //set the player's id (the server could have changed it);
             game.player.id = data.playerID;
             document.cookie = 'pid=' + game.player.id + ';';
@@ -97,21 +94,5 @@ class gameServer {
             y: y,
         }));
     }
-
-}
-
-// given a player id, return the player's color dictionary
-var getPlayerClr = function(id) {
-    for (var key in game.gameServer.players) {
-        if (game.gameServer.players[key].id === id) {
-            return game.gameServer.players[key].clr;
-        }
-    }
-    console.log('player not found!')
-    return {
-        r: 1.0,
-        g: 1.0,
-        b: 1.0
-    };
 
 }

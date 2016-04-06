@@ -8,6 +8,8 @@ class Game extends Phaser.Game {
         });
         
         this.player = new Player(playerType);
+        
+        this.players = [];
 
         this.cursors;
 
@@ -104,7 +106,7 @@ class Game extends Phaser.Game {
                             currentGeometry.x,
                             currentGeometry.y,
                             currentGeometry.radius,
-                            getPlayerClr(currentEvent.ownerID),
+                            this.getPlayerClr(currentEvent.ownerID),
                             currentGeometry.inputIndex);
                     }
                 } else if (currentEvent.type === 'manualSplatter') {
@@ -113,7 +115,7 @@ class Game extends Phaser.Game {
                         currentGeometry.x,
                         currentGeometry.y,
                         currentGeometry.radius,
-                        getPlayerClr(currentEvent.ownerID),
+                        this.getPlayerClr(currentEvent.ownerID),
                         currentGeometry.inputIndex);
                 } else if (currentEvent.type === 'moveUnit') {
                     var data = currentEvent.data;
@@ -166,5 +168,18 @@ class Game extends Phaser.Game {
         game.scale.height = height;
         game.camera.setSize(width, height);
         game.renderer.resize(width, height);
+    }
+    
+    // given a player id, return the player's color {r,g,b} object
+    getPlayerClr(id) {
+        let player = this.players.find((player)=>player.id===id);
+        if(player){
+            return player.clr;
+        }
+        else{
+            console.log('player with id ' + id + ' not found.')
+            return {r:0.0, g:0.0, b:0.0};
+        }
+        
     }
 }

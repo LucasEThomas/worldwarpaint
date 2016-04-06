@@ -159,9 +159,6 @@ class GameBoardGraphics {
 
         // look up where the vertex data needs to go.
         var locCache = this.locCache = new LocationsCache(gl, program, ['a_inputRects', 'a_outputRects', 'a_colors', 'u_inResolution', 'u_outResolution', 'u_finalOutResolution', 'u_matrixa', 'u_drawMode', 'u_flipY', 'u_canvasDest']);
-
-        console.log(locCache);
-        console.log(locCache.getLoc('u_inResolution'));
         
         // lookup uniforms
 
@@ -315,10 +312,9 @@ class LocationsCache {
     setLocation(string) {
         if (string.substring(0, 2).toLowerCase() === 'u_') {
             this.setUniformLocation(string);
-            console.log('set uniform ' + string);
+
         } else if (string.substring(0, 2).toLowerCase() === 'a_') {
             this.setAttributeLocation(string);
-            console.log('set attribute ' + string);
         }
         else{
             console.error('string must begin with \'u_\' or \'a_\'');
