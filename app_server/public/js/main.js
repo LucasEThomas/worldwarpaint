@@ -17,7 +17,7 @@ angular.module('app').controller('RoomController', ['$scope', '$rootScope', 'roo
 }]);
 
 var game;
-var startPhaser = function(playerType) {
+var startGame = function(playerType) {
     //todo, disconnect room server ws connection
     $('#setupContainer').remove();
     game = new Game();
