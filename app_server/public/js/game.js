@@ -64,12 +64,6 @@ class Game extends Phaser.Game {
         });
         game.camera.y = 200;
         game.camera.x = 1020;
-        
-        game.canvas.oncontextmenu = function(e) {
-            e.preventDefault();
-            if (player.type === 'champion' || player.type === 'archer')
-                this.gameServer.moveHero(game.input.worldX, game.input.worldY);
-        }
 
         //create the four layers
         this.terrainRenderTexture = new Map(game, 3548, 2048, 'terrainBackground'); 

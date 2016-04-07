@@ -6,6 +6,8 @@ class GameInputs {
         this.MAP_SCROLL_SPEED = 16;
         this.arrowKeys = game.input.keyboard.createCursorKeys();
 
+        game.canvas.oncontextmenu = this.rightMouseUp;
+
         abilities.forEach((ability, n) => {
             var button = game.add.sprite(0, 0, ability.image);
             button.fixedToCamera = true;
@@ -49,6 +51,13 @@ class GameInputs {
             game.gameServer.manualSplatter(point.x, point.y, 50, game.player.id);
         }
     }
+    rightMouseUp(e) {
+        console.log('rc');
+        e.preventDefault();
+        if (game.player.type === 'champion' || game.player.type === 'archer')
+            game.gameServer.moveHero(game.input.worldX, game.input.worldY);
+    }
+
 
     update() {
         if (this.arrowKeys.up.isDown)
