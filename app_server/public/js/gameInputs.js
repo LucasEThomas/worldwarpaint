@@ -23,12 +23,12 @@ class GameInputs {
         if (ability.onClickOptions) {
             let options = ability.onClickOptions;
             if (options.inIsoUnitsGroup) {
-                this.abilityCursor = game.add.isoSprite(0, 0, 0, options.imageName, 0, game.unitsGroup);
+                this.abilityCursor = game.add.isoSprite(0, 0, 0, options.imageName, 0, game.units.group);
                 this.abilityCursor.inputEnabled = false;
                 this.abilityCursor.anchor.setTo(0.5, 0.84);
                 this.abilityCursor.alpha = options.alpha;
             } else {
-                this.abilityCursor = game.add.isoSprite(0, 0, 0, options.imageName, 0, game.unitsGroup);
+                this.abilityCursor = game.add.isoSprite(0, 0, 0, options.imageName, 0, game.units.group);
                 this.abilityCursor.inputEnabled = false;
                 this.abilityCursor.anchor.setTo(0.5, 0.5);
                 this.abilityCursor.alpha = options.alpha;

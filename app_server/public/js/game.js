@@ -9,12 +9,10 @@ class Game extends Phaser.Game {
         
         this.player = new Player(playerType);
         
-        this.units = new UnitsManager();
+        this.units;
         
-        this.players = [];
-
-        this.unitsGroup;
-
+        this.players = new PlayersManager();
+        
         this.eventQueue = [];
     }
 
@@ -77,7 +75,7 @@ class Game extends Phaser.Game {
         
         this.gameBoardLayer = new GameBoardLayer(this);
         
-        this.unitsGroup = game.add.group();
+        this.units = new UnitsManager();
         
         this.gameInputs = new GameInputs(abilities);
         
@@ -103,7 +101,7 @@ class Game extends Phaser.Game {
         }
 
         this.gameInputs.update();
-        game.iso.simpleSort(this.unitsGroup);
+        this.units.update();
     }
 
     childRender() {
@@ -124,18 +122,5 @@ class Game extends Phaser.Game {
         game.scale.height = height;
         game.camera.setSize(width, height);
         game.renderer.resize(width, height);
-    }
-    
-    // given a player id, return the player's color {r,g,b} object
-    getPlayerClr(id) {
-        let player = this.players.find((player)=>player.id===id);
-        if(player){
-            return player.clr;
-        }
-        else{
-            console.log('player with id ' + id + ' not found.')
-            return {r:0.0, g:0.0, b:0.0};
-        }
-        
     }
 }

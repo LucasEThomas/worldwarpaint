@@ -33,7 +33,7 @@ class gameServer {
             // set player color
             game.player.clr = data.playerClr;
             // save players for the game session
-            game.players = data.players;
+            game.players.setPlayers(data.players);
             //set the player's id (the server could have changed it);
             game.player.id = data.playerID;
             document.cookie = 'pid=' + game.player.id + ';';
