@@ -6,10 +6,7 @@ class GameInputs {
         this.MAP_SCROLL_SPEED = 16;
         this.arrowKeys = game.input.keyboard.createCursorKeys();
 
-        console.log(abilities);
-
         abilities.forEach((ability, n) => {
-            console.log(ability);
             var button = game.add.sprite(0, 0, ability.image);
             button.fixedToCamera = true;
             button.cameraOffset.setTo(30, 150 + 60 * n);
