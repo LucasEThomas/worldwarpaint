@@ -62,7 +62,9 @@ class Game extends Phaser.Game {
         $(window).resize(()=>{
             this.resizeGame();
         });
-
+        game.camera.y = 200;
+        game.camera.x = 1020;
+        
         game.canvas.oncontextmenu = function(e) {
             e.preventDefault();
             if (player.type === 'champion' || player.type === 'archer')
