@@ -6,13 +6,11 @@ class Game extends Phaser.Game {
             update: () => this.childUpdate(),
             render: () => this.childRender()
         });
-        
+
         this.player = new Player(playerType);
-        
-        this.units;
-        
+
         this.players = new PlayersManager();
-        
+
         this.eventQueue = [];
     }
 
@@ -59,21 +57,18 @@ class Game extends Phaser.Game {
         let game = this;
         //  Modify the world and camera bounds
         game.world.setBounds(0, 0, 3548, 2048);
-        $(window).resize(()=>{
+        $(window).resize(() => {
             this.resizeGame();
         });
         game.camera.y = 200;
         game.camera.x = 1020;
 
-        //create the four layers
-        this.terrainRenderTexture = new Map(game, 3548, 2048, 'terrainBackground'); 
-        
-        this.gameBoardLayer = new GameBoardLayer(this);
-        
-        this.units = new UnitsManager();
-        
-        this.gameInputs = new GameInputs(abilities);
-        
+        //create the four visible layers (it matters which order we create these in)
+        this.terrainRenderTexture = new Map(game, 3548, 2048, 'terrainBackground'); //  1st Layer, the terrain background
+        this.gameBoardLayer = new GameBoardLayer(this); //                              2nd layer, the paint
+        this.units = new UnitsManager(); //                                             3rd layer, the game units
+        this.gameInputs = new GameInputs(abilities); //                                 4th layer, the gui buttons
+
         //initialize the connection with the game server
         // this will trigger the exchange of initial sync data between the server and client
         // the map will be generated/rendered upon receipt of the map data from the server
@@ -100,8 +95,9 @@ class Game extends Phaser.Game {
     }
 
     childRender() {
-        game.debug.cameraInfo(game.camera, 32, 32);
-        game.debug.text('fps:' + (game.time.fps || '--'), 32, 115);
+        let rect = new Phaser.Rectangle( game.camera.x + (game.camera.width / 2) - 160, game.camera.y + 12, 340, 30 );
+        game.debug.geom( rect, 'rgba(55,55,55,1)' );
+        game.debug.text('fps:' + (game.time.fps || '--') + ' x:' + game.camera.x + ' y:' + game.camera.y + ' w:' + game.camera.width + ' h:' + game.camera.height, (game.camera.width / 2) - 150, 32);
         this.gameBoardLayer.render();
     }
     resizeGame() {
