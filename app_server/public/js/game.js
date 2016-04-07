@@ -71,7 +71,6 @@ class Game extends Phaser.Game {
 
         //create the four layers
         this.terrainRenderTexture = new Map(game, 3548, 2048, 'terrainBackground'); 
-        game.world.create(0, 0, this.terrainRenderTexture);
         
         this.gameBoardLayer = new GameBoardLayer(this);
         

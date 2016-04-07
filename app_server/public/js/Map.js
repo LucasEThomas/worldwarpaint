@@ -1,8 +1,9 @@
 "use strict";
 
 class Map extends Phaser.RenderTexture{
-    constructor() {
+    constructor(game) {
         super(game, 3548, 2048, 'terrainBackground');
+        game.world.create(0, 0, this);
     }
 
     setTerrainMap(terrainMap) {
