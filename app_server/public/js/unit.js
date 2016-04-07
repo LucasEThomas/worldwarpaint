@@ -5,7 +5,7 @@ class Unit {
 }
 class UnitsManager {
     constructor() {
-        this.towers = [];
+        this.units = [];
     }
     newTower(x, y, id, ownerId, type) {
         var tower = game.add.isoSprite(x, y, 0, 'tower', 0, game.unitsGroup);
@@ -14,6 +14,24 @@ class UnitsManager {
         tower.anchor.setTo(0.5, 0.84); //1-((tower.width/4)/tower.height));
         tower.ownerID = ownerId;
         tower.type = type;
-        this.towers.push(tower);
+        this.units.push(tower);
+    }
+    processEvent(event) {
+        //this logic should be somewhere else... but here's fine for now :) 
+        if (event.type === 'sprinklerUnit') {
+            let clr = game.getPlayerClr(event.ownerID)
+            event.data.forEach((splatter, n) => {
+                game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
+            });
+        } else if (event.type === 'manualSplatter') {
+            let clr = game.getPlayerClr(event.ownerID)
+            let splatter = event.data[0];
+            game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
+        } else if (event.type === 'moveUnit') {
+            //todo, this needs to work in the isometic plugin.
+            let tower = this.units.find((t) => t.id === event.data.id);
+            tower.x = event.data.x;
+            tower.y = event.data.y;
+        }
     }
 }

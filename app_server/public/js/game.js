@@ -87,41 +87,13 @@ class Game extends Phaser.Game {
         this.gameServer = new gameServer(this.player.type);
     }
     childUpdate() {
-        //if the the time has come for the next item in the queue to be executed, add it to the render queue
+        //if the  time has come for the next item in the queue to be executed, add it to the render queue
         let game = this;
         var currentTime = (new Date()).getTime();
         if (this.eventQueue.length && this.eventQueue[0].scheduledTime <= currentTime) {
-            var currentTimeSlot = this.eventQueue.shift();
+            let currentTimeSlot = this.eventQueue.shift();
             for (var currentEvent of currentTimeSlot) {
-
-                //todo, need to break out into another method that decides what to do with each event in the timeSlot
-                if (currentEvent.type === 'sprinklerUnit') {
-                    for (var currentGeometry of currentEvent.data) {
-                        this.gameBoardLayer.stageSplatter(
-                            currentGeometry.x,
-                            currentGeometry.y,
-                            currentGeometry.radius,
-                            this.getPlayerClr(currentEvent.ownerID),
-                            currentGeometry.inputIndex);
-                    }
-                } else if (currentEvent.type === 'manualSplatter') {
-                    var currentGeometry = currentEvent.data[0];
-                    this.gameBoardLayer.stageSplatter(
-                        currentGeometry.x,
-                        currentGeometry.y,
-                        currentGeometry.radius,
-                        this.getPlayerClr(currentEvent.ownerID),
-                        currentGeometry.inputIndex);
-                } else if (currentEvent.type === 'moveUnit') {
-                    var data = currentEvent.data;
-                    towers.forEach((tower, index) => {
-                        if (tower.id === data.id) {
-                            tower.x = data.x;
-                            tower.y = data.y;
-                        }
-                    });
-                }
-
+                this.units.processEvent(currentEvent);
             }
 
         }
