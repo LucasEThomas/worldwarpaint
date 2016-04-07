@@ -40,13 +40,7 @@ class gameServer {
             // display the towers that existed before the client connected
             data.units.forEach(function(e, i) {
                 // create a sprite to represent each tower from the server
-                var tower = game.add.isoSprite(e.x, e.y, 0, 'tower', 0, game.unitsGroup);
-                tower.id = e.id;
-                // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
-                tower.anchor.setTo(0.5, 0.84); //1-((tower.width/4)/tower.height));
-                tower.ownerID = e.ownerID;
-                tower.type = e.type;
-                towers.push(tower);
+                game.units.newTower(e.x, e.y, e.id, e.ownerId, e.type);
             });
         } else if (data.event === 'scheduleEvents') {
             //A new list of events has come down from the server. Each one needs to scheduled in the eventQueue.
@@ -57,23 +51,16 @@ class gameServer {
                 game.eventQueue.push(currentScheduleItem)
             }
         } else if (data.event === 'sync-addUnit') {
-            var tower = game.add.isoSprite(data.unit.x, data.unit.y, 0, 'tower', 0, game.unitsGroup);
-            tower.id = data.unit.id;
-            // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
-            tower.anchor.setTo(0.5, 0.84); //1-((tower.width/4)/tower.height));
-            tower.ownerID = data.unit.ownerID;
-            tower.type = data.unit.type;
-            towers.push(tower);
+            game.units.newTower(data.unit.x, data.unit.y, data.unit.id, data.unit.ownerId, data.unit.type);
         }
     }
 
-    createTower(x, y, type, id, owner) {
+    createTower(x, y, type, owner) {
         this.ws.send(JSON.stringify({
             event: 'new tower',
             x: x,
             y: y,
             type: type,
-            id: id,
             owner: owner
         }));
     }

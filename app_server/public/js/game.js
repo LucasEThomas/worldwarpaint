@@ -9,13 +9,11 @@ class Game extends Phaser.Game {
         
         this.player = new Player(playerType);
         
+        this.units = new UnitsManager();
+        
         this.players = [];
 
-        this.cursors;
-
         this.unitsGroup;
-
-        this.MAP_SCROLL_SPEED = 16;
 
         this.eventQueue = [];
     }
@@ -67,9 +65,6 @@ class Game extends Phaser.Game {
             this.resizeGame();
         });
 
-        //setup the game input so that it works (I think is what this does)
-        this.cursors = game.input.keyboard.createCursorKeys();
-
         game.canvas.oncontextmenu = function(e) {
             e.preventDefault();
             if (player.type === 'champion' || player.type === 'archer')
@@ -84,7 +79,7 @@ class Game extends Phaser.Game {
         
         this.unitsGroup = game.add.group();
         
-        towerButton.makeButtons();
+        this.gameInputs = new GameInputs(abilities);
         
         //initialize the connection with the game server
         // this will trigger the exchange of initial sync data between the server and client
@@ -135,18 +130,7 @@ class Game extends Phaser.Game {
             this.eventQueue.length = 0;
         }
 
-        if (this.cursors.up.isDown)
-            game.camera.y -= this.MAP_SCROLL_SPEED;
-        if (this.cursors.down.isDown)
-            game.camera.y += this.MAP_SCROLL_SPEED;
-        if (this.cursors.left.isDown)
-            game.camera.x -= this.MAP_SCROLL_SPEED;
-        if (this.cursors.right.isDown)
-            game.camera.x += this.MAP_SCROLL_SPEED;
-
-        if (towerDrag) {
-            tower.dragCord();
-        }
+        this.gameInputs.update();
         game.iso.simpleSort(this.unitsGroup);
     }
 

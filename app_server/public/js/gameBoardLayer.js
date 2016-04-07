@@ -3,33 +3,17 @@ class GameBoardLayer {
         var canvas = $('#gameboard_canvas')[0];
         this.gameBoardGraphics = new GameBoardGraphics(canvas);
         canvas = document.getElementById('gameboard_canvas');
-        //var context = canvas.getContext('2d');
         this.baseTexture = new PIXI.BaseTexture(canvas);
         var texture = new PIXI.Texture(this.baseTexture);
         var textureFrame = new Phaser.Frame(0, 0, 0, game.world.width, game.world.height, 'debug', game.rnd.uuid());
         this.sprite = game.add.sprite(0, 0, texture, textureFrame);
         this.sprite.fixedToCamera = false;
         this.sprite.inputEnabled = true;
-        this.sprite.events.onInputUp.add(()=>this.mouseUp());
+        this.sprite.events.onInputUp.add(()=>game.gameInputs.mouseUp());
         
         this.stageOutputColors = [];
         this.stageInputRects = [];
         this.stageOutputRects = [];
-    }
-    mouseUp() {
-        //logic for placing towers goes here?
-        if (towerDrag) {
-            if (this.gameBoardGraphics.colorMatch(game.input.worldX, game.input.worldY, game.player.clr)) {
-                tower.towerPlaced(towerDrag.isoX, towerDrag.isoY);
-            } else {
-                // stop dragging a new tower
-                towerDrag.destroy();
-                towerDrag = null;
-            }
-        } else {
-            var point = game.iso.unproject(game.input.activePointer.position);
-            game.gameServer.manualSplatter(point.x, point.y, 50, game.player.id);
-        }
     }
 
     stageSplatter(x, y, radius, clr, inputIndex) {
