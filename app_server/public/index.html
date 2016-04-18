@@ -185,9 +185,16 @@
     <script src="js/game.js"></script>
     <script src="js/unit.js"></script>
     <div ng-app="app" ng-controller="RoomController">
+       
+        <h2 style="display:inline">player name: {{name}}</h2>
+        <input ng-model="name" type="text" style="display:inline">
+        <button class="bigButton" type="button" onclick="">READY</button>
+        <button class="bigButton" type="button" ng-click="setPlayerData()">SEND DATA</button>
+        <button class="bigButton" type="button" onclick="startGame('champion');">START GAME</button>
+        
         <div id="setupContainer">
             <div id="colorsContainer">
-                <h1>select team color</h1>
+                <h1 class="centeredHeader">select team color</h1>
                 <div id="colorsRadiosContainer">
                     <input class="blue" id="radioBlue" type="radio" name="field" value="blue">
                         <label for="radioBlue"></label>
@@ -207,30 +214,26 @@
                         <label for="radioViolet"></label>
                 </div>
             </div>
-            <div id="chooserContainer">
-                <h1>select player type</h1>
+            
+            <div style="display:inline-flex; flex-flow:column nowrap; justify-content:flex-start; width:360px; margin-right:50px;">
+                <h1 class="centeredHeader">select player type</h1>
                 <div id="columnTitles">
                     <div id='spacer'></div>
                     <h2>POWERFUL</h2>
                     <h2>TACTICAL</h2>
                 </div>
-                <div id=rowTitles>
-                    <h2 class='vertical-text' style="height:165px">ARCHITECT</h2>
-                    <h2 class='vertical-text' style="height:165px">HERO</h2>
-                </div>
-                <div id="gameModesRadiosContainer">
-                    <input class="playerType" id="radioCommander" type="radio" name="field2" value="option">
-                        <label for="radioCommander"></label>
-                    <input class="playerType" id="radioEngineer" type="radio" name="field2" value="option">
-                        <label for="radioEngineer"></label>
-                    <input class="playerType" id="radioChampion" type="radio" name="field2" value="option">
-                        <label for="radioChampion"></label>
-                    <input class="playerType" id="radioArcher" type="radio" name="field2" value="option">
-                        <label for="radioArcher"></label>
+                <div style="display:inline-flex; flex-flow:row nowrap; justify-content:flex-start; width:300px;">
+                    <div id=rowTitles>
+                        <h2 class='vertical-text' style="height:165px">ARCHITECT</h2>
+                        <h2 class='vertical-text' style="height:165px">HERO</h2>
+                    </div>
+                    <div style="display:inline-flex; flex-flow:row wrap; justify-content:space-around; width:270px; height:270px;">
+                        <custom-radio-button ng-repeat="playerType in playerTypes"></custom-radio-button>
+                    </div>
                 </div>
             </div>
             <div id="playersContainer">
-                <h1>teams:{{numberOfTeams}} players:{{numberOfPlayers}}</h1>
+                <h1 class="centeredHeader">teams:{{numberOfTeams}} players:{{numberOfPlayers}}</h1>
                 <div ng-repeat="team in teams" class="teamContainer">
                     <svg width="50" height="0" ng-attr-height="{{20 + team.players.length * 30}}">
                         <svg preserveAspectRatio="xMinYMid meet" viewBox="0 0 30 30" width="30" height="100%">
@@ -253,7 +256,6 @@
                 </div>
                 
             </div>
-            <button type="button" onclick="startGame('champion');">READY</button>
         </div>
     </div>
     <div id="phaser_container"></div>

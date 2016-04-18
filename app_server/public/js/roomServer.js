@@ -1,4 +1,3 @@
-
 angular.module('services.roomServer', []).factory('roomServer', ['$rootScope', function($rootScope) {
     // We return this object to anything injecting our service
     var service = {};
@@ -69,6 +68,7 @@ angular.module('services.roomServer', []).factory('roomServer', ['$rootScope', f
     });
     
     service.setPlayerData = function(name, clr, type, ready) {
+        console.log('sending!');
         service.ws.send(JSON.stringify({
             event: 'setPlayerData',
             name: name,
