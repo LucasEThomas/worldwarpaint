@@ -189,27 +189,27 @@
             <h2 style="display:inline">player name: {{name}}</h2>
             <input ng-model="name" type="text" style="display:inline">
             <button class="bigButton" type="button" onclick="">READY</button>
-            <button class="bigButton" type="button" ng-click="setPlayerData()">SEND DATA</button>
+            <button class="bigButton" type="button" ng-click="sendPlayerData();">SEND DATA</button>
             <button class="bigButton" type="button" onclick="startGame('champion');">START GAME</button>
             <div id="flexContainer">
                 <div id="colorsContainer">
                     <h1 class="centeredHeader">select team color</h1>
                     <div id="colorsRadiosContainer">
-                        <input class="blue" id="radioBlue" type="radio" name="field" value="blue">
+                        <input class="blue" id="radioBlue" type="radio" name="clr" ng-model="clr" value="blue">
                             <label for="radioBlue"></label>
-                        <input class="teal" id="radioTeal" type="radio" name="field" value="option">
+                        <input class="teal" id="radioTeal" type="radio" name="clr" ng-model="clr" value="teal">
                             <label for="radioTeal"></label>
-                        <input class="white" id="radioWhite" type="radio" name="field" value="option">
+                        <input class="white" id="radioWhite" type="radio" name="clr" ng-model="clr" value="white">
                             <label for="radioWhite"></label>
-                        <input class="yellow" id="radioYellow" type="radio" name="field" value="option">
+                        <input class="yellow" id="radioYellow" type="radio" name="clr" ng-model="clr" value="yellow">
                             <label for="radioYellow"></label>
-                        <input class="orange" id="radioOrange" type="radio" name="field" value="option">
+                        <input class="orange" id="radioOrange" type="radio" name="clr" ng-model="clr" value="orange">
                             <label for="radioOrange"></label>
-                        <input class="red" id="radioRed" type="radio" name="field" value="option">
+                        <input class="red" id="radioRed" type="radio" name="clr" ng-model="clr" value="red">
                             <label for="radioRed"></label>
-                        <input class="magenta" id="radioMagenta" type="radio" name="field" value="option">
+                        <input class="magenta" id="radioMagenta" type="radio" name="clr" ng-model="clr" value="magenta">
                             <label for="radioMagenta"></label>
-                        <input class="violet" id="radioViolet" type="radio" name="field" value="option">
+                        <input class="violet" id="radioViolet" type="radio" name="clr" ng-model="clr" value="violet">
                             <label for="radioViolet"></label>
                     </div>
                 </div>

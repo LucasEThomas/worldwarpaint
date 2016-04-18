@@ -20,40 +20,40 @@ angular.module('app').controller('RoomController', ['$scope', '$rootScope', 'roo
             image:'assets/optionCommander.png',
             text:'Commander',
             selected:false,
-            clr1:'#B0B0B0',
-            clr2:'#E0E0E0'
+            clr1:'#D0D0D0',
+            clr2:'#F0F0F0'
         },
         {
             image:'assets/optionEngineer.png',
             text:'Engineer',
             selected:false,
-            clr1:'#B0B0B0',
-            clr2:'#E0E0E0'
+            clr1:'#D0D0D0',
+            clr2:'#F0F0F0'
         },
         {
             image:'assets/optionChampion.png',
             text:'Champion',
             selected:false,
-            clr1:'#B0B0B0',
-            clr2:'#E0E0E0'
+            clr1:'#D0D0D0',
+            clr2:'#F0F0F0'
         },
         {
             image:'assets/optionArcher.png',
             text:'Archer',
             selected:false,
-            clr1:'#C0C0C0',
-            clr2:'#E0E0E0'
+            clr1:'#D0D0D0',
+            clr2:'#F0F0F0'
         }
     ];
-    $scope.deselectAllPlayerTypes = ()=>{
+    $scope.deselectAllPlayerTypes = () => {
         $scope.playerTypes.forEach((e,n)=>{
             e.selected = false;
         });
     };
     
     $scope.sendPlayerData = () => {
-        console.log('sendPlayerData!');
-        RoomServerService.setPlayerData($scope.name, $scope.clr, $scope.type, $scope.ready);
+        console.log($scope);
+        RoomServerService.setPlayerData($scope.name, $scope.clr, $scope.type, true);
     };
     
 }]);
@@ -71,7 +71,7 @@ angular.module('app').directive("customRadioButton", () => {
         link: (scope, elem, attrs) => {
             elem.bind('click', function() {
                 scope.$apply(function() {
-                    scope.type = scope.playerType.text;
+                    scope.$parent.type = scope.playerType.text;
                     scope.deselectAllPlayerTypes();
                     scope.playerType.selected = true;
                 });
