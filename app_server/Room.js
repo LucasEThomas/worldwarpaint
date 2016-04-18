@@ -34,7 +34,7 @@ class Room {
         var id = uuid.v4();
         
         var onUpdate = (player) => {
-            pushUpdatedPlayer(player);
+            this.pushUpdatedPlayer(player);
         };
         
         var onChangeRoom = (newRoomId) => {
