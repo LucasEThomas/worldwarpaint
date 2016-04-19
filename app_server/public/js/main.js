@@ -53,7 +53,17 @@ angular.module('app').controller('RoomController', ['$scope', '$rootScope', 'roo
     
     $scope.sendPlayerData = () => {
         console.log($scope);
-        RoomServerService.setPlayerData($scope.name, $scope.clr, $scope.type, true);
+        var colorsDict = {
+            blue: '#4186EF',
+            teal: '#57C5B8',
+            white: '#ECE0F2',
+            yellow: '#ECC82F',
+            orange: '#F28B31',
+            red: '#EB4D4D',
+            magenta: '#EC53AC',
+            violet: '#9950B4'
+        };
+        RoomServerService.setPlayerData($scope.name, colorsDict[$scope.clr], $scope.type, true);
     };
     
 }]);

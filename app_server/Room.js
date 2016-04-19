@@ -80,7 +80,7 @@ class Room {
         var colorsDict = {
             blue: '#4186EF', 
             teal: '#57C5B8', 
-            white: '#3C3042',
+            white: '#ECE0F2',
             yellow: '#ECC82F',
             orange: '#F28B31', 
             red: '#EB4D4D', 

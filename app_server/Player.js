@@ -6,33 +6,33 @@ class Player {
         this.onUpdate = onUpdate;
         this.onChangeRoom = onChangeRoom;
         this.onDisconnect = onDisconnect;
-        
+
         this.id = id;
         this.name;
         this.clr;
         this.type;
         this.ready = false;
-        
-        if(ws){
-            ws.on('close', ()=>{
+
+        if (ws) {
+            ws.on('close', () => {
                 this.onDisconnect(this);
             });
 
-            ws.on('message', (data, flags)=>{
+            ws.on('message', (data, flags) => {
                 this.messageRxvd(JSON.parse(data));
             });
         }
     }
-    
-    messageRxvd(data){
+
+    messageRxvd(data) {
         if (data.event === 'setPlayerData') {
             this.setPlayerData(data);
             this.onUpdate(this);
-        } else if(data.event === 'changeRoom'){
+        } else if (data.event === 'changeRoom') {
             this.onChangeRoom(this, data.newRoomId);
         }
     }
-    setPlayerData(data){
+    setPlayerData(data) {
         this.id = data.id;
         this.name = data.name;
         this.clr = data.clr;
