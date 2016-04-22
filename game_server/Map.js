@@ -35,16 +35,33 @@ class Map {
         var xBorders = [0, this.mapWidth - 1];
         var yBorders = [0, this.mapHeight - 1];
 
-        // pick a startNode
-        var startX = Math.rangeInt(0, this.mapWidth - 1);
+        var startX = 0;
         var startY = 0;
-        if (startX === 0 || startX === this.mapWidth - 1) {
-            // pick any startY
-            startY = Math.rangeInt(0, this.mapHeight - 1);
-        } else {
-            // pick an end or startY on the border only (0 or this.mapWidth - 1)
-            startY = rAV(yBorders);
+        switch (Math.rangeInt(0, 1)) {
+            case 0:
+                var startX = Math.rangeInt(0, this.mapWidth - 1);
+                if (startX === 0 || startX === this.mapWidth - 1) {
+                    // pick any startY
+                    startY = Math.rangeInt(0, this.mapHeight - 1);
+                } else {
+                    // pick an end or startY on the border only (0 or this.mapWidth - 1)
+                    startY = rAV(yBorders);
+                }
+                break;
+
+            case 1:
+                var startY = Math.rangeInt(0, this.mapHeight - 1);
+                if (startY === 0 || startY === this.mapHeight - 1) {
+                    // pick any startX
+                    startX = Math.rangeInt(0, this.mapWidth - 1);
+                } else {
+                    // pick an end or startY on the border only (0 or this.mapWidth - 1)
+                    startX = rAV(xBorders);
+                }
+                break;
         }
+        // pick a startNode
+
         var startNode = [startX, startY];
 
         // pick an endNode
