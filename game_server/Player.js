@@ -25,7 +25,7 @@ class Player {
 
     messageRxvd(data) {
         if (data.event === 'initsyncClient') {
-            this.onInitSync(this);
+            this.onInitSync(this, data);
         } else if (data.event === 'new tower') {
             this.onNewTower(this, data.x, data.y, data.type, data.owner);
         } else if (data.event === 'manual splatter') {

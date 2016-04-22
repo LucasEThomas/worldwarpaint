@@ -50,8 +50,9 @@ class Game {
         this.players.push(newPlayer);
     }
 
-    onInitSync(player) {
+    onInitSync(player, data) {
         // send players to connecting client
+        this.onNewTower(player, 1000, 1000, 'champion', player.id);
         var sendPlayers = this.players.map((current) => current.toJSON());
         player.initSyncServer(sendPlayers, this.units, this.map);
     }
