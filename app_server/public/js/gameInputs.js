@@ -4,14 +4,21 @@ class GameInputs {
         this.abilityCursor;
 
         this.MAP_SCROLL_SPEED = 16;
-        this.arrowKeys = game.input.keyboard.createCursorKeys();
+        this.keys = game.input.keyboard.createCursorKeys();
+        this.keys.W = game.input.keyboard.addKey(Phaser.Keyboard.W);
+        this.keys.S = game.input.keyboard.addKey(Phaser.Keyboard.S);
+        this.keys.A = game.input.keyboard.addKey(Phaser.Keyboard.A);
+        this.keys.D = game.input.keyboard.addKey(Phaser.Keyboard.D);
+
+        this.keys.shift = game.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
+        this.keys.esc = game.input.keyboard.addKey(Phaser.Keyboard.ESC);
+
 
         game.canvas.oncontextmenu = this.rightMouseUp;
 
         abilities.forEach((ability, n) => {
-            var button = game.add.sprite(0, 0, ability.image);
+            let button = game.add.sprite(30, 150 + 60 * n, ability.image);
             button.fixedToCamera = true;
-            button.cameraOffset.setTo(30, 150 + 60 * n);
             button.anchor.setTo(0.5, 0.5);
             button.inputEnabled = true;
             button.events.onInputDown.add(() => this.useAbility(ability));
@@ -19,31 +26,56 @@ class GameInputs {
         });
     }
     useAbility(ability) {
-        if (ability.usageCallback) { //any action that happens immediately after the ability is selected
-            ability.usageCallback();
-        }
-        if (ability.onClickOptions) {
-            let options = ability.onClickOptions;
-            if (options.inIsoUnitsGroup) {
-                this.abilityCursor = game.add.isoSprite(0, 0, 0, options.imageName, 0, game.units.group);
-                this.abilityCursor.inputEnabled = false;
-                this.abilityCursor.anchor.setTo(0.5, 0.84);
-                this.abilityCursor.alpha = options.alpha;
-            } else {
-                this.abilityCursor = game.add.isoSprite(0, 0, 0, options.imageName, 0, game.units.group);
-                this.abilityCursor.inputEnabled = false;
-                this.abilityCursor.anchor.setTo(0.5, 0.5);
-                this.abilityCursor.alpha = options.alpha;
+        if (ability.cost <= game.money.amount) {
+            game.money.amount -= ability.cost; //subtract the immediate cost
+            if (ability.usageCallback) { //any action that happens immediately after the ability is selected
+                ability.usageCallback();
             }
-            this.abilityCursor.onClickOptions = options;
+            if (ability.onClickOptions) {
+                let options = ability.onClickOptions;
+
+                if (options.inIsoUnitsGroup) {
+                    this.abilityCursor = game.add.isoSprite(0, 0, 0, options.imageName, 0, game.units.group);
+                    this.abilityCursor.inputEnabled = false;
+                    this.abilityCursor.anchor.setTo(0.5, 0.84);
+                    this.abilityCursor.alpha = options.alpha;
+                } else {
+                    this.abilityCursor = game.add.isoSprite(0, 0, 0, options.imageName, 0, game.units.group);
+                    this.abilityCursor.inputEnabled = false;
+                    this.abilityCursor.anchor.setTo(0.5, 0.5);
+                    this.abilityCursor.alpha = options.alpha;
+                }
+                this.abilityCursor.onClickOptions = options;
+            }
         }
     }
     mouseUp() {
         if (this.abilityCursor) {
-            if (!this.abilityCursor.onClickOptions.mustColorMatch || game.gameBoardLayer.gameBoardGraphics.colorMatch(game.input.worldX, game.input.worldY, game.player.clr)) {
-                this.abilityCursor.onClickOptions.onClickCallback(this.abilityCursor.isoX, this.abilityCursor.isoY)
-                this.abilityCursor.destroy();
-                this.abilityCursor = null;
+            //if the ability doesn't have to happen on the player's color, then just do it
+            let options = this.abilityCursor.onClickOptions;
+            if (options.cost <= game.money.amount) {
+                if (!options.mustColorMatch) {
+                    game.money.amount -= options.cost;
+                    options.onClickCallback(this.abilityCursor.isoX, this.abilityCursor.isoY)
+                    if (!this.keys.shift.isDown) {
+                        this.abilityCursor.destroy();
+                        this.abilityCursor = null;
+                    }
+                }
+                //else if the ability must happen on the player's color and it has, then do it
+                else if (game.gameBoardLayer.gameBoardGraphics.colorMatch(game.input.worldX, game.input.worldY, game.player.clr)) {
+                    game.money.amount -= options.cost;
+                    options.onClickCallback(this.abilityCursor.isoX, this.abilityCursor.isoY)
+                    if (!this.keys.shift.isDown) {
+                        this.abilityCursor.destroy();
+                        this.abilityCursor = null;
+                    }
+                }
+                //else if, the ability must happen on the player's color, but it hasn't, and the user doesn't have the shift key pressed, then cancel
+                else if (!this.keys.shift.isDown) {
+                    this.abilityCursor.destroy();
+                    this.abilityCursor = null;
+                }
             }
         } else {
             //this is just for dev purposes for now.
@@ -60,14 +92,21 @@ class GameInputs {
 
 
     update() {
-        if (this.arrowKeys.up.isDown)
+        if (this.keys.up.isDown || this.keys.W.isDown)
             game.camera.y -= this.MAP_SCROLL_SPEED;
-        if (this.arrowKeys.down.isDown)
+        if (this.keys.down.isDown || this.keys.S.isDown)
             game.camera.y += this.MAP_SCROLL_SPEED;
-        if (this.arrowKeys.left.isDown)
+        if (this.keys.left.isDown || this.keys.A.isDown)
             game.camera.x -= this.MAP_SCROLL_SPEED;
-        if (this.arrowKeys.right.isDown)
+        if (this.keys.right.isDown || this.keys.D.isDown)
             game.camera.x += this.MAP_SCROLL_SPEED;
+
+        if (this.keys.esc.isDown) {
+            if (this.abilityCursor) {
+                this.abilityCursor.destroy();
+                this.abilityCursor = null;
+            }
+        }
 
         if (this.abilityCursor) {
             let point = game.iso.unproject(game.input.activePointer.position);

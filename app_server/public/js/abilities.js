@@ -1,9 +1,11 @@
 var abilities = [
     {
         name: 'new tower',
+        cost: 0,
         image: 'blueButton1',
         usageCallback: undefined,
         onClickOptions: {
+            cost: 100,
             imageName: 'tower',
             alpha: 0.6,
             inIsoUnitsGroup: true,

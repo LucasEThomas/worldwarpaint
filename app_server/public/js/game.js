@@ -64,11 +64,12 @@ class Game extends Phaser.Game {
         game.camera.y = 200;
         game.camera.x = 1020;
 
-        //create the four visible layers (it matters which order we create these in)
+        //create the five visible layers (it matters which order we create these in)
         this.terrainRenderTexture = new Map(game, 3548, 2048, 'terrainBackground'); //  1st Layer, the terrain background
         this.gameBoardLayer = new GameBoardLayer(this); //                              2nd layer, the paint
         this.units = new UnitsManager(); //                                             3rd layer, the game units
         this.gameInputs = new GameInputs(abilities); //                                 4th layer, the gui buttons
+        this.money = new moneyManager(); //                                             5th layer, the money
 
         //initialize the connection with the game server
         // this will trigger the exchange of initial sync data between the server and client
@@ -93,6 +94,7 @@ class Game extends Phaser.Game {
 
         this.gameInputs.update();
         this.units.update();
+        this.money.update();
     }
 
     childRender() {
