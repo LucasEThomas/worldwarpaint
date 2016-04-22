@@ -34,7 +34,8 @@ class NodeGraph {
                 return true;
             }
         });
-        return !pass;
+        // passable if cost is less than 999,999
+        return (this.cost(node) < 999999) ? !pass : pass;
     }
 
     neighbors(node) {

@@ -1,7 +1,6 @@
 "use strict";
 var Utility = require('./Utility.js');
-var NodeGraph = require('./Graph.js');
-var PriorityQueue = require('./PriorityQueue.js');
+var AStar = require('./AStar.js');
 
 class Map {
     constructor(mapWidth, mapHeight) {
@@ -15,6 +14,12 @@ class Map {
 
     // procedurally generate the map
     generateMap() {
+        // generate the grass
+        // pick the river start node (support both diagonal directions)
+        // pick the river end node
+        // find the river path (pass in impassable nodes (e.g. buildings/zones/etc))
+        // update terrain map with river path sprites
+
         // generate the grass
         for (var y = 0; y < this.mapHeight; y++) {
             this.terrainMap[y] = [];
@@ -53,7 +58,7 @@ class Map {
             endY = (startY === 0) ? this.mapHeight - 1 : 0;
         }
         var endNode = [endX, endY];
-        
+
         console.log(startNode);
         console.log(endNode);
 
@@ -71,7 +76,32 @@ class Map {
         }
 
         // find the river path
-        var path = this.findPath(startNode, endNode);
+        //var path = this.findPath(startNode, endNode);
+
+        var nodes = [];
+        var nodeWeights = [];
+
+        // create the nodes and a default weight of 0 for each one
+        for (var x = 0; x < this.mapWidth; x++) {
+            for (var y = 0; y < this.mapHeight; y++) {
+                nodes.push([x, y]);
+                nodeWeights[[x, y]] = 0;
+            }
+        }
+
+        // generate a bunch of random weights to create a fake random flow for the river
+        for (var x = 0; x < this.mapWidth; x++) {
+            for (var y = 0; y < this.mapHeight; y++) {
+                if (![x, y].equals(startNode) && ![x, y].equals(endNode) && nodeWeights[[x, y]] === 0) {
+                    if (Math.random() < .9) {
+                        nodeWeights[[x, y]] = Math.floor(Math.random() * (24 - 1)) + 1;
+                    }
+                }
+            }
+        }
+
+        var findRiverPath = new AStar(this.mapWidth, this.mapHeight, startNode, endNode, nodeWeights);
+        var path = findRiverPath.path;
 
         // update the terrain map with the river path (calculate turns (or maybe turns are calculated from arrow code??))
         //   first set the start and end node terrain
@@ -171,117 +201,6 @@ class Map {
             iPrevNode = iCurrentNode;
             iCurrentNode = path[iCurrentNode];
         }
-    }
-
-    // aStar
-    findPath(startNode, endNode) {
-        // return path nodes or false if no path
-
-
-        // create the graph
-        var graph = new NodeGraph(this.mapWidth, this.mapHeight);
-
-        // priority queue sort function
-        var queueSort = function(a, b) {
-            return a.priority - b.priority;
-        }
-
-        // initialize the priority queue
-        var queue = new PriorityQueue({
-            comparator: queueSort
-        });
-
-        // track the path
-        var came_from = [];
-
-        // track path cost
-        var cost_so_far = [];
-
-        // hold all the nodes
-        var nodes = [];
-        // hold all the nodes' weights
-        var nodeWeights = [];
-
-        // create the nodes and a default weight of 0 for each one
-        for (var x = 0; x < this.mapWidth; x++) {
-            for (var y = 0; y < this.mapHeight; y++) {
-                nodes.push([x, y]);
-                nodeWeights[[x, y]] = 0;
-            }
-        }
-
-        // pass the nodes and their weights to the graph
-        graph.setNodes(nodes);
-        graph.setWeights(nodeWeights);
-
-        // generate a bunch of random weights to create a fake random flow for the river
-        for (var x = 0; x < this.mapWidth; x++) {
-            for (var y = 0; y < this.mapHeight; y++) {
-                if (![x, y].equals(startNode) && ![x, y].equals(endNode) && graph.cost([x, y]) !== 999999 && graph.cost([x, y]) === 0) {
-                    if (Math.random() < .9) {
-                        var weight = Math.floor(Math.random() * (24 - 1)) + 1
-                        graph.setCost([x, y], weight);
-                    }
-                }
-            }
-        }
-
-        // conversion function to convert coord node to dict node
-        var ctod = function(node, priority) {
-            // coordinate node to dictionary node (required for queue)
-            var dict = {
-                priority: priority,
-                node: node
-            };
-            return dict;
-        };
-
-        // heuristic function
-        function heuristic(a, b) {
-            return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
-        }
-
-        // pass the startNode to the queue and setup the tracking starting with it
-        came_from[startNode] = null;
-        cost_so_far[startNode] = 0;
-        queue.queue(ctod(startNode, 0));
-
-        // spin up the search!
-        while (queue.length > 0) {
-            var currentNode = queue.dequeue().node;
-
-            // is this the end node?
-            if (currentNode.equals(endNode)) {
-                // yes, empty the queue first
-                queue.clear();
-
-                // now get the path put together and then return it out
-                return came_from;
-            }
-
-            // iterate through the node's neighbors
-            graph.neighbors(currentNode).forEach(function(next, ind, arr) {
-                // get cost to use the neighbor
-                var new_cost = cost_so_far[currentNode] + graph.cost(next);
-
-                // if the neighbor has not been evaluated OR the new cost is less than the cost last evaluated with this neighbor through a different path
-                if (cost_so_far[next] === undefined || new_cost < cost_so_far[next]) {
-                    // update the cost to use the neighbor this route
-                    cost_so_far[next] = new_cost;
-
-                    // get the priority value of the path through the neighbor
-                    var priority = new_cost + heuristic(endNode, next);
-
-                    // add the neighbor to the queue
-                    queue.queue(ctod(next, priority));
-
-                    // track node path
-                    came_from[next] = currentNode;
-                }
-            });
-        }
-
-        return false;
     }
 }
 
