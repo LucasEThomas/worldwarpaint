@@ -67,57 +67,61 @@
     }
     </script>
     <!-- fragment shader -->
-    <script id="2d-fragment-shader" type="x-shader/x-fragment">
+    <script id="histogram-fragment-shader" type="x-shader/x-fragment">
         precision mediump float;
 
         // our 2 canvases
-        uniform sampler2D u_canvasBuff;
-        uniform sampler2D u_canvasDest;
-        uniform bool u_fgDrawFromBuffer;
+        uniform sampler2D u_textureIn;
+        uniform bool u_initialInput;
+        uniform vec2 u_resolutionIn;
+        
+        uniform vec3 playerClrs[4];
 
         // the texCoords passed in from the vertex shader.
-        // note: we're only using 1 set of texCoords which means
-        //   we're assuming the canvases are the same size.
         varying vec2 v_texCoord;
 
         void main() {
-             // Look up the pixels from buff and dest canvases
-             vec4 colorBuff = texture2D(u_canvasBuff, v_texCoord);
-             vec4 colorDest = texture2D(u_canvasDest, v_texCoord);
-
-             if(u_fgDrawFromBuffer){
-             
-                if(colorBuff.a == 1.0){
-                    gl_FragColor = colorDest;//default value
-                    if(colorDest.a <= 0.0){
-                        gl_FragColor = vec4(colorBuff.rgb, 0.2);
-                    }else if(colorDest.a <= 0.8){
-                        if(colorBuff.rgb == colorDest.rgb){
-                            gl_FragColor = vec4(colorBuff.rgb,colorDest.a + 0.2);
-                            if(gl_FragColor.a > 0.8) {
-                                gl_FragColor = vec4(gl_FragColor.rgb, 0.8);
-                            }
-                        } else {
-                            gl_FragColor = vec4(colorDest.rgb,colorDest.a - 0.2);
-                        }
-                    } else {
-                        gl_FragColor = vec4(colorBuff.rgb,0.8);
+            vec4 colorOut = vec4(0,0,0,0);
+            
+            if(u_initialInput){
+                for(int x=0; x<4; x++){
+                    for(int y=0; y<4; y++){
+                        vec2 currentPixel = vec2(x,y) / u_resolution;
+                        vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4) + currentPixel); // Look up the pixels input texture
+                        colorOut += getPixelIncrementation(colorIn);
                     }
-                } else {
-                    gl_FragColor = colorDest;
                 }
-             }
-             else{
-                //todo, antialiasing code probably goes here.
-                gl_FragColor =  colorDest;
-             }
+            }
+            else{
+                for(int x=0; x<4; x++){
+                    for(int y=0; y<4; y++){
+                        vec2 currentPixel = vec2(x,y) / u_resolution;
+                        vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4) + currentPixel); // Look up the pixels input texture
+                        colorOut += colorIn * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
+                    }
+                }
+            }
+
+            gl_FragColor = colorOut;
+        }
+        
+        vec4 getPixelIncrementation(vec4 colorIn){
+            vec4 toReturn = vec4(0,0,0,0);
+            for(int i=0; i<4; i++){
+                if(playerClrs[i] == colorIn.rgb){
+                    toReturn[i] = colorIn.a * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
+                }
+            }
+            return toReturn;
         }
     </script>
 
-    <p>buffer (2dCtx) canvas</p>
-    <canvas id="canvasBuffer" width="128" height="128"></canvas>
-    <p>destination (webgl) canvas</p>
-    <canvas id="canvasDest" width="128" height="128"></canvas>
+    <p>paint canvas</p>
+    <canvas id="canvasPaint" width="128" height="128"></canvas>
+    <p>input canvas</p>
+    <canvas id="canvasInput" width="128" height="128"></canvas>
+    <p>output canvas</p>
+    <canvas id="canvasOutput" width="32" height="32"></canvas>
     
     <script src="/main.js"></script>
 </body>
