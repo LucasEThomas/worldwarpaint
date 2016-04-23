@@ -35,62 +35,51 @@ class Map {
         var xBorders = [0, this.mapWidth - 1];
         var yBorders = [0, this.mapHeight - 1];
 
-        var startX = 0;
-        var startY = 0;
-        switch (Math.rangeInt(0, 1)) {
-            case 0:
-                var startX = Math.rangeInt(0, this.mapWidth - 1);
-                if (startX === 0 || startX === this.mapWidth - 1) {
-                    // pick any startY
-                    startY = Math.rangeInt(0, this.mapHeight - 1);
-                } else {
-                    // pick an end or startY on the border only (0 or this.mapWidth - 1)
-                    startY = rAV(yBorders);
-                }
-                break;
+        function pickBorderCoord(width, height) {
+            // randomly start with X or Y
+            var x = 0;
+            var y = 0;
+            switch (Math.rangeInt(0, 1)) {
+                case 0:
+                    var x = Math.rangeInt(0, width - 1); // shave off 1 if mapWidth/Height is passed without shaving 1
+                    if (x === 0 || x === width - 1) {
+                        y = Math.rangeInt(0, height - 1);
+                    } else {
+                        // pick an end or startY on the border only (0 or this.mapWidth - 1)
+                        y = rAV(yBorders);
+                    }
+                    break;
 
-            case 1:
-                var startY = Math.rangeInt(0, this.mapHeight - 1);
-                if (startY === 0 || startY === this.mapHeight - 1) {
-                    // pick any startX
-                    startX = Math.rangeInt(0, this.mapWidth - 1);
-                } else {
-                    // pick an end or startY on the border only (0 or this.mapWidth - 1)
-                    startX = rAV(xBorders);
-                }
-                break;
+                case 1:
+                    var y = Math.rangeInt(0, height - 1);
+                    if (y === 0 || y === height - 1) {
+                        // pick any startX
+                        x = Math.rangeInt(0, width - 1);
+                    } else {
+                        // pick an end or startY on the border only (0 or this.mapWidth - 1)
+                        x = rAV(xBorders);
+                    }
+                    break;
+            }
+            return [x, y];
         }
-        // pick a startNode
 
-        var startNode = [startX, startY];
-
-        // pick an endNode
-        var endX = Math.rangeInt(0, this.mapWidth - 1);
-        var endY = 0;
-        if (endX === 0 || endX === this.mapWidth - 1) {
-            // pick any endY
-            endY = Math.rangeInt(0, this.mapHeight - 1);
-        } else {
-            // pick an endY on the border only (0 or this.mapWidth - 1)
-            endY = (startY === 0) ? this.mapHeight - 1 : 0;
-        }
-        var endNode = [endX, endY];
-
-        console.log(startNode);
-        console.log(endNode);
-
-        // pick start/end nodes for the river
-        /*var startNode = [Math.rangeInt(0, this.mapWidth - 1), Math.rangeInt(0, this.mapHeight - 1)];
-        var endNode = [Math.rangeInt(0, this.mapWidth - 1), Math.rangeInt(0, this.mapHeight - 1)];*/
+        var startNode = pickBorderCoord(this.mapWidth, this.mapHeight);
+        var endNode = pickBorderCoord(this.mapWidth, this.mapHeight);
+        
         var timeOut = 128; // try this many times to find a suitable end node (in this case one that doesn't equal the startNode coords)
         while (endNode.equals(startNode)) {
+            console.log('WARNING: endNode is equal to startNode, trying to find a suitable new endNode')
             if (timeOut === 0) {
                 console.log("FAILURE: Can't find a suitable end node!");
                 break;
             }
-            endNode = [Math.rangeInt(0, this.mapWidth - 1), Math.rangeInt(0, this.mapHeight - 1)];
+            endNode = pickBorderCoord(this.mapWidth, this.mapHeight);
             timeOut -= 1;
         }
+
+        console.log(startNode);
+        console.log(endNode);
 
         // find the river path
         //var path = this.findPath(startNode, endNode);
