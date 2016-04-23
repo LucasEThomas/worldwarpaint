@@ -53,6 +53,8 @@ class AStar {
         came_from[startNode] = null;
         cost_so_far[startNode] = 0;
         queue.queue(ctod(startNode, 0));
+        
+        var lastNode;
 
         // start the search!
         while (queue.length > 0) {
@@ -66,6 +68,7 @@ class AStar {
                 // now get the path put together and then return it out
                 return {
                     success: true,
+                    last_node: currentNode,
                     path: came_from
                 };
             }
@@ -90,11 +93,16 @@ class AStar {
                     came_from[next] = currentNode;
                 }
             });
+            
+            lastNode = currentNode;
         }
 
         // this only happens if a path can't be found, e.g. blocked off by impassable nodes
+        console.log('failed path');
+        console.log(lastNode);
         return {
             success: false,
+            last_node: lastNode,
             path: came_from
         };
     }

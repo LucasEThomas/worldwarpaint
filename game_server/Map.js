@@ -8,12 +8,12 @@ class Map {
         this.mapHeight = mapHeight;
         this.terrainMap = [];
         this.objectMap = [];
+        this.nodeWeights = [];
+
+        // hold a map containing object types (e.g. tree, house, river, etc.)
+        // hold a map containing weights for each grid position
 
         this.generateMap();
-    }
-
-    generateWater() {
-
     }
 
     pickBorderCoord(width, height) {
@@ -58,9 +58,15 @@ class Map {
         // generate cities and intra-roads
         // generate inter-city paths
         // generate rivers (stop at forks)
+            // actually, let's redo this
+            // create a "big river" function that creates a wide "main" river
+                // and create "little rivers" based off of points on that main river
+                // maybe use the heuristic to prevent split offs from being to close? (so a reversed "closest point" heuristic)
+            // create a "small river" function that creates a small river
+                // if it intersects any other river, it forks into it and "dies"
         // generate trees/forests
         // generate shrubs/other nature
-        
+
         // pick the river start node (support both diagonal directions)
         // pick the river end node
         // find the river path (pass in impassable nodes (e.g. buildings/zones/etc))
@@ -74,8 +80,34 @@ class Map {
             }
         }
 
+        var nodes = [];
+
+        // create the nodes and a default weight of 0 for each one
+        for (var x = 0; x < this.mapWidth; x++) {
+            for (var y = 0; y < this.mapHeight; y++) {
+                nodes.push([x, y]);
+                this.nodeWeights[[x, y]] = 0;
+            }
+        }
+
+        // generate the first (main) river
+        this.generateRiver(3, this.nodeWeights);
+        this.generateRiver(3, this.nodeWeights);
+
+
+
+
+
+
+    }
+
+    generateRiver(width, nodeWeights) {
+        // set a start and an end node
         var startNode = this.pickBorderCoord(this.mapWidth, this.mapHeight);
         var endNode = this.pickBorderCoord(this.mapWidth, this.mapHeight);
+
+        console.log(startNode);
+        console.log(endNode);
 
         var timeOut = 128; // try this many times to find a suitable end node (in this case one that doesn't equal the startNode coords)
         while (endNode.equals(startNode)) {
@@ -88,24 +120,7 @@ class Map {
             timeOut -= 1;
         }
 
-        console.log(startNode);
-        console.log(endNode);
-
-        // find the river path
-        //var path = this.findPath(startNode, endNode);
-
-        var nodes = [];
-        var nodeWeights = [];
-
-        // create the nodes and a default weight of 0 for each one
-        for (var x = 0; x < this.mapWidth; x++) {
-            for (var y = 0; y < this.mapHeight; y++) {
-                nodes.push([x, y]);
-                nodeWeights[[x, y]] = 0;
-            }
-        }
-
-        // generate a bunch of random weights to create a fake random flow for the river
+        // generate a bunch of random weights to create a pseudo random flow for the river
         for (var x = 0; x < this.mapWidth; x++) {
             for (var y = 0; y < this.mapHeight; y++) {
                 if (![x, y].equals(startNode) && ![x, y].equals(endNode) && nodeWeights[[x, y]] === 0) {
@@ -119,13 +134,13 @@ class Map {
         var findRiverPath = new AStar(this.mapWidth, this.mapHeight, startNode, endNode, nodeWeights);
         var path = findRiverPath.path;
 
-        // update the terrain map with the river path (calculate turns (or maybe turns are calculated from arrow code??))
+        // update the terrain map with the river path (calculate turns)
         //   first set the start and end node terrain
-        this.terrainMap[startNode[1]][startNode[0]] = 2;
-        this.terrainMap[endNode[1]][endNode[0]] = 2;
+        //this.terrainMap[startNode[1]][startNode[0]] = 2;
+        //this.terrainMap[endNode[1]][endNode[0]] = 2;
         //   iterate over the path to draw the river
-        var iCurrentNode = endNode;
-        var iPrevNode;
+        var iCurrentNode = findRiverPath.last_node;
+        var iPrevNode = [];
         var iNextNode;
         var iPrevNodeDir;
 
@@ -151,7 +166,14 @@ class Map {
             }
         }
 
+        console.log('river go');
+        console.log(startNode);
+        console.log(endNode);
+        console.log(iCurrentNode);
+        console.log('river end');
         while (!iCurrentNode.equals(startNode)) {
+            this.nodeWeights[[[iCurrentNode[0]], [iCurrentNode[1]]]] = 1000000;
+            //this.nodeWeights[[iCurrentNode[0],iCurrentNode[1]]] = 1000000;
             if (!iCurrentNode.equals(endNode)) {
                 // get direction of other node
                 // right, down, left, up
@@ -162,11 +184,9 @@ class Map {
                 dirs.forEach(function(dir, ind, arr) {
                     // get the possible neighbor's coordinates
                     var neighbor = [iCurrentNode[0] + dir[0], iCurrentNode[1] + dir[1]];
-                    //console.log('Iterate: ' + iCurrentNode + ', ' + neighbor);
                     if (path[iCurrentNode].equals(neighbor)) {
                         // in order to know if it's a turn or a straight,
                         //   we need to look at the previous and next nodes
-                        //this.terrainMap[iCurrentNode[1]][iCurrentNode[0]] = ind + 3;
 
                         iNextNode = neighbor;
 
@@ -179,30 +199,13 @@ class Map {
                                 this.terrainMap[iCurrentNode[1]][iCurrentNode[0]] = assignVal(ind, ind2);
                             }
                         }, this);
-
-
-
-                        //-----------
-                        /*iNextNode = neighbor;
-                        if (iNextNode[0] === iPrevNode[0] || iNextNode[1] === iPrevNode[1]) {
-                            this.terrainMap[iCurrentNode[1]][iCurrentNode[0]] = 2;
-                        } else {
-                            var checkDirs = [[1, 1], [-1, 1], [-1, -1], [1, -1]];
-                            checkDirs.forEach(function(dir, ind2, arr) {
-                                var checkNeighbor = [iPrevNode[0] + dir[0], iPrevNode[1] + dir[1]];
-                                if (checkNeighbor.equals(iNextNode)) {
-                                    console.log(ind+ind2);
-                                    this.terrainMap[iCurrentNode[1]][iCurrentNode[0]] = ind + ind2 + 3;
-                                }
-                            }, this);
-                        }*/
-                        //--------
                     }
                 }, this);
             }
             iPrevNode = iCurrentNode;
             iCurrentNode = path[iCurrentNode];
         }
+
     }
 }
 
