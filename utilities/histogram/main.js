@@ -1,41 +1,44 @@
 //gonna draw a random image here
 var canvasPaint = document.getElementById("canvasPaint");
-var paintCtx = canvasBuff.getContext("2d");
+var paintCtx = canvasPaint.getContext("2d");
 
 var canvasInput = document.getElementById("canvasInput");
-var canvasOutput = document.getElementById("canvasOutput");
+var canvasOutput1 = document.getElementById("canvasOutput1");
+var canvasOutput2 = document.getElementById("canvasOutput2");
+var canvasOutput3 = document.getElementById("canvasOutput3");
 
-var gl = getWebGLContext(canvasDest, {
+var gl = getWebGLContext(canvasOutput1, {
     preserveDrawingBuffer: true,
     premultipliedAlpha: false
 });
 
 var interval = {};
 
+var colorsDict = {
+    blue: '#4186EF',
+    teal: '#57C5B8',
+    white: '#ECE0F2',
+    yellow: '#ECC82F',
+    orange: '#F28B31',
+    red: '#EB4D4D',
+    magenta: '#EC53AC',
+    violet: '#9950B4'
+};
+var colorsArray = Object.keys(colorsDict).map((key) => colorsDict[key]);
+
 function startGameLoop() {
-    initializeShaders();
+    //initializeShaders();
 
-    paintCtx.clearRect(0, 0, canvasBuff.width, canvasBuff.height);
-    paintCtx.beginPath();
-    paintCtx.fillStyle = "#ff0000";
-    paintCtx.moveTo(64, 64)
-    paintCtx.arc(64, 64, 50, 0, Math.PI * 2, false);
-    paintCtx.fill();
-
-    var circleX = Math.round(Math.random() * 127);
-    if (circleX < 16) circleX = 16;
-    else if (circleX >= 127 - 16) circleX = 127 - 16;
-
-    var circleY = Math.round(Math.random() * 127);
-    if (circleY < 16) circleY = 16;
-    else if (circleY > 127 - 16) circleY = 127 - 16;
-    paintCtx.clearRect(0, 0, canvasBuff.width, canvasBuff.height);
-    paintCtx.beginPath();
-    paintCtx.fillStyle = "#00ff00";
-    paintCtx.moveTo(circleX, circleY)
-    paintCtx.arc(circleX, circleY, 6, 0, Math.PI * 2, false);
-    paintCtx.fill();
-    paintCanvas(circleX - 16, circleY - 16, 32, 32);
+    for (var i = 0; i < 1000; i++) {
+        var color = colorsArray[Math.round(Math.random() * 7)];
+        var circleX = Math.round(Math.random() * 2047);
+        var circleY = Math.round(Math.random() * 2047);
+        paintCtx.beginPath();
+        paintCtx.fillStyle = color;
+        paintCtx.moveTo(circleX, circleY)
+        paintCtx.arc(circleX, circleY, 60, 0, Math.PI * 2, false);
+        paintCtx.fill();
+    }
 }
 
 function initializeShaders() {
@@ -157,7 +160,7 @@ function paintCanvas(x, y, width, height) {
 }
 
 // Counts the pixels of each player's color (taking alpha into account)
-countPixels() {
+function countPixels() {
     var gl = gameBoardLayer.gameBoardDestination.gl;
     //load in the buffer canvas data
     gl.activeTexture(gl.TEXTURE0);
@@ -273,11 +276,10 @@ class LocationsCache {
 
         } else if (string.substring(0, 2).toLowerCase() === 'a_') {
             this.setAttributeLocation(string);
-        }
-        else{
+        } else {
             console.error('string must begin with \'u_\' or \'a_\'');
         }
-        
+
     }
     setUniformLocation(string) {
         this.map[string] = this.gl.getUniformLocation(this.program, string);

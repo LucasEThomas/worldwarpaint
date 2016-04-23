@@ -4,7 +4,6 @@
 
 <style type="text/css">
     html, body {
-        background-image: url("terrain.jpeg");
         margin:10;
     }
     canvas {
@@ -25,25 +24,19 @@
 
 <body>
     <!-- vertex shader -->
-    <script src="/webgl-utils.js"></script>
-<!--    <script src="https://rawgit.com/greggman/twgl.js/master/dist/twgl.min.js"></script>-->
+    <script src="./webgl-utils.js"></script>
     
     <script id="2d-vertex-shader" type="x-shader/x-vertex">
-    attribute vec2 a_position; //varies between 0->buffer pixels size
-    //attribute vec2 a_texCoord; //varies between 0->1
+    attribute vec2 a_position; //each vertex (units:pixels)
 
     uniform float u_flipY; //flip along y axis or not
-    uniform vec2 u_resolution; //total dest resolution
-    
-    uniform vec2 u_buff_resolution; // buff resolution
-    uniform vec2 u_buff_position; // buff position
-    uniform bool u_vxDrawFromBuffer;
+    uniform vec2 u_resolutionOut; //total dest resolution
 
     varying vec2 v_texCoord; //varies between buffer start->buffer end
 
     void main() {
-       // convert the rectangle from pixels to 0.0 to 1.0
-       vec2 zeroToOne = a_position / u_resolution;
+       // convert the units from pixels to 0.0 to 1.0
+       vec2 zeroToOne = a_position / u_resolutionOut;
 
        // convert from 0->1 to 0->2
        vec2 zeroToTwo = zeroToOne * 2.0;
@@ -55,15 +48,7 @@
 
        // pass the texCoord to the fragment shader
        // The GPU will interpolate this value between points.
-       if(u_vxDrawFromBuffer){
-           v_texCoord = zeroToOne;
-           //v_texCoord = (u_buff_position + (a_texCoord * u_buff_resolution)) / u_resolution;
-       }
-       else{
-           v_texCoord = zeroToOne;
-           //v_texCoord = (u_buff_position + (a_texCoord * u_buff_resolution)) / u_resolution;
-           //v_texCoord = a_texCoord;
-       }
+       v_texCoord = zeroToOne;
     }
     </script>
     <!-- fragment shader -->
@@ -72,57 +57,54 @@
 
         // our 2 canvases
         uniform sampler2D u_textureIn;
-        uniform bool u_initialInput;
         uniform vec2 u_resolutionIn;
         
-        uniform vec3 playerClrs[4];
+        uniform vec3 playerClrs[8];
 
         // the texCoords passed in from the vertex shader.
         varying vec2 v_texCoord;
 
         void main() {
-            vec4 colorOut = vec4(0,0,0,0);
+            float clrSums[8] = float[8](0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             
-            if(u_initialInput){
-                for(int x=0; x<4; x++){
-                    for(int y=0; y<4; y++){
-                        vec2 currentPixel = vec2(x,y) / u_resolution;
-                        vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4) + currentPixel); // Look up the pixels input texture
-                        colorOut += getPixelIncrementation(colorIn);
-                    }
-                }
-            }
-            else{
-                for(int x=0; x<4; x++){
-                    for(int y=0; y<4; y++){
-                        vec2 currentPixel = vec2(x,y) / u_resolution;
-                        vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4) + currentPixel); // Look up the pixels input texture
-                        colorOut += colorIn * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
+            //iterate through all 16 pixels
+            for(int x=0; x<4; x++){
+                for(int y=0; y<4; y++){
+                    vec2 currentPixel = vec2(x,y) / u_resolutionIn;
+                    vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4) + currentPixel); // Look up the pixels input texture
+                    
+                    //now iterate through all 8 colors and sum each pixel into them
+                    for(int i=0; i<8; i++){
+                        if(playerClrs[i] == colorIn.rgb){
+                            clrSums[i] += colorIn.a * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
+                        }
                     }
                 }
             }
 
-            gl_FragColor = colorOut;
-        }
-        
-        vec4 getPixelIncrementation(vec4 colorIn){
-            vec4 toReturn = vec4(0,0,0,0);
-            for(int i=0; i<4; i++){
-                if(playerClrs[i] == colorIn.rgb){
-                    toReturn[i] = colorIn.a * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
+            //now set output gl_FragColor to the biggest color.
+            gl_FragColor = vec4(0,0,0,0);
+            for(int i=0; i<8; i++){
+                if(clrSums[i] > toReturn.a){
+                    gl_FragColor = vec4(playerClrs[i], clrSums[i]);
                 }
             }
-            return toReturn;
         }
+        
+        
     </script>
 
     <p>paint canvas</p>
-    <canvas id="canvasPaint" width="128" height="128"></canvas>
+    <canvas id="canvasPaint" width="2048" height="2048"></canvas>
     <p>input canvas</p>
-    <canvas id="canvasInput" width="128" height="128"></canvas>
-    <p>output canvas</p>
-    <canvas id="canvasOutput" width="32" height="32"></canvas>
+    <canvas id="canvasInput" width="2048" height="2048"></canvas>
+    <p>output canvas 1</p>
+    <canvas id="canvasOutput1" width="512" height="512"></canvas>
+    <p>output canvas 2</p>
+    <canvas id="canvasOutput2" width="128" height="128"></canvas>
+    <p>output canvas 3</p>
+    <canvas id="canvasOutput3" width="64" height="64"></canvas>
     
-    <script src="/main.js"></script>
+    <script src="./main.js"></script>
 </body>
 </html>
