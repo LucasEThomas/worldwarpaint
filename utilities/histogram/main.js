@@ -1,18 +1,34 @@
-//gonna draw a random image here
+'use strict'
+//gonna draw a random image on this canvas
 var canvasPaint = document.getElementById("canvasPaint");
 var paintCtx = canvasPaint.getContext("2d");
 
-var canvasInput = document.getElementById("canvasInput");
-var canvasOutput1 = document.getElementById("canvasOutput1");
-var canvasOutput2 = document.getElementById("canvasOutput2");
-var canvasOutput3 = document.getElementById("canvasOutput3");
+//the initial paint canvas
+var canvasInput = document.getElementById("canvasGl");
 
-var gl = getWebGLContext(canvasOutput1, {
+//then output to these ones. (maybe?)
+
+var gl = getWebGLContext(canvasGl, {
     preserveDrawingBuffer: true,
     premultipliedAlpha: false
 });
 
 var interval = {};
+
+var hexToRgb = function(hex) {
+        // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+        var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
 
 var colorsDict = {
     blue: '#4186EF',
@@ -25,10 +41,18 @@ var colorsDict = {
     violet: '#9950B4'
 };
 var colorsArray = Object.keys(colorsDict).map((key) => colorsDict[key]);
+//console.log(colorsArray);
+//var colorsRGBArray = colorsArray
+//    .map((clr) => hexToRgb(clr))
+//    .map((clr) => [Math.round(clr.r/25.5)*0.1, Math.round(clr.g/25.5)*0.1, Math.round(clr.b/25.5)*0.1])
+//    .reduce((flat,toFlatten) => flat.concat(toFlatten))
+//    .map((component)=>(component + '').substr(0,3))
+//    .reduce((flat,toFlatten) => flat.concat(toFlatten + ', '));
+//console.log(colorsRGBArray);
 
-function startGameLoop() {
-    //initializeShaders();
 
+
+function start() {
     for (var i = 0; i < 1000; i++) {
         var color = colorsArray[Math.round(Math.random() * 7)];
         var circleX = Math.round(Math.random() * 2047);
@@ -39,8 +63,13 @@ function startGameLoop() {
         paintCtx.arc(circleX, circleY, 60, 0, Math.PI * 2, false);
         paintCtx.fill();
     }
+    initializeShaders();
+    countPixels();
 }
 
+var gl;
+var program;
+var locCache;
 function initializeShaders() {
 
     // Get A WebGL context
@@ -50,30 +79,26 @@ function initializeShaders() {
     }
 
     // setup GLSL program
-    vertexShader = createShaderFromScriptElement(gl, "2d-vertex-shader");
-    fragmentShader = createShaderFromScriptElement(gl, "2d-fragment-shader");
-    program = createProgram(gl, [vertexShader, fragmentShader]);
+    var vertexShader = createShaderFromScriptElement(gl, "2d-vertex-shader");
+    var histogramShader = createShaderFromScriptElement(gl, "histogram-fragment-shader");
+    program = createProgram(gl, [vertexShader, histogramShader]);
     gl.useProgram(program);
-    gl.viewport(0, 0, canvasDest.width, canvasDest.height); //set the viewport to the whole display
+    gl.viewport(0, 0, canvasGl.width, canvasGl.height); //set the viewport to the whole display
 
     // look up where the vertex data needs to go.
-    var positionLocation = gl.getAttribLocation(program, "a_position");
-    // lookup uniforms
-    resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-    vxDrawFromBufferLocation = gl.getUniformLocation(program, "u_vxDrawFromBuffer");
-    fgDrawFromBufferLocation = gl.getUniformLocation(program, "u_fgDrawFromBuffer");
+    locCache = new LocationsCache(gl, program, ['a_position', 'u_resolutionOut', 'u_vxDrawFromBuffer', 'u_fgDrawFromBuffer', 'u_flipY', 'u_resolutionIn', 'u_canvasDest', 'u_initialInput', 'u_textureIn']);
 
     // set the resolution
-    gl.uniform2f(resolutionLocation, canvasDest.width, canvasDest.height);
+    gl.uniform2f(locCache.getLoc('u_resolutionIn'), canvasGl.width, canvasGl.height);
 
     // Create a buffer for the position of the rectangle corners.
     var buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.enableVertexAttribArray(positionLocation);
-    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(locCache.getLoc('a_position'));
+    gl.vertexAttribPointer(locCache.getLoc('a_position'), 2, gl.FLOAT, false, 0, 0);
 
     // Set a rectangle the same size as the image.
-    setRectangle(gl, 0, 0, canvasDest.width, canvasDest.height);
+    setRectangle(gl, 0, 0, canvasGl.width, canvasGl.height);
 
     function setupTexture(canvas, textureUnit, program, uniformName) {
         var tex = gl.createTexture();
@@ -95,103 +120,70 @@ function initializeShaders() {
     }
 
     //setup the textures
-    texBuff = setupTexture(canvasBuff, 0, program, "u_canvasBuff");
-    texDest1 = setupTexture(canvasDest, 1, program, "u_canvasDest1");
-    texDest2 = setupTexture(canvasDest, 2, program, "u_canvasDest1");
-    u_canvasDestLocation = gl.getUniformLocation(program, "u_canvasDest");
+    texInput = setupTexture(canvasGl, 0, program, 'u_textureIn');
+    texAtlas1 = setupTexture(canvasGl, 1, program, 'u_textureIn');
+    texAtlas2 = setupTexture(canvasGl, 2, program, 'u_textureIn');
 
-    // Create a framebuffer and attach texDest1 to it
+    // Create a framebuffer and attach texAtlas1 to it
     fbo1 = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texDest1, 0);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texAtlas1, 0);
 
-    // Create a framebuffer and attach texDest2 to it
+    // Create a framebuffer and attach texAtlas2 to it
     fbo2 = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texDest2, 0);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texAtlas2, 0);
 }
-var resolutionLocation;
-var u_canvasDestLocation;
-var vxDrawFromBufferLocation;
-var fgDrawFromBufferLocation;
-var texBuff;
-var texDest1;
-var texDest2;
+
+var texInput;
+var texAtlas1;
+var texAtlas2;
 var fbo1;
 var fbo2;
 
-function paintCanvas(x, y, width, height) {
-    //load in the buffer canvas data
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texBuff);
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(bufferCtx.getImageData(x, y, width, height).data));
-
-    //tell the shader the size to update
-    setRectangle(gl, x, y, width, height);
-
-    //setup uniforms for combining buffer with destination data
-    gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), 1); //flip the y axis
-    //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); //todo use this instead
-    gl.uniform1f(vxDrawFromBufferLocation, 1); //combine buffer and destination data
-    gl.uniform1f(fgDrawFromBufferLocation, 1); //combine buffer and destination data
-
-    //tell it to write from texDest1
-    gl.uniform1i(u_canvasDestLocation, 1);
-    gl.activeTexture(gl.TEXTURE0 + 1);
-    gl.bindTexture(gl.TEXTURE_2D, texDest1);
-    //into framebuffer2
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-    //now copy result back to to prev texDest1
-    gl.uniform1f(vxDrawFromBufferLocation, 0); //render only the destination texture to the screen
-    gl.uniform1f(fgDrawFromBufferLocation, 0); //render only the destination texture to the screen
-    gl.uniform1i(u_canvasDestLocation, 2);
-    gl.activeTexture(gl.TEXTURE0 + 2);
-    gl.bindTexture(gl.TEXTURE_2D, texDest2); //bind the last destination texture as the input to this draw
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1); //set the framebuffer we're rendering into (output)
-    gl.drawArrays(gl.TRIANGLES, 0, 6); //do the draw
-
-    //render the result to the screen
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null); //now, render to the screen not a framebuffer
-    gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), -1); //don't flip the y axis for this operation
-    gl.drawArrays(gl.TRIANGLES, 0, 6); //do the draw
-
-}
-
 // Counts the pixels of each player's color (taking alpha into account)
 function countPixels() {
-    var gl = gameBoardLayer.gameBoardDestination.gl;
-    //load in the buffer canvas data
+    //load the paint canvas data into inputTex
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texBuff);
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, game.world.width, game.world.height, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(gameBoardLayer.gameBoardBuffer.ctx.getImageData(0, 0, game.world.width, game.world.height).data));
+    gl.bindTexture(gl.TEXTURE_2D, texInput);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 2048, 2048, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(paintCtx.getImageData(0, 0, 2048, 2048).data));
 
     //tell the shader the size to update
-    gameBoardLayer.gameBoardDestination.setRectangle(gl, 0, 0, game.world.width / 4, game.world.height / 4);
+    setRectangle(gl, 0, 0, 2048 / 4, 2048 / 4);
 
     //setup uniforms for combining buffer with destination data
-    gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), 1); //flip the y axis
+    gl.uniform1f(locCache.getLoc('u_flipY'), 1); //flip the y axis
     //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); //todo use this instead
-    gl.uniform2iv(gl.getUniformLocation(program, "u_resolutionIn"), [game.world.width, game.world.height]);
-    gl.uniform1i(gl.getUniformLocation(program, "u_initialInput"), 1); //initial input
-    var playerClrs = [
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 1.0,
-            1.0, 1.0, 0.0
+    gl.uniform2fv(locCache.getLoc('u_resolutionIn'), [2048, 2048]);
+    gl.uniform1i(locCache.getLoc('u_initialInput'), 1); //initial input
+    var playerClrs = 
+        [
+            0.3, 0.5, 0.9, 
+            0.3, 0.8, 0.7, 
+            0.9, 0.9, 0.9, 
+            0.9, 0.8, 0.2, 
+            0.9, 0.5, 0.2, 
+            0.9, 0.3, 0.3, 
+            0.9, 0.3, 0.7, 
+            0.6, 0.3, 0.7
         ];
-    gl.uniform3fv(gl.getUniformLocation(program, "u_initialInput"), playerClrs); //players colors array
+    gl.uniform3fv(locCache.getLoc('u_initialInput'), playerClrs); //players colors array
 
     //tell it to write from inputTex
-    gl.uniform1i(gl.getUniformLocation(program, "u_textureIn"), 0);
+    gl.uniform1i(locCache.getLoc('u_textureIn'), 0);
     gl.activeTexture(gl.TEXTURE0 + 0);
-    gl.bindTexture(gl.TEXTURE_2D, texDest1);
+    gl.bindTexture(gl.TEXTURE_2D, texInput);
     //into framebuffer1
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
-
     var atlasRects = [
+        null,
+        {
+            x: 0,
+            y: 0,
+            w: 2048,
+            h: 2048
+        },
         {
             x: 0,
             y: 0,
@@ -224,20 +216,23 @@ function countPixels() {
         }
     ];
 
-    for (var i = 0; i < 5; i++) {
+    for (var i = 2; i < 7; i++) {
         //todo, need to tell it the destination location in the atlas
-        gameBoardLayer.gameBoardDestination.setRectangle(gl, atlasRects[i].x, atlasRects[i].y, atlasRects[i].w, atlasRects[i].h);
+        setRectangle(gl, atlasRects[i].x, atlasRects[i].y, atlasRects[i].w, atlasRects[i].h);
+        gl.uniform2fv(locCache.getLoc('u_resolutionIn'), [atlasRects[i-1].w, atlasRects[i-1].h]);
+        gl.uniform2fv(locCache.getLoc('u_resolutionOut'), [atlasRects[i].w, atlasRects[i].h]); //initial input
 
         //set the location of the previous atlas, todo, need to set position and resolution here.
-        gl.uniform1i(gl.getUniformLocation(program, "u_textureIn"), i % 2 ? 1 : 2);
-        gl.activeTexture(gl.TEXTURE0 + i % 2 ? 1 : 2);
+        gl.uniform1i(locCache.getLoc('u_textureIn'), i % 2 ? 1 : 2);
+        gl.activeTexture(gl.TEXTURE0 + (i % 2 ? 1 : 2));
         gl.bindTexture(gl.TEXTURE_2D, i % 2 ? texAtlas1 : texAtlas2);
         //into framebuffer
         gl.bindFramebuffer(gl.FRAMEBUFFER, i % 2 ? fbo2 : fbo1);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1);
     var pixels = new Uint8Array(16);
-    gl.readPixels(x, y, 4, 4, gl.RGBA, gl.UNSIGNED_BYTE, pixels); //todo, need to set to the final 4x4 atlas
+    gl.readPixels(512, 32, 4, 4, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
     //scores is an array that will hold the amount of paint each player has
     var scores = new Uint8Array(4);
     for (var i = 0; i < 16; i++) {
@@ -298,4 +293,4 @@ class LocationsCache {
     }
 }
 
-startGameLoop();
+start();

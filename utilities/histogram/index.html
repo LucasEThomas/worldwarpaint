@@ -65,13 +65,13 @@
         varying vec2 v_texCoord;
 
         void main() {
-            float clrSums[8] = float[8](0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+            float clrSums[8];
             
             //iterate through all 16 pixels
             for(int x=0; x<4; x++){
                 for(int y=0; y<4; y++){
                     vec2 currentPixel = vec2(x,y) / u_resolutionIn;
-                    vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4) + currentPixel); // Look up the pixels input texture
+                    vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4.0) + currentPixel); // Look up the pixels input texture
                     
                     //now iterate through all 8 colors and sum each pixel into them
                     for(int i=0; i<8; i++){
@@ -85,7 +85,7 @@
             //now set output gl_FragColor to the biggest color.
             gl_FragColor = vec4(0,0,0,0);
             for(int i=0; i<8; i++){
-                if(clrSums[i] > toReturn.a){
+                if(clrSums[i] > gl_FragColor.a){
                     gl_FragColor = vec4(playerClrs[i], clrSums[i]);
                 }
             }
@@ -94,16 +94,10 @@
         
     </script>
 
-    <p>paint canvas</p>
-    <canvas id="canvasPaint" width="2048" height="2048"></canvas>
     <p>input canvas</p>
-    <canvas id="canvasInput" width="2048" height="2048"></canvas>
-    <p>output canvas 1</p>
-    <canvas id="canvasOutput1" width="512" height="512"></canvas>
-    <p>output canvas 2</p>
-    <canvas id="canvasOutput2" width="128" height="128"></canvas>
-    <p>output canvas 3</p>
-    <canvas id="canvasOutput3" width="64" height="64"></canvas>
+    <canvas id="canvasPaint" width="2048" height="2048"></canvas>
+    <p>output canvas</p>
+    <canvas id="canvasGl" width="2048" height="2048"></canvas>
     
     <script src="./main.js"></script>
 </body>
