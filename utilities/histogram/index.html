@@ -8,8 +8,8 @@
     }
     canvas {
         border: 2px solid black;
-        width: 512px;
-        height: 512px;
+        width: 128px;
+        height: 128px;
     }
 </style>
 
@@ -31,8 +31,15 @@
 
     uniform float u_flipY; //flip along y axis or not
     uniform vec2 u_resolutionTotal; //total dest resolution
+    
+    uniform vec2 u_resolutionOut;
+    uniform vec2 u_positionOut;
+    
+    //uniform vec2 u_resolutionIn;
+    uniform vec2 u_positionIn;
 
     varying vec2 v_texCoord; //varies between buffer start->buffer end
+    varying vec2 v_normTexCoord; //varies between buffer start->buffer end
 
     void main() {
        // convert the units from pixels to 0.0 to 1.0
@@ -48,7 +55,8 @@
 
        // pass the texCoord to the fragment shader
        // The GPU will interpolate this value between points.
-       v_texCoord = zeroToOne;
+       v_normTexCoord = zeroToOne;
+       v_texCoord = ( (((a_position - u_positionOut))*4.0) + u_positionIn) / u_resolutionTotal;
     }
     </script>
     <!-- fragment shader -->
@@ -56,13 +64,16 @@
         precision mediump float;
 
         // our 2 canvases
+        uniform float u_copy;
         uniform sampler2D u_textureIn;
+        
         uniform vec2 u_resolutionIn;
         
         uniform vec3 u_playerClrs[8];
 
         // the texCoords passed in from the vertex shader.
         varying vec2 v_texCoord;
+        varying vec2 v_normTexCoord;
 
         void main() {
             float clrSums[8];
@@ -75,13 +86,13 @@
             clrSums[6] = 0.0;
             clrSums[7] = 0.0;
             
-            float normalizer =  0.25 / u_resolutionIn.x;
+            float normalizer =  1.0/u_resolutionIn.x;
             
             //iterate through all 16 pixels
             for(int x=0; x<4; x++){
                 for(int y=0; y<4; y++){
-                    vec2 currentPixel = vec2(x,y) * normalizer;
-                    vec4 colorIn = texture2D(u_textureIn, (v_texCoord*4.0) + currentPixel); // Look up the pixels input texture
+                    vec2 currentPixel = (vec2(x,y) * normalizer) - (vec2(1,1)*normalizer*2.0);
+                    vec4 colorIn = texture2D(u_textureIn, v_texCoord + currentPixel); // Look up the pixels input texture
                     
                     //now iterate through all 8 colors and sum each pixel into them
                     for(int i=0; i<8; i++){
@@ -93,15 +104,18 @@
             }
             
             //now set output gl_FragColor to the biggest color.
-            gl_FragColor = vec4(0,0,0,0);
-            for(int i=0; i<8; i++){
+            gl_FragColor = vec4(0.0,0.0,0.0,0.0);
+            for(int i=0; i<=7; i++){
                 if(clrSums[i] > gl_FragColor.a){
                     gl_FragColor = vec4(u_playerClrs[i], clrSums[i]);
                 }
             }
             
-            //if(texture2D(u_textureIn, (v_texCoord*4.0) + 0.0).rgb == u_playerClrs[0])
-            //    gl_FragColor = vec4(u_playerClrs[0], 1.0);
+            gl_FragColor = vec4(gl_FragColor.rgb, 1.0);
+            
+            if(u_copy == 1.0){
+                gl_FragColor = texture2D(u_textureIn, v_normTexCoord);
+            }
 
         }
         
@@ -111,7 +125,7 @@
     <p>input canvas</p>
     <canvas id="canvasPaint" width="2048" height="2048"></canvas>
     <p>output canvas</p>
-    <canvas id="canvasGl" width="2048" height="2048"></canvas>
+    <canvas id="canvasGl" width="2048" height="2048" style = "height:2048px; width:2048px;"></canvas>
     
     <script src="./main.js"></script>
 </body>
