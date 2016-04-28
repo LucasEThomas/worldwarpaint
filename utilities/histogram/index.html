@@ -109,7 +109,7 @@
                 }
             }
             
-            //gl_FragColor = vec4(gl_FragColor.rgb, 1.0);
+            gl_FragColor = vec4(gl_FragColor.rgb, 1.0);
             
             if(u_copy == 1.0){
                 gl_FragColor = texture2D(u_textureIn, v_normTexCoord);

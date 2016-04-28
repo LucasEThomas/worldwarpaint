@@ -52,46 +52,46 @@ var colorsArray = Object.keys(colorsDict).map((key) => colorsDict[key]);
 //console.log(colorsRGBArray);
 
 function start() {
-    var color = colorsArray[0];
-    paintCtx.beginPath();
-    paintCtx.fillStyle = color;
-    paintCtx.moveTo(1024, 1024)
-    paintCtx.arc(1024, 1024, 128, 0, Math.PI * 2, false);
-    paintCtx.fill();
-    var color = colorsArray[1];
-    paintCtx.beginPath();
-    paintCtx.fillStyle = color;
-    paintCtx.moveTo(0, 0)
-    paintCtx.arc(0, 0, 512, 0, Math.PI * 2, false);
-    paintCtx.fill();
-    var color = colorsArray[2];
-    paintCtx.beginPath();
-    paintCtx.fillStyle = color;
-    paintCtx.moveTo(0, 2048)
-    paintCtx.arc(0, 2048, 512, 0, Math.PI * 2, false);
-    paintCtx.fill();
-    var color = colorsArray[3];
-    paintCtx.beginPath();
-    paintCtx.fillStyle = color;
-    paintCtx.moveTo(2048, 0)
-    paintCtx.arc(2048, 0, 512, 0, Math.PI * 2, false);
-    paintCtx.fill();
-    var color = colorsArray[4];
-    paintCtx.beginPath();
-    paintCtx.fillStyle = color;
-    paintCtx.moveTo(2048, 2048)
-    paintCtx.arc(2048, 2048, 512, 0, Math.PI * 2, false);
-    paintCtx.fill();
-    //    for (var i = 0; i < 1000; i++) {
-    //        var color = colorsArray[Math.floor(Math.random() * 8)];
-    //        var circleX = Math.round(Math.random() * 2047);
-    //        var circleY = Math.round(Math.random() * 2047);
-    //        paintCtx.beginPath();
-    //        paintCtx.fillStyle = color;
-    //        paintCtx.moveTo(circleX, circleY)
-    //        paintCtx.arc(circleX, circleY, 60, 0, Math.PI * 2, false);
-    //        paintCtx.fill();
-    //    }
+//    var color = colorsArray[0];
+//    paintCtx.beginPath();
+//    paintCtx.fillStyle = color;
+//    paintCtx.moveTo(1024, 1024)
+//    paintCtx.arc(1024, 1024, 128, 0, Math.PI * 2, false);
+//    paintCtx.fill();
+//    var color = colorsArray[1];
+//    paintCtx.beginPath();
+//    paintCtx.fillStyle = color;
+//    paintCtx.moveTo(0, 0)
+//    paintCtx.arc(0, 0, 512, 0, Math.PI * 2, false);
+//    paintCtx.fill();
+//    var color = colorsArray[2];
+//    paintCtx.beginPath();
+//    paintCtx.fillStyle = color;
+//    paintCtx.moveTo(0, 2048)
+//    paintCtx.arc(0, 2048, 512, 0, Math.PI * 2, false);
+//    paintCtx.fill();
+//    var color = colorsArray[3];
+//    paintCtx.beginPath();
+//    paintCtx.fillStyle = color;
+//    paintCtx.moveTo(2048, 0)
+//    paintCtx.arc(2048, 0, 512, 0, Math.PI * 2, false);
+//    paintCtx.fill();
+//    var color = colorsArray[4];
+//    paintCtx.beginPath();
+//    paintCtx.fillStyle = color;
+//    paintCtx.moveTo(2048, 2048)
+//    paintCtx.arc(2048, 2048, 512, 0, Math.PI * 2, false);
+//    paintCtx.fill();
+    for (var i = 0; i < 20; i++) {
+        var color = colorsArray[Math.floor(Math.random() * 8)];
+        var circleX = Math.round(Math.random() * 2047);
+        var circleY = Math.round(Math.random() * 2047);
+        paintCtx.beginPath();
+        paintCtx.fillStyle = color;
+        paintCtx.moveTo(circleX, circleY)
+        paintCtx.arc(circleX, circleY, 1000 - (i * 40), 0, Math.PI * 2, false);
+        paintCtx.fill();
+    }
     initializeShaders();
     countPixels();
 }
