@@ -67,7 +67,7 @@
         uniform float u_copy;
         uniform sampler2D u_textureIn;
         
-        uniform vec2 u_resolutionIn;
+        uniform vec2 u_resolutionInNorm;
         
         uniform vec3 u_playerClrs[8];
 
@@ -86,13 +86,11 @@
             clrSums[6] = 0.0;
             clrSums[7] = 0.0;
             
-            float normalizer =  1.0/u_resolutionIn.x;
-            
             //iterate through all 16 pixels
-            for(int x=0; x<4; x++){
-                for(int y=0; y<4; y++){
-                    vec2 currentPixel = (vec2(x,y) * normalizer) - (vec2(1,1)*normalizer*2.0);
-                    vec4 colorIn = texture2D(u_textureIn, v_texCoord + currentPixel); // Look up the pixels input texture
+            for(int x=-2; x<2; x++){
+                for(int y=-2; y<2; y++){
+                    vec2 currentPixel = v_texCoord + vec2(x,y) * u_resolutionInNorm;
+                    vec4 colorIn = texture2D(u_textureIn, currentPixel); // Look up the pixels input texture
                     
                     //now iterate through all 8 colors and sum each pixel into them
                     for(int i=0; i<8; i++){
@@ -111,7 +109,7 @@
                 }
             }
             
-            gl_FragColor = vec4(gl_FragColor.rgb, 1.0);
+            //gl_FragColor = vec4(gl_FragColor.rgb, 1.0);
             
             if(u_copy == 1.0){
                 gl_FragColor = texture2D(u_textureIn, v_normTexCoord);
