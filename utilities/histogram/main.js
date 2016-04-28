@@ -242,7 +242,7 @@ function countPixels() {
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1);
     var pixels = new Uint8Array(16);
-    gl.readPixels(681, 0, 2, 2, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+    gl.readPixels(680, 0, 2, 2, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
     //scores is an array that will hold the amount of paint each player has
     var scores = new Uint8Array(4);
     for (var i = 0; i < 4; i++) {
