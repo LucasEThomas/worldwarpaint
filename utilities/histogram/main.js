@@ -228,13 +228,13 @@ function countPixels() {
 
     meldPixels(0, 0, 512, 512, 0, 0, 2048, 2048, texInput, 0, fbo1);
     copyPixels(2048, texAtlas1, 1, fbo2);
-    meldPixels(513, 0, 128, 128, 0, 0, 2048, 2048, texAtlas2, 2, fbo1);
+    meldPixels(512, 0, 128, 128, 0, 0, 2048, 2048, texAtlas2, 2, fbo1);
     copyPixels(2048, texAtlas1, 1, fbo2);
-    meldPixels(641, 0, 32, 32, 513, 0, 2048, 2048, texAtlas2, 2, fbo1);
+    meldPixels(640, 0, 32, 32, 512, 0, 2048, 2048, texAtlas2, 2, fbo1);
     copyPixels(2048, texAtlas1, 1, fbo2);
-    meldPixels(673, 0, 8, 8, 641, 0, 2048, 2048, texAtlas2, 2, fbo1);
+    meldPixels(672, 0, 8, 8, 640, 0, 2048, 2048, texAtlas2, 2, fbo1);
     copyPixels(2048, texAtlas1, 1, fbo2);
-    meldPixels(681, 0, 2, 2, 673, 0, 2048, 2048, texAtlas2, 2, fbo1);
+    meldPixels(680, 0, 2, 2, 672, 0, 2048, 2048, texAtlas2, 2, fbo1);
 
     //copy to onscreen buffer
     gl.uniform1f(locCache.getLoc('u_flipY'), -1); //flip the y axis
