@@ -101,7 +101,8 @@ var program;
 var locCache;
 
 function initializeShaders() {
-
+    var startTime = Date.now();
+    console.log('time=0 start initialzation');
     // Get A WebGL context
     if (!gl) {
         console.error('no gl')
@@ -171,19 +172,8 @@ function initializeShaders() {
     fbo3 = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo3);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texAtlas3, 0);
-}
-
-var texInput;
-var texAtlas1;
-var texAtlas2;
-var texAtlas3;
-var fbo1;
-var fbo2;
-var fbo3;
-
-// Counts the pixels of each player's color (taking alpha into account)
-function countPixels() {
-    //load the paint canvas data into inputTex
+    
+      //load the paint canvas data into inputTex
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texInput);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 2048, 2048, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(paintCtx.getImageData(0, 0, 2048, 2048).data));
@@ -202,7 +192,23 @@ function countPixels() {
             0.6, 0.3137254901960784, 0.7058823529411765,
         ];
     gl.uniform3fv(locCache.getLoc('u_playerClrs'), playerClrs); //players colors array
+    console.log('time='+(Date.now()-startTime)+' end initialzation');
+}
 
+var texInput;
+var texAtlas1;
+var texAtlas2;
+var texAtlas3;
+var fbo1;
+var fbo2;
+var fbo3;
+
+// Counts the pixels of each player's color (taking alpha into account)
+function countPixels() {
+  
+    var startTime = Date.now();
+    console.log('time=0 start countPixels')
+    
     var meldPixels = function(outX, outY, outW, outH, inX, inY, inW, inH, texIn, texInLocNum, fbOut) {
         //compute from inputTex into texAtlas1
         setRectangle(gl, outX, outY, outW, outH);
@@ -248,39 +254,44 @@ function countPixels() {
         gl.uniform1f(locCache.getLoc('u_copy'), 0);
     }
 
+    console.log('time='+(Date.now()-startTime)+' done instantiating functions');
+    
     gl.uniform1i(locCache.getLoc('u_reductionFactorVX'), 4);
     gl.uniform1i(locCache.getLoc('u_reductionFactorFG'), 4);
     meldPixels(0, 0, 512, 512, 0, 0, 2048, 2048, texInput, 0, fbo1);
-
+    console.log('time='+(Date.now()-startTime)+' shader 1 done');
+    
     meldPixels(0, 0, 128, 128, 0, 0, 512, 512, texAtlas1, 1, fbo2);
-
+    console.log('time='+(Date.now()-startTime)+' shader 2 done');
+    
     gl.uniform1i(locCache.getLoc('u_reductionFactorVX'), 2);
     gl.uniform1i(locCache.getLoc('u_reductionFactorFG'), 2);
     meldPixels(0, 0, 64, 64, 0, 0, 128, 128, texAtlas2, 2, fbo3);
-
-    //    copyPixels(683, 512, texAtlas1, 1, fbo2);
-    //    meldPixels(672, 0, 8, 8, 640, 0, 2048, 2048, texAtlas2, 2, fbo1);
-    //    copyPixels(683, 512, texAtlas1, 1, fbo2);
-    //    meldPixels(680, 0, 2, 2, 672, 0, 2048, 2048, texAtlas2, 2, fbo1);
-    //    copyPixels(683, 512, texAtlas1, 1, fbo2);
-    //    gl.uniform1i(locCache.getLoc('u_reductionFactor'), 2);
-    //    meldPixels(682, 0, 1, 1, 680, 0, 2048, 2048, texAtlas2, 2, fbo1);
-
+    console.log('time='+(Date.now()-startTime)+' shader 3 done');
+    
     //copy to onscreen buffer
-    gl.uniform1f(locCache.getLoc('u_flipY'), -1); //flip the y axis
-    copyPixels(0, 0, 1024, 1024, 0, 0, 2048, 2048, texAtlas1, 1, null);
-    copyPixels(1024, 0, 1024, 1024, 0, 0, 2048, 2048, texAtlas2, 2, null);
-    copyPixels(1024, 1024, 1024, 1024, 0, 0, 2048, 2048, texAtlas3, 3, null);
-
+//    gl.uniform1f(locCache.getLoc('u_flipY'), -1); //flip the y axis
+//    copyPixels(0, 0, 1024, 1024, 0, 0, 2048, 2048, texAtlas1, 1, null);
+//    copyPixels(1024, 0, 1024, 1024, 0, 0, 2048, 2048, texAtlas2, 2, null);
+//    copyPixels(1024, 1024, 1024, 1024, 0, 0, 2048, 2048, texAtlas3, 3, null);
+//    console.log('time='+(Date.now()-startTime)+' copying to workCanvas done');
+    
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo3);
     var pixels = new Uint8Array(16384);
+    console.log('time='+(Date.now()-startTime)+' array creation done');
     gl.readPixels(0, 0, 64, 64, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+    console.log('time='+(Date.now()-startTime)+' readPixels done');
+    gl.readPixels(0, 0, 64, 64, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+    console.log('time='+(Date.now()-startTime)+' readPixels again');
+    
+    
     //scores is an array that will hold the amount of paint each player has
     var scores = new Uint8Array(4096);
     for (var i = 0; i < 4096; i++) {
         scores[i] = pixels[3 + 4 * i];
     }
-    console.log(scores); //for now, just output to the console.
+    console.log('time='+(Date.now()-startTime)+' array computation done');
+    //console.log(scores); //for now, just output to the console.
     var clampedPixels = new Uint8ClampedArray(pixels);
     
     
@@ -288,6 +299,7 @@ function countPixels() {
     var testCtx = document.getElementById("canvasTest").getContext("2d");
     var data = new ImageData(clampedPixels, 64,64);
     testCtx.putImageData(data, 0, 0);
+    console.log('time='+(Date.now()-startTime)+' test canvas done');
     
 }
 
