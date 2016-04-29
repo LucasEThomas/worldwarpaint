@@ -52,46 +52,46 @@ var colorsArray = Object.keys(colorsDict).map((key) => colorsDict[key]);
 //console.log(colorsRGBArray);
 
 function start() {
-//    var color = colorsArray[0];
-//    paintCtx.beginPath();
-//    paintCtx.fillStyle = color;
-//    paintCtx.moveTo(1024, 1024)
-//    paintCtx.arc(1024, 1024, 128, 0, Math.PI * 2, false);
-//    paintCtx.fill();
-//    var color = colorsArray[1];
-//    paintCtx.beginPath();
-//    paintCtx.fillStyle = color;
-//    paintCtx.moveTo(0, 0)
-//    paintCtx.arc(0, 0, 512, 0, Math.PI * 2, false);
-//    paintCtx.fill();
-//    var color = colorsArray[2];
-//    paintCtx.beginPath();
-//    paintCtx.fillStyle = color;
-//    paintCtx.moveTo(0, 2048)
-//    paintCtx.arc(0, 2048, 512, 0, Math.PI * 2, false);
-//    paintCtx.fill();
-//    var color = colorsArray[3];
-//    paintCtx.beginPath();
-//    paintCtx.fillStyle = color;
-//    paintCtx.moveTo(2048, 0)
-//    paintCtx.arc(2048, 0, 512, 0, Math.PI * 2, false);
-//    paintCtx.fill();
-//    var color = colorsArray[4];
-//    paintCtx.beginPath();
-//    paintCtx.fillStyle = color;
-//    paintCtx.moveTo(2048, 2048)
-//    paintCtx.arc(2048, 2048, 512, 0, Math.PI * 2, false);
-//    paintCtx.fill();
-    for (var i = 0; i < 20; i++) {
-        var color = colorsArray[Math.floor(Math.random() * 8)];
-        var circleX = Math.round(Math.random() * 2047);
-        var circleY = Math.round(Math.random() * 2047);
-        paintCtx.beginPath();
-        paintCtx.fillStyle = color;
-        paintCtx.moveTo(circleX, circleY)
-        paintCtx.arc(circleX, circleY, 1000 - (i * 40), 0, Math.PI * 2, false);
-        paintCtx.fill();
-    }
+    var color = colorsArray[0];
+    paintCtx.beginPath();
+    paintCtx.fillStyle = color;
+    paintCtx.moveTo(1024, 1024)
+    paintCtx.arc(1024, 1024, 128, 0, Math.PI * 2, false);
+    paintCtx.fill();
+    var color = colorsArray[1];
+    paintCtx.beginPath();
+    paintCtx.fillStyle = color;
+    paintCtx.moveTo(0, 0)
+    paintCtx.arc(0, 0, 512, 0, Math.PI * 2, false);
+    paintCtx.fill();
+    var color = colorsArray[2];
+    paintCtx.beginPath();
+    paintCtx.fillStyle = color;
+    paintCtx.moveTo(0, 2048)
+    paintCtx.arc(0, 2048, 512, 0, Math.PI * 2, false);
+    paintCtx.fill();
+    var color = colorsArray[3];
+    paintCtx.beginPath();
+    paintCtx.fillStyle = color;
+    paintCtx.moveTo(2048, 0)
+    paintCtx.arc(2048, 0, 512, 0, Math.PI * 2, false);
+    paintCtx.fill();
+    var color = colorsArray[4];
+    paintCtx.beginPath();
+    paintCtx.fillStyle = color;
+    paintCtx.moveTo(2048, 2048)
+    paintCtx.arc(2048, 2048, 512, 0, Math.PI * 2, false);
+    paintCtx.fill();
+//    for (var i = 0; i < 20; i++) {
+//        var color = colorsArray[Math.floor(Math.random() * 8)];
+//        var circleX = Math.round(Math.random() * 2047);
+//        var circleY = Math.round(Math.random() * 2047);
+//        paintCtx.beginPath();
+//        paintCtx.fillStyle = color;
+//        paintCtx.moveTo(circleX, circleY)
+//        paintCtx.arc(circleX, circleY, 1000 - (i * 40), 0, Math.PI * 2, false);
+//        paintCtx.fill();
+//    }
     initializeShaders();
     countPixels();
 }
@@ -116,7 +116,7 @@ function initializeShaders() {
     gl.viewport(0, 0, 2048, 2048); //set the viewport to the whole display
 
     // look up where the vertex data needs to go.
-    locCache = new LocationsCache(gl, program, ['a_position', 'u_resolutionTotal', 'u_vxDrawFromBuffer', 'u_fgDrawFromBuffer', 'u_flipY', 'u_playerClrs', 'u_positionIn', 'u_resolutionInNorm', 'u_positionOut', 'u_resolutionOut', 'u_canvasDest', 'u_textureIn', 'u_copy']);
+    locCache = new LocationsCache(gl, program, ['a_position', 'u_resolutionTotal', 'u_vxDrawFromBuffer', 'u_fgDrawFromBuffer', 'u_flipY', 'u_playerClrs', 'u_positionIn', 'u_resolutionInNorm', 'u_positionOut', 'u_resolutionOut', 'u_canvasDest', 'u_reductionFactorFG', 'u_reductionFactorVX', 'u_textureIn', 'u_copy']);
 
     gl.uniform1f(locCache.getLoc('u_copy'), 0);
     // set the resolution
@@ -212,10 +212,10 @@ function countPixels() {
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
 
-    var copyPixels = function(size, texIn, texInLocNum, fbOut) {
+    var copyPixels = function(width, height, texIn, texInLocNum, fbOut) {
         //copy from texAtlas1 into texAtlas2 
         gl.uniform1f(locCache.getLoc('u_copy'), 1);
-        setRectangle(gl, 0, 0, size, size);
+        setRectangle(gl, 0, 0, width, height);
 
         gl.uniform1i(locCache.getLoc('u_textureIn'), texInLocNum);
         gl.activeTexture(gl.TEXTURE0 + texInLocNum);
@@ -225,20 +225,30 @@ function countPixels() {
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         gl.uniform1f(locCache.getLoc('u_copy'), 0);
     }
-
+    
+    gl.uniform1i(locCache.getLoc('u_reductionFactorVX'), 4);
+    gl.uniform1i(locCache.getLoc('u_reductionFactorFG'), 4);
     meldPixels(0, 0, 512, 512, 0, 0, 2048, 2048, texInput, 0, fbo1);
-    copyPixels(2048, texAtlas1, 1, fbo2);
+    copyPixels(704, 512, texAtlas1, 1, fbo2);
+    
     meldPixels(512, 0, 128, 128, 0, 0, 2048, 2048, texAtlas2, 2, fbo1);
-    copyPixels(2048, texAtlas1, 1, fbo2);
-    meldPixels(640, 0, 32, 32, 512, 0, 2048, 2048, texAtlas2, 2, fbo1);
-    copyPixels(2048, texAtlas1, 1, fbo2);
-    meldPixels(672, 0, 8, 8, 640, 0, 2048, 2048, texAtlas2, 2, fbo1);
-    copyPixels(2048, texAtlas1, 1, fbo2);
-    meldPixels(680, 0, 2, 2, 672, 0, 2048, 2048, texAtlas2, 2, fbo1);
+    copyPixels(704, 512, texAtlas1, 1, fbo2);
+    
+    gl.uniform1i(locCache.getLoc('u_reductionFactorVX'), 2);
+    gl.uniform1i(locCache.getLoc('u_reductionFactorFG'), 2);
+    meldPixels(640, 0, 64, 64, 512, 0, 2048, 2048, texAtlas2, 2, fbo1);
+    
+//    copyPixels(683, 512, texAtlas1, 1, fbo2);
+//    meldPixels(672, 0, 8, 8, 640, 0, 2048, 2048, texAtlas2, 2, fbo1);
+//    copyPixels(683, 512, texAtlas1, 1, fbo2);
+//    meldPixels(680, 0, 2, 2, 672, 0, 2048, 2048, texAtlas2, 2, fbo1);
+//    copyPixels(683, 512, texAtlas1, 1, fbo2);
+//    gl.uniform1i(locCache.getLoc('u_reductionFactor'), 2);
+//    meldPixels(682, 0, 1, 1, 680, 0, 2048, 2048, texAtlas2, 2, fbo1);
 
     //copy to onscreen buffer
     gl.uniform1f(locCache.getLoc('u_flipY'), -1); //flip the y axis
-    copyPixels(2048, texAtlas1, 1, null);
+    copyPixels(704, 512, texAtlas1, 1, null);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1);
     var pixels = new Uint8Array(16);
