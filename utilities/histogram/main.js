@@ -141,19 +141,15 @@ function initializeShaders() {
     var histogramShader = createShaderFromScriptElement(gl, "histogram-fragment-shader");
     program = createProgram(gl, [vertexShader, histogramShader]);
     gl.useProgram(program);
-    gl.viewport(0, 0, 2048, 2048); //set the viewport to the whole display
 
     // look up where the vertex data needs to go.
     locCache = new LocationsCache(gl, program, ['a_positionOut', 'u_resolutionOriginal', 'u_flipY', 'u_playerClrs', 'u_resolutionInNorm', 'u_reductionFactorFG', 'u_reductionFactorVX', 'u_textureIn']);
 
-    // Create a buffer for the position of the rectangle corners.
+    // Create a buffer for the position of the rects corners.
     var buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.enableVertexAttribArray(locCache.getLoc('a_positionOut'));
     gl.vertexAttribPointer(locCache.getLoc('a_positionOut'), 2, gl.FLOAT, false, 0, 0);
-
-    // Set a rectangle the same size as the image.
-    //setRectangle(gl, 0, 0, canvasGl.width, canvasGl.height);
 
     function setupTexture(width, height, textureUnit, program, uniformName) {
         var tex = gl.createTexture();
@@ -208,12 +204,12 @@ function initializeShaders() {
         ];
     gl.uniform3fv(locCache.getLoc('u_playerClrs'), playerClrs); //players colors array
     console.log('time=' + (Date.now() - startTime) + ' end initialzation');
-    
-        //setup uniforms for combining buffer with destination data
+
+    //setup uniforms for combining buffer with destination data
     gl.uniform1f(locCache.getLoc('u_flipY'), 1); //flip the y axis
     gl.uniform2fv(locCache.getLoc('u_resolutionOriginal'), [2048, 2048]);
-    
-        //load the paint canvas data into inputTex
+
+    //load the paint canvas data into inputTex
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texInput);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 2048, 2048, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(paintCtx.getImageData(0, 0, 2048, 2048).data));
@@ -232,6 +228,7 @@ var fbo3;
 function countPixels(rects) {
 
     var startTime = Date.now();
+    gl.useProgram(program);
     console.log('time=0 start countPixels')
 
     var meldPixels = function(rects, reductionFactor, outW, outH, inW, inH, texIn, texInLocNum, fbOut) {
