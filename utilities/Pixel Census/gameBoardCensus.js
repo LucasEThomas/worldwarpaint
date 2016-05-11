@@ -1,5 +1,9 @@
 class GameBoardCensus {
     constructor(canvas) {
+       this.initializeGL(canvas);
+    }
+    
+    initializeGL(canvas){
         var startTime = Date.now();
         console.log('time=0 start initialzation');
         
@@ -156,10 +160,10 @@ class GameBoardCensus {
 
         setTimeout(() => {
             //copy to onscreen buffer
-            //gl.uniform1f(locCache.getLoc('u_flipY'), -1); //flip the y axis
-            //setRectangle(gl, 0, 0, 2048, 2048);
-            //copyPixels(2048, 2048, 2048, 2048, tex1, 1, null);
-            //gl.uniform1f(locCache.getLoc('u_flipY'), 1); //flip the y axis
+            gl.uniform1f(locCache.getLoc('u_flipY'), -1); //flip the y axis
+            this.setRectangle(gl, 0, 0, 2048, 2048);
+            copyPixels(2048, 2048, 2048, 2048, this.texInput, 1, null);
+            gl.uniform1f(locCache.getLoc('u_flipY'), 1); //flip the y axis
             //console.log('time=' + (Date.now() - startTime) + ' copying to workCanvas done');
 
             var pixels = new Uint8Array(16384);
