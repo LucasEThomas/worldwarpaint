@@ -84,21 +84,50 @@ function start() {
     paintCtx.fill();
 
     initializeShaders();
-    countPixels();
+    var rects = [];
+    for (var x = 0; x <= 64; x += 1) {
+        for (var y = 0; y <= 64; y += 2) {
+            rects.push({
+                x: x,
+                y: y
+            });
+        }
+    }
+    countPixels(rects);
 }
 
+var offset = 0;
 function refresh() {
     for (var i = 0; i < 20; i++) {
         var color = colorsArray[Math.floor(Math.random() * 8)];
-        var circleX = Math.round(Math.random() * 2047);
-        var circleY = Math.round(Math.random() * 2047);
+        var circleX = Math.round(Math.random() * 2048);
+        var circleY = Math.round(Math.random() * 2048);
         paintCtx.beginPath();
         paintCtx.fillStyle = color;
         paintCtx.moveTo(circleX, circleY)
         paintCtx.arc(circleX, circleY, 1000 - (i * 40), 0, Math.PI * 2, false);
         paintCtx.fill();
     }
-    countPixels();
+    initializeShaders();
+
+    var rects = [];
+    for (var x = offset % 2; x <= 64; x += 8) {
+        for (var y = Math.floor((offset / 2)) % 2; y <= 64; y += 8) {
+            rects.push({
+                x: x,
+                y: y
+            });
+        }
+    }
+    offset = (offset + 1) % 4
+    countPixels(rects);
+}
+
+function tileToPixelSpace(pnt) {
+    return {
+        x: Math.floor(pnt.x / 32),
+        y: Math.floor(pnt.y / 32)
+    };
 }
 
 var gl;
@@ -122,20 +151,16 @@ function initializeShaders() {
     gl.viewport(0, 0, 2048, 2048); //set the viewport to the whole display
 
     // look up where the vertex data needs to go.
-    locCache = new LocationsCache(gl, program, ['a_position', 'u_resolutionTotal', 'u_vxDrawFromBuffer', 'u_fgDrawFromBuffer', 'u_flipY', 'u_playerClrs', 'u_positionIn', 'u_resolutionIn', 'u_resolutionInNorm', 'u_positionOut', 'u_resolutionOut', 'u_canvasDest', 'u_reductionFactorFG', 'u_reductionFactorVX', 'u_textureIn', 'u_copy']);
-
-    gl.uniform1f(locCache.getLoc('u_copy'), 0);
-    // set the resolution
-    gl.uniform2f(locCache.getLoc('u_resolutionIn'), canvasGl.width, canvasGl.height);
+    locCache = new LocationsCache(gl, program, ['a_positionOut', 'u_resolutionOriginal', 'u_flipY', 'u_playerClrs', 'u_resolutionIn', 'u_resolutionInNorm', 'u_resolutionOut', 'u_reductionFactorFG', 'u_reductionFactorVX', 'u_textureIn']);
 
     // Create a buffer for the position of the rectangle corners.
     var buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.enableVertexAttribArray(locCache.getLoc('a_position'));
-    gl.vertexAttribPointer(locCache.getLoc('a_position'), 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(locCache.getLoc('a_positionOut'));
+    gl.vertexAttribPointer(locCache.getLoc('a_positionOut'), 2, gl.FLOAT, false, 0, 0);
 
     // Set a rectangle the same size as the image.
-    setRectangle(gl, 0, 0, canvasGl.width, canvasGl.height);
+    //setRectangle(gl, 0, 0, canvasGl.width, canvasGl.height);
 
     function setupTexture(width, height, textureUnit, program, uniformName) {
         var tex = gl.createTexture();
@@ -180,7 +205,7 @@ function initializeShaders() {
 
     //setup uniforms for combining buffer with destination data
     gl.uniform1f(locCache.getLoc('u_flipY'), 1); //flip the y axis
-    gl.uniform2fv(locCache.getLoc('u_resolutionTotal'), [2048, 2048]);
+    gl.uniform2fv(locCache.getLoc('u_resolutionOriginal'), [2048, 2048]);
     var playerClrs = [
             0.2549019607843137, 0.5254901960784314, 0.9372549019607843,
             0.3411764705882353, 0.7725490196078432, 0.7215686274509804,
@@ -204,7 +229,7 @@ var fbo2;
 var fbo3;
 
 // Counts the pixels of each player's color (taking alpha into account)
-function countPixels() {
+function countPixels(rects) {
 
     var startTime = Date.now();
     console.log('time=0 start countPixels')
@@ -213,20 +238,15 @@ function countPixels() {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texInput);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 2048, 2048, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(paintCtx.getImageData(0, 0, 2048, 2048).data));
-    
     console.log('time=' + (Date.now() - startTime) + ' done loading in new image');
-    
-    var meldPixels = function(outX, outY, outW, outH, inX, inY, inW, inH, texIn, texInLocNum, fbOut) {
+
+    var meldPixels = function(rects, reductionFactor, outW, outH, inW, inH, texIn, texInLocNum, fbOut) {
         //compute from inputTex into texAtlas1
-        setRectangle(gl, outX, outY, outW, outH);
 
         gl.viewport(0, 0, inW, inH); //set the viewport to the input buffer size
-        gl.uniform2fv(locCache.getLoc('u_resolutionTotal'), [outW, outH]);
-
-        gl.uniform2fv(locCache.getLoc('u_positionOut'), [outX, outY]);
-        gl.uniform2fv(locCache.getLoc('u_resolutionOut'), [outW, outH]);
-        gl.uniform2fv(locCache.getLoc('u_positionIn'), [inX, inY]);
-        gl.uniform2fv(locCache.getLoc('u_resolutionIn'), [inW, inH]);
+        gl.uniform1f(locCache.getLoc('u_reductionFactorVX'), reductionFactor);
+        gl.uniform1f(locCache.getLoc('u_reductionFactorFG'), reductionFactor);
+        //gl.uniform2fv(locCache.getLoc('u_resolutionOutFactor'), [1 / outW, 1 / outH]);
         gl.uniform2fv(locCache.getLoc('u_resolutionInNorm'), [1 / inW, 1 / inH]);
 
         gl.uniform1i(locCache.getLoc('u_textureIn'), texInLocNum);
@@ -234,23 +254,16 @@ function countPixels() {
         gl.bindTexture(gl.TEXTURE_2D, texIn);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbOut);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        gl.drawArrays(gl.TRIANGLES, 0, rects.length * 6);
     }
 
-    var copyPixels = function(outX, outY, outW, outH, inX, inY, inW, inH, texIn, texInLocNum, fbOut) {
+    var copyPixels = function(outW, outH, inW, inH, texIn, texInLocNum, fbOut) {
         //copy from texAtlas1 into texAtlas2 
-        gl.uniform1f(locCache.getLoc('u_copy'), 1);
-
-        gl.uniform2fv(locCache.getLoc('u_resolutionTotal'), [2048, 2048]);
         gl.viewport(0, 0, 2048, 2048); //set the viewport to the whole display
-        setRectangle(gl, outX, outY, outW, outH);
-
-
-        gl.uniform2fv(locCache.getLoc('u_positionOut'), [outX, outY]);
-        gl.uniform2fv(locCache.getLoc('u_resolutionOut'), [outW, outH]);
-        gl.uniform2fv(locCache.getLoc('u_positionIn'), [inX, inY]);
-        gl.uniform2fv(locCache.getLoc('u_resolutionIn'), [inW, inH]);
-        gl.uniform2fv(locCache.getLoc('u_resolutionInNorm'), [1 / inW, 1 / inH]);
+        gl.uniform1f(locCache.getLoc('u_reductionFactorVX'), 1);
+        gl.uniform1f(locCache.getLoc('u_reductionFactorFG'), 1);
+        //gl.uniform2fv(locCache.getLoc('u_resolutionOutFactor'), [1 / 2048, 1 / 2048]);
+        //gl.uniform2fv(locCache.getLoc('u_resolutionInFactor'), [1 / inW, 1 / inH]);
 
         gl.uniform1i(locCache.getLoc('u_textureIn'), texInLocNum);
         gl.activeTexture(gl.TEXTURE0 + texInLocNum);
@@ -258,29 +271,30 @@ function countPixels() {
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbOut);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
-        gl.uniform1f(locCache.getLoc('u_copy'), 0);
     }
 
     console.log('time=' + (Date.now() - startTime) + ' done instantiating functions');
 
-    gl.uniform1i(locCache.getLoc('u_reductionFactorVX'), 4);
-    gl.uniform1i(locCache.getLoc('u_reductionFactorFG'), 4);
-    meldPixels(0, 0, 512, 512, 0, 0, 2048, 2048, texInput, 0, fbo1);
+    setRectangles(gl, rects, 4);
+    meldPixels(rects, 4, 512, 512, 2048, 2048, texInput, 0, fbo1);
     console.log('time=' + (Date.now() - startTime) + ' shader 1 done');
 
-    meldPixels(0, 0, 128, 128, 0, 0, 512, 512, texAtlas1, 1, fbo2);
+    setRectangles(gl, rects, 4);
+    meldPixels(rects, 4, 128, 128, 512, 512, texAtlas1, 1, fbo2);
     console.log('time=' + (Date.now() - startTime) + ' shader 2 done');
 
-    gl.uniform1i(locCache.getLoc('u_reductionFactorVX'), 2);
-    gl.uniform1i(locCache.getLoc('u_reductionFactorFG'), 2);
-    meldPixels(0, 0, 64, 64, 0, 0, 128, 128, texAtlas2, 2, fbo3);
+    setRectangles(gl, rects, 2);
+    meldPixels(rects, 2, 64, 64, 128, 128, texAtlas2, 2, fbo3);
     console.log('time=' + (Date.now() - startTime) + ' shader 3 done');
 
     //copy to onscreen buffer
     gl.uniform1f(locCache.getLoc('u_flipY'), -1); //flip the y axis
-    copyPixels(0, 0, 1024, 1024, 0, 0, 2048, 2048, texAtlas1, 1, null);
-    copyPixels(1024, 0, 1024, 1024, 0, 0, 2048, 2048, texAtlas2, 2, null);
-    copyPixels(1024, 1024, 1024, 1024, 0, 0, 2048, 2048, texAtlas3, 3, null);
+//    copyPixels(rects, 1024, 1024, 2048, 2048, texInput, 0, null);
+    setRectangle(gl, 0,0,2048,2048);
+//    copyPixels(2048, 2048, 2048, 2048, texAtlas1, 1, null);
+    copyPixels(2048, 2048, 2048, 2048, texAtlas3, 3, null);
+//    copyPixels(rects, 1024, 1024, 2048, 2048, texAtlas3, 3, null);
+
     console.log('time=' + (Date.now() - startTime) + ' copying to workCanvas done');
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo3);
@@ -322,6 +336,34 @@ function setRectangle(gl, x, y, width, height) {
      x1, y2,
      x2, y1,
      x2, y2]), gl.STATIC_DRAW);
+}
+
+function setRectangles(gl, rectangles, reductionFactor) {
+    //gl.bindBuffer(gl.ARRAY_BUFFER, this.outputRectangles);
+    let reductionNorm = 1 / reductionFactor;
+    let width = 32 * reductionNorm;
+    let height = 32 * reductionNorm;
+    let bufferBuilder = [];
+    for (var i = 0; i < rectangles.length; i++) {
+        let rectangle = rectangles[i];
+        let x = rectangle.x * 32 * reductionNorm;;
+        let y = rectangle.y * 32 * reductionNorm;;
+        
+        let x1 = x;
+        let x2 = x + width;
+        let y1 = y;
+        let y2 = y + height;
+
+        bufferBuilder.push(
+            x1, y1,
+            x2, y1,
+            x1, y2,
+            x1, y2,
+            x2, y1,
+            x2, y2
+        );
+    }
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bufferBuilder), gl.STATIC_DRAW);
 }
 
 class LocationsCache {

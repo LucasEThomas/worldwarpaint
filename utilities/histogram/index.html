@@ -27,25 +27,18 @@
     <script src="./webgl-utils.js"></script>
     
     <script id="2d-vertex-shader" type="x-shader/x-vertex">
-    attribute vec2 a_position; //each vertex (units:pixels)
+    attribute vec2 a_positionOut; //each vertex (units:pixels)
 
     uniform float u_flipY; //flip along y axis or not
-    uniform vec2 u_resolutionTotal; //total dest resolution
+    uniform vec2 u_resolutionOriginal; //total dest resolution
     
-    uniform vec2 u_resolutionOut;
-    uniform vec2 u_positionOut;
-    
-    uniform int u_reductionFactorVX;
-    
-    uniform vec2 u_resolutionIn;
-    uniform vec2 u_positionIn;
+    uniform float u_reductionFactorVX; //either 1, 2, or 4
 
-    varying vec2 v_texCoord; //varies between buffer start->buffer end
-    varying vec2 v_normTexCoord; //varies between buffer start->buffer end
+    varying vec2 v_texCoord; //input coords
 
     void main() {
        // convert the units from pixels to 0.0 to 1.0
-       vec2 zeroToOne = a_position / u_resolutionTotal;
+       vec2 zeroToOne = a_positionOut / u_resolutionOriginal;
 
        // convert from 0->1 to 0->2
        vec2 zeroToTwo = zeroToOne * 2.0;
@@ -57,8 +50,9 @@
 
        // pass the texCoord to the fragment shader
        // The GPU will interpolate this value between points.
-       v_normTexCoord = zeroToOne;
-       v_texCoord = ( (((a_position - u_positionOut)) * u_resolutionIn / u_resolutionOut) + u_positionIn) / u_resolutionTotal;
+       v_texCoord = zeroToOne * u_reductionFactorVX;
+       
+       //v_texCoord = ( (((a_positionOut - u_positionOut)) * u_reductionFactorVX) + u_positionIn) / u_resolutionOriginal;
     }
     </script>
     <!-- fragment shader -->
@@ -73,72 +67,69 @@
         
         uniform vec3 u_playerClrs[8];
 
-        uniform int u_reductionFactorFG;
+        uniform float u_reductionFactorFG;
 
         // the texCoords passed in from the vertex shader.
         varying vec2 v_texCoord;
-        varying vec2 v_normTexCoord;
 
         void main() {
             
-            if(u_copy == 0.0){
-                float clrSums[8];
-                clrSums[0] = 0.0;
-                clrSums[1] = 0.0;
-                clrSums[2] = 0.0;
-                clrSums[3] = 0.0;
-                clrSums[4] = 0.0;
-                clrSums[5] = 0.0;
-                clrSums[6] = 0.0;
-                clrSums[7] = 0.0;
-                //iterate through 16 pixels
-                if(u_reductionFactorFG == 4){
-                    for(int x=-2; x<2; x++){
-                        for(int y=-2; y<2; y++){
-                            vec2 currentPixel = v_texCoord + vec2(x,y) * u_resolutionInNorm;
-                            vec4 colorIn = texture2D(u_textureIn, currentPixel); // Look up the pixels input texture
-
-                            //now iterate through all 8 colors and sum each pixel into them
-                            for(int i=0; i<8; i++){
-                                if(u_playerClrs[i] == colorIn.rgb){
-                                    clrSums[i] += colorIn.a * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
-                                }
-                            }
-                        }
-                    }
-                }
-                //iterate through 4 pixels
-                else if(u_reductionFactorFG == 2){
-                    for(int x=-1; x<1; x++){
-                        for(int y=-1; y<1; y++){
-                            vec2 currentPixel = v_texCoord + vec2(x,y) * u_resolutionInNorm;
-                            vec4 colorIn = texture2D(u_textureIn, currentPixel); // Look up the pixels input texture
-
-                            //now iterate through all 8 colors and sum each pixel into them
-                            for(int i=0; i<8; i++){
-                                if(u_playerClrs[i] == colorIn.rgb){
-                                    clrSums[i] += colorIn.a * 0.25; // 0.25 = 1/4 but multiply is faster than divide
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-                //now set output gl_FragColor to the biggest color.
-                gl_FragColor = vec4(0.0,0.0,0.0,0.0);
-                for(int i=0; i<=7; i++){
-                    if(clrSums[i] > gl_FragColor.a){
-                        gl_FragColor = vec4(u_playerClrs[i], clrSums[i]);
-                    }
-                }
-
-                gl_FragColor = vec4(gl_FragColor.rgb, 1.0);
-            
-            }else if(u_copy == 1.0){
+            float clrSums[8];
+            clrSums[0] = 0.0;
+            clrSums[1] = 0.0;
+            clrSums[2] = 0.0;
+            clrSums[3] = 0.0;
+            clrSums[4] = 0.0;
+            clrSums[5] = 0.0;
+            clrSums[6] = 0.0;
+            clrSums[7] = 0.0;
+            //iterate through 16 pixels
+            if(u_reductionFactorFG == 1.0){
                 gl_FragColor = texture2D(u_textureIn, v_texCoord);
+                return;
+            }
+            else if(u_reductionFactorFG == 4.0){
+                for(int x=-2; x<2; x++){
+                    for(int y=-2; y<2; y++){
+                        vec2 currentPixel = v_texCoord + vec2(x,y) * u_resolutionInNorm;
+                        vec4 colorIn = texture2D(u_textureIn, currentPixel); // Look up the pixels input texture
+
+                        //now iterate through all 8 colors and sum each pixel into them
+                        for(int i=0; i<8; i++){
+                            if(u_playerClrs[i] == colorIn.rgb){
+                                clrSums[i] += colorIn.a * 0.0625; // 0.0625 = 1/16 but multiply is faster than divide
+                            }
+                        }
+                    }
+                }
+            }
+            //iterate through 4 pixels
+            else if(u_reductionFactorFG == 2.0){
+                for(int x=-1; x<1; x++){
+                    for(int y=-1; y<1; y++){
+                        vec2 currentPixel = v_texCoord + vec2(x,y) * u_resolutionInNorm;
+                        vec4 colorIn = texture2D(u_textureIn, currentPixel); // Look up the pixels input texture
+
+                        //now iterate through all 8 colors and sum each pixel into them
+                        for(int i=0; i<8; i++){
+                            if(u_playerClrs[i] == colorIn.rgb){
+                                clrSums[i] += colorIn.a * 0.25; // 0.25 = 1/4 but multiply is faster than divide
+                            }
+                        }
+                    }
+                }
             }
 
+
+            //now set output gl_FragColor to the biggest color.
+            gl_FragColor = vec4(0.0,0.0,0.0,0.0);
+            for(int i=0; i<=7; i++){
+                if(clrSums[i] > gl_FragColor.a){
+                    gl_FragColor = vec4(u_playerClrs[i], clrSums[i]);
+                }
+            }
+
+            gl_FragColor = vec4(gl_FragColor.rgb, 1.0);
         }
         
         
@@ -148,7 +139,7 @@
     <canvas id="canvasPaint" width="2048" height="2048"></canvas>
     <button onClick="refresh();">refresh</button>
     <p>work canvas</p>
-    <canvas id="canvasGl" width="2048" height="2048" style = "height:128px; width:128px;"></canvas>
+    <canvas id="canvasGl" width="2048" height="2048" style = "height:512px; width:512px;"></canvas>
     
     <p>output canvas</p>
     <canvas id="canvasTest" width="64" height="64" style = "height:64px; width:64px;"></canvas>
