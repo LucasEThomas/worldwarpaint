@@ -24,6 +24,13 @@ class GameBoardGraphics {
     render(stageInputRects, stageOutputRects, stageOutputColors) {
         var gl = this.gl;
         var locCache = this.locCache;
+        gl.useProgram(this.program);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.outputRectangles);
+        gl.enableVertexAttribArray(locCache.getLoc('a_outputRects'));
+        gl.vertexAttribPointer(locCache.getLoc('a_outputRects'), 2, gl.FLOAT, false, 0, 0);
+        
+        gl.viewport(0, 0, 3548, 2048); 
         //tell the shader the rectangles and colors to update and clear the staging buffers
         var numOfVertices = stageOutputColors.length * 6;
         this.setInputRectangles(gl, stageInputRects);
@@ -149,18 +156,16 @@ class GameBoardGraphics {
         }
 
         // setup GLSL program
-        var vertexShader = createShaderFromScriptElement(gl, "2d-vertex-shader");
-        var fragmentShader = createShaderFromScriptElement(gl, "2d-fragment-shader");
+        let vertexShader = createShaderFromScriptElement(gl, "2d-vertex-shader");
+        let fragmentShader = createShaderFromScriptElement(gl, "2d-fragment-shader");
         //histogramShader = createShaderFromScriptElement(gl, "histogram-fragment-shader");
-        var program = createProgram(gl, [vertexShader, fragmentShader]);
+        let program = this.program = createProgram(gl, [vertexShader, fragmentShader]);
         //histogramProgram = createProgram(gl, [vertexShader, histogramShader]);
         gl.useProgram(program);
         gl.viewport(0, 0, 3548, 2048); //set the viewport to the whole display
 
         // look up where the vertex data needs to go.
         var locCache = this.locCache = new LocationsCache(gl, program, ['a_inputRects', 'a_outputRects', 'a_colors', 'u_inResolution', 'u_outResolution', 'u_finalOutResolution', 'u_matrixa', 'u_drawMode', 'u_flipY', 'u_canvasDest']);
-        
-        // lookup uniforms
 
         // set the resolution
         gl.uniform2f(locCache.getLoc('u_inResolution'), 1024, 1024);
@@ -233,68 +238,6 @@ class GameBoardGraphics {
         this.fbo2 = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo2);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texDest2, 0);
-    }
-
-    // Counts the pixels of each player's color (taking alpha into account)
-    countPixels(){
-        var gl = gameBoardLayer.gameBoardDestination.gl;
-        //load in the buffer canvas data
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, texBuff);
-        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, game.world.width, game.world.height, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(gameBoardLayer.gameBoardBuffer.ctx.getImageData(0, 0, game.world.width, game.world.height).data));
-        
-        //tell the shader the size to update
-        gameBoardLayer.gameBoardDestination.setRectangle(gl, 0, 0, game.world.width/4, game.world.height/4);
-    
-        //setup uniforms for combining buffer with destination data
-        gl.uniform1f(gl.getUniformLocation(program, "u_flipY"), 1); //flip the y axis
-        //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); //todo use this instead
-        gl.uniform2iv(gl.getUniformLocation(program, "u_resolutionIn"), [game.world.width, game.world.height]);
-        gl.uniform1i(gl.getUniformLocation(program, "u_initialInput"), 1); //initial input
-        var playerClrs = [
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 1.0,
-            1.0, 1.0, 0.0
-        ];
-        gl.uniform3fv(gl.getUniformLocation(program, "u_initialInput"), playerClrs); //players colors array
-    
-        //tell it to write from inputTex
-        gl.uniform1i(gl.getUniformLocation(program, "u_textureIn"), 0);
-        gl.activeTexture(gl.TEXTURE0 + 0);
-        gl.bindTexture(gl.TEXTURE_2D, texDest1);
-        //into framebuffer1
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo1);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-        
-        var atlasRects = [
-            {x:0,   y:0,    w:512,  h:512},
-            {x:0,   y:0,    w:128,  h:128},
-            {x:512, y:0,    w:32,   h:32},
-            {x:128, y:0,    w:8,    h:8},
-            {x:512, y:32,   w:2,    h:2}
-        ]
-        
-        for(var i=0; i<5; i++){
-            //todo, need to tell it the destination location in the atlas
-            gameBoardLayer.gameBoardDestination.setRectangle(gl, atlasRects[i].x, atlasRects[i].y, atlasRects[i].w, atlasRects[i].h);
-            
-            //set the location of the previous atlas, todo, need to set position and resolution here.
-            gl.uniform1i(gl.getUniformLocation(program, "u_textureIn"), i%2?1:2);
-            gl.activeTexture(gl.TEXTURE0 + i%2?1:2);
-            gl.bindTexture(gl.TEXTURE_2D, i%2?texAtlas1:texAtlas2);
-            //into framebuffer
-            gl.bindFramebuffer(gl.FRAMEBUFFER, i%2?fbo2:fbo1);
-            gl.drawArrays(gl.TRIANGLES, 0, 6);
-        }
-        var pixels = new Uint8Array(16);
-        gl.readPixels(x, y, 4, 4, gl.RGBA, gl.UNSIGNED_BYTE, pixels);//todo, need to set to the final 4x4 atlas
-        //scores is an array that will hold the amount of paint each player has
-        var scores = new Uint8Array(4);
-        for(var i=0; i<16; i++){
-            scores[i%4] += pixels[i];
-        }
-        console.log(scores);//for now, just output to the console.
     }
 }
 

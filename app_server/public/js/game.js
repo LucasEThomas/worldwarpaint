@@ -85,7 +85,6 @@ class Game extends Phaser.Game {
             for (var currentEvent of currentTimeSlot) {
                 this.units.processEvent(currentEvent);
             }
-
         }
         //bandaid fix for when the browser looses focus and the eventQueue just piles up. Don't wanna memory leak!
         if (this.eventQueue.length > 10) {

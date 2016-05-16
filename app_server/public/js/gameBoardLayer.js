@@ -2,6 +2,7 @@ class GameBoardLayer {
     constructor(game) {
         var canvas = $('#gameboard_canvas')[0];
         this.gameBoardGraphics = new GameBoardGraphics(canvas);
+        this.gameBoardCensus = new GameBoardCensus(this.gameBoardGraphics.gl, this.gameBoardGraphics.texDest2);
         canvas = document.getElementById('gameboard_canvas');
         this.baseTexture = new PIXI.BaseTexture(canvas);
         var texture = new PIXI.Texture(this.baseTexture);
@@ -14,6 +15,10 @@ class GameBoardLayer {
         this.stageOutputColors = [];
         this.stageInputRects = [];
         this.stageOutputRects = [];
+        
+        this.censusInterval = setInterval(()=>{
+            this.performCensus();
+        }, 400);
     }
 
     stageSplatter(x, y, radius, clr, inputIndex) {
@@ -43,12 +48,14 @@ class GameBoardLayer {
             return;
         }
         this.stageOutputColors.push(clr);
-        this.stageOutputRects.push({
+        let rect = {
             x: x - radius,
             y: y - radius,
             width: radius * 2,
             height: radius * 2
-        });
+        };
+        this.stageOutputRects.push(rect);
+        this.gameBoardCensus.registerSplatter(rect.x, rect.y, rect.width, rect.height);
     }
 
 
@@ -59,5 +66,8 @@ class GameBoardLayer {
             this.stageOutputRects = [];
             this.stageOutputColors = [];
         }
+    }
+    performCensus(){
+        this.gameBoardCensus.performCensus();
     }
 }
