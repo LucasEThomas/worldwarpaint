@@ -19,8 +19,8 @@ class GameBoardCensus {
         }
 
         // setup GLSL program
-        var vertexShader = createShaderFromScriptElement(gl, "2d-vertex-shader");
-        var histogramShader = createShaderFromScriptElement(gl, "histogram-fragment-shader");
+        var vertexShader = createShaderFromScriptElement(gl, "census-vertex-shader");
+        var histogramShader = createShaderFromScriptElement(gl, "census-fragment-shader");
         this.program = createProgram(gl, [vertexShader, histogramShader]);
         gl.useProgram(this.program);
 
@@ -145,16 +145,19 @@ class GameBoardCensus {
 
         setTimeout(() => {
             meldPixels(rects, 4, 512, 512, 2048, 2048, this.texInput, 0, this.fbo1);
+            gl.flush();
             console.log('time=' + (Date.now() - startTime) + ' shader 1 done');
         }, 0);
 
         setTimeout(() => {
             meldPixels(rects, 4, 128, 128, 512, 512, this.tex1, 1, this.fbo2);
+            gl.flush();
             console.log('time=' + (Date.now() - startTime) + ' shader 2 done');
         }, 100);
 
         setTimeout(() => {
             meldPixels(rects, 2, 64, 64, 128, 128, this.tex2, 2, this.fbo3);
+            gl.flush();
             console.log('time=' + (Date.now() - startTime) + ' shader 3 done');
         }, 200);
 
@@ -166,8 +169,10 @@ class GameBoardCensus {
             //            gl.uniform1f(locCache.getLoc('u_flipY'), 1); //flip the y axis
             //console.log('time=' + (Date.now() - startTime) + ' copying to workCanvas done');
 
+            console.log('time=' + (Date.now() - startTime) + ' readPixels start');
+            //gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo3);
             var pixels = new Uint8Array(16384);
-            gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo3);
+            
             gl.readPixels(0, 0, 64, 64, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
             console.log('time=' + (Date.now() - startTime) + ' readPixels done');
 

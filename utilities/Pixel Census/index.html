@@ -26,7 +26,7 @@
     <!-- vertex shader -->
     <script src="./webgl-utils.js"></script>
     
-    <script id="2d-vertex-shader" type="x-shader/x-vertex">
+    <script id="census-vertex-shader" type="x-shader/x-vertex">
     attribute vec2 a_positionOut; //each vertex (units:pixels)
 
     uniform float u_flipY; //flip along y axis or not
@@ -56,7 +56,7 @@
     }
     </script>
     <!-- fragment shader -->
-    <script id="histogram-fragment-shader" type="x-shader/x-fragment">
+    <script id="census-fragment-shader" type="x-shader/x-fragment">
         precision mediump float;
 
         // our 2 canvases
@@ -131,8 +131,6 @@
 
             gl_FragColor = vec4(gl_FragColor.rgb, 1.0);
         }
-        
-        
     </script>
     <button onClick="refresh();">refresh</button>
     
