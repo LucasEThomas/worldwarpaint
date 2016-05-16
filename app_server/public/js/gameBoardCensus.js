@@ -13,6 +13,10 @@ class GameBoardCensus {
         let upperXbound = Math.floor((x + w) * 0.03125);
         let lowerYbound = Math.floor(y * 0.03125);
         let upperYbound = Math.floor((x + h) * 0.03125);
+        lowerXbound = (lowerXbound >= 0)?lowerXbound:0;
+        upperXbound = (upperXbound <= 64)?lowerXbound:64;
+        lowerYbound = (lowerYbound >= 0)?lowerYbound:0;
+        upperYbound = (upperYbound <= 64)?upperYbound:64;
 
         //console.log(`xlo:${lowerXbound} xhi:${upperXbound} ylo:${lowerYbound} yhi:${upperYbound}`);
 
