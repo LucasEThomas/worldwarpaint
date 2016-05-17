@@ -12,16 +12,16 @@ class GameBoardCensus {
         let lowerXbound = Math.floor(x * 0.03125); //0.03125 = 1/32
         let upperXbound = Math.floor((x + w) * 0.03125);
         let lowerYbound = Math.floor(y * 0.03125);
-        let upperYbound = Math.floor((x + h) * 0.03125);
-        lowerXbound = (lowerXbound >= 0)?lowerXbound:0;
-        upperXbound = (upperXbound <= 64)?lowerXbound:64;
-        lowerYbound = (lowerYbound >= 0)?lowerYbound:0;
-        upperYbound = (upperYbound <= 64)?upperYbound:64;
+        let upperYbound = Math.floor((y + h) * 0.03125);
+        lowerXbound = (lowerXbound >= 0) ? lowerXbound : 0;
+        upperXbound = (upperXbound <= 63) ? upperXbound : 63;
+        lowerYbound = (lowerYbound >= 0) ? lowerYbound : 0;
+        upperYbound = (upperYbound <= 63) ? upperYbound : 63;
 
-        //console.log(`xlo:${lowerXbound} xhi:${upperXbound} ylo:${lowerYbound} yhi:${upperYbound}`);
+        console.log(`xlo:${lowerXbound} xhi:${upperXbound} ylo:${lowerYbound} yhi:${upperYbound}`);
 
         for (var j = lowerXbound; j <= upperXbound; j++) {
-            for (var k = lowerXbound; k <= upperXbound; k++) {
+            for (var k = lowerYbound; k <= upperYbound; k++) {
                 if (!this.tiles[j + k * 64].selected) {
                     this.tiles[j + k * 64].selected = true;
                     this.registeredTiles.push({
@@ -39,13 +39,13 @@ class GameBoardCensus {
                     let arrayLocation = tile.x + tile.y * 64
                     this.tiles[arrayLocation].selected = false;
                     let newClr = {
-                        r: this.data[0 + arrayLocation * 4] * 255,
-                        g: this.data[1 + arrayLocation * 4] * 255,
-                        b: this.data[2 + arrayLocation * 4] * 255
+                        r: this.data[0 + arrayLocation * 4],
+                        g: this.data[1 + arrayLocation * 4],
+                        b: this.data[2 + arrayLocation * 4]
                     };
                     let newLevel = this.data[3 + arrayLocation * 4];
                     this.tiles[arrayLocation].doUpdate(newClr, newLevel);
-                    //console.log(newLevel);
+                    //console.log(newClr);
                 });
                 this.registeredTiles = [];
             });
@@ -141,6 +141,11 @@ class GameBoardCensus {
         var meldPixels = (rects, reductionFactor, outW, outH, inW, inH, texIn, texInLocNum, fbOut) => {
             //compute from inputTex into tex1
             gl.useProgram(this.program);
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.rectsBuffer);
+            gl.enableVertexAttribArray(locCache.getLoc('a_positionOut'));
+            gl.vertexAttribPointer(locCache.getLoc('a_positionOut'), 2, gl.FLOAT, false, 0, 0);
+
             this.setRectangles(gl, rects, reductionFactor);
             gl.viewport(0, 0, inW, inH); //set the viewport to the input buffer size
             gl.uniform1f(locCache.getLoc('u_reductionFactorVX'), reductionFactor);
@@ -153,7 +158,7 @@ class GameBoardCensus {
             gl.bindTexture(gl.TEXTURE_2D, texIn);
 
             gl.bindFramebuffer(gl.FRAMEBUFFER, fbOut);
-            //gl.drawArrays(gl.TRIANGLES, 0, rects.length * 6);
+            gl.drawArrays(gl.TRIANGLES, 0, rects.length * 6);
         }
         setTimeout(() => {
             meldPixels(rects, 4, 512, 512, 2048, 2048, this.texInput, 2, this.fbo1);
@@ -173,11 +178,16 @@ class GameBoardCensus {
         setTimeout(() => {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo3);
             gl.readPixels(0, 0, 64, 64, gl.RGBA, gl.UNSIGNED_BYTE, this.data);
+            var testCtx = document.getElementById("canvasTest64").getContext("2d");
+            var data = new ImageData(new Uint8ClampedArray(this.data), 64, 64);
+            testCtx.putImageData(data, 0, 0);
             onFinishCallback();
         }, 300);
     }
 
     setRectangles(gl, rectangles, reductionFactor) {
+        //console.log(`xlo:${lowerXbound} xhi:${upperXbound} ylo:${lowerYbound} yhi:${upperYbound}`);
+        //console.log(rectangles);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.rectsBuffer);
         let reductionNorm = 1 / reductionFactor;
         let width = 32 * reductionNorm;
@@ -210,7 +220,11 @@ class CensusTile {
     constructor() {
         this.selected = false;
         this.onChangeCallback;
-        this.clr = {r:0,g:0,b:0};
+        this.clr = {
+            r: 0,
+            g: 0,
+            b: 0
+        };
         this.level = 0;
     }
     doUpdate(newClr, newLevel) {

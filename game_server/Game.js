@@ -13,10 +13,10 @@ class Game {
             new Player('5afdaeaf-f317-4470-ae6f-33bca53fd0de', null, Utility.hexToRgb(this.pickRandomColor())),
             new Player('dda2571a-55d9-46d3-96c2-8b984164c905', null, Utility.hexToRgb(this.pickRandomColor()))];
         // create a units array, for now we auto-generate two units linked to two players for testing
-        this.units = [
-            new Unit(1, 600, 300, 'hero', 'dda2571a-55d9-46d3-96c2-8b984164c904'),
-            new Unit(2, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
-            new Unit(3, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')];
+        this.units = [];
+            //new Unit(1, 600, 300, 'hero', 'dda2571a-55d9-46d3-96c2-8b984164c904'),
+            //new Unit(2, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
+            //new Unit(3, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')];
         this.extraEvents = [];
 
         this.interval = setInterval(() => {
@@ -52,7 +52,7 @@ class Game {
 
     onInitSync(player, data) {
         // send players to connecting client
-        this.onNewTower(player, 1000, 1000, 'champion', player.id);
+        //this.onNewTower(player, 1000, 1000, 'champion', player.id);
         var sendPlayers = this.players.map((current) => current.toJSON());
         player.initSyncServer(sendPlayers, this.units, this.map);
     }
