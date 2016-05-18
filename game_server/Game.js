@@ -14,9 +14,9 @@ class Game {
             new Player('dda2571a-55d9-46d3-96c2-8b984164c905', null, Utility.hexToRgb(this.pickRandomColor()))];
         // create a units array, for now we auto-generate two units linked to two players for testing
         this.units = [];
-            //new Unit(1, 600, 300, 'hero', 'dda2571a-55d9-46d3-96c2-8b984164c904'),
-            //new Unit(2, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
-            //new Unit(3, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')];
+        //new Unit(1, 600, 300, 'hero', 'dda2571a-55d9-46d3-96c2-8b984164c904'),
+        //new Unit(2, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
+        //new Unit(3, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')];
         this.extraEvents = [];
 
         this.interval = setInterval(() => {
@@ -116,7 +116,7 @@ class Game {
     generateScheduleItemEvents() {
         var toReturn = [];
 
-        this.fairlyIterateThroughUnits((unit) => {
+        this.units.forEach((unit, index) => {
             var events = unit.generateEvents();
             events.forEach((event, index) => {
                 toReturn.push({
@@ -135,15 +135,25 @@ class Game {
 
         return toReturn;
     }
+    //this algorithm doesn't work for units.length == 2 :/
     fairlyIterateThroughUnits(callback) {
-        var tLength = this.units.length; //cache for clean code and minor speed increase
+        var tLength = this.units.length; //cache for clean code
         for (var i = 0; i < tLength; i++) {
-            var rri = (i + this.roundRobinOffset) % tLength;
-            var unit = this.units[this.reverseIterate ? -rri + tLength - 1 : rri]
+            var rri = (i + this.roundRobinOffset % tLength) || 0;
+            console.log('roundRobinOffset:' + this.roundRobinOffset);
+            var unit = this.units[this.reverseIterate ? (-rri + tLength - 1) : rri]
+            if (tLength === 2) {
+                console.log(this.units);
+                console.log('roundRobinOffset:' + this.roundRobinOffset);
+                console.log('rri:' + rri);
+                console.log('-rri' + (-rri))
+                console.log('(-rri + tLength - 1)' + (-rri + tLength - 1))
+                console.log('index:' + (this.reverseIterate ? (-rri + tLength - 1) : rri));
+            }
             callback(unit);
         }
         if (this.reverseIterate) {
-            this.roundRobinOffset = (this.roundRobinOffset + 1) % tLength;
+            this.roundRobinOffset = ((this.roundRobinOffset + 1) % tLength) || 0;
         }
         this.reverseIterate = !this.reverseIterate;
     }
