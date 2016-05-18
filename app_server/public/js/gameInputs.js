@@ -63,7 +63,7 @@ class GameInputs {
                     }
                 }
                 //else if the ability must happen on the player's color and it has, then do it
-                else if (game.gameBoardLayer.gameBoardGraphics.colorMatch(game.input.worldX, game.input.worldY, game.player.clr)) {
+                else if (game.gameBoardLayer.gameBoardGraphics.colorMatch(this.abilityCursor.isoX, this.abilityCursor.isoY, game.player.clr)) {
                     game.money.amount -= options.cost;
                     options.onClickCallback(this.abilityCursor.isoX, this.abilityCursor.isoY)
                     if (!this.keys.shift.isDown) {
@@ -79,12 +79,21 @@ class GameInputs {
             }
         } else {
             //this is just for dev purposes for now.
-            var point = game.iso.unproject(game.input.activePointer.position);
-            game.gameServer.manualSplatter(point.x, point.y, 50, game.player.id);
+            if (this.keys.shift.isDown) {
+                var point = game.iso.unproject(game.input.activePointer.position);
+                game.gameServer.manualSplatter(point.x, point.y, 50, game.player.id);
+            }
+            else{
+                //let point = game.iso.unproject(game.input.activePointer.position)
+                //console.log(game.gameBoardLayer.gameBoardGraphics.colorMatch(point.x, point.y, game.player.clr));
+            }
+
+
+
         }
     }
     rightMouseUp(e) {
-        console.log('rc');
+        console.log('right click');
         e.preventDefault();
         if (game.player.type === 'champion' || game.player.type === 'archer')
             game.gameServer.moveHero(game.input.worldX, game.input.worldY);

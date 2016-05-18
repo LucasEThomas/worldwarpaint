@@ -14,10 +14,14 @@ class GameBoardGraphics {
 
     //returns true if the rgb value at x,y is close to rgb
     colorMatch(x, y, rgb) {
-        y = -y + 2048; //flip y
+        x = Math.floor(x * 1.732421875);
+        y = Math.floor(y);
         var gl = this.gl;
         var pixelValues = new Uint8Array(4);
+        gl.useProgram(this.program);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo2);
         gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelValues);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         return (Math.abs(pixelValues[0] - rgb.r) <= 12 && Math.abs(pixelValues[1] - rgb.g) <= 12 && Math.abs(pixelValues[2] - rgb.b) <= 12);
     }
 
