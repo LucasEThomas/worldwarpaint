@@ -18,7 +18,7 @@ class GameBoardCensus {
         lowerYbound = (lowerYbound >= 0) ? lowerYbound : 0;
         upperYbound = (upperYbound <= 63) ? upperYbound : 63;
 
-        console.log(`xlo:${lowerXbound} xhi:${upperXbound} ylo:${lowerYbound} yhi:${upperYbound}`);
+        //console.log(`xlo:${lowerXbound} xhi:${upperXbound} ylo:${lowerYbound} yhi:${upperYbound}`);
 
         for (var j = lowerXbound; j <= upperXbound; j++) {
             for (var k = lowerYbound; k <= upperYbound; k++) {
@@ -34,8 +34,8 @@ class GameBoardCensus {
     }
     performCensus() {
         if (this.registeredTiles.length) {
-            this.countPixels(this.registeredTiles, () => {
-                this.registeredTiles.forEach((tile, index) => {
+            this.countPixels(this.registeredTiles.slice(), (processedRects) => {
+                processedRects.forEach((tile, index) => {
                     let arrayLocation = tile.x + tile.y * 64
                     this.tiles[arrayLocation].selected = false;
                     let newClr = {
@@ -45,10 +45,9 @@ class GameBoardCensus {
                     };
                     let newLevel = this.data[3 + arrayLocation * 4];
                     this.tiles[arrayLocation].doUpdate(newClr, newLevel);
-                    //console.log(newClr);
                 });
-                this.registeredTiles = [];
             });
+            this.registeredTiles = [];
         }
     }
 
@@ -181,13 +180,11 @@ class GameBoardCensus {
             var testCtx = document.getElementById("canvasTest64").getContext("2d");
             var data = new ImageData(new Uint8ClampedArray(this.data), 64, 64);
             testCtx.putImageData(data, 0, 0);
-            onFinishCallback();
+            onFinishCallback(rects);
         }, 300);
     }
 
     setRectangles(gl, rectangles, reductionFactor) {
-        //console.log(`xlo:${lowerXbound} xhi:${upperXbound} ylo:${lowerYbound} yhi:${upperYbound}`);
-        //console.log(rectangles);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.rectsBuffer);
         let reductionNorm = 1 / reductionFactor;
         let width = 32 * reductionNorm;
@@ -231,7 +228,6 @@ class CensusTile {
         if (newClr.r !== this.clr.r || newClr.g !== this.clr.g || newClr.b !== this.clr.b || newLevel !== this.level) {
             this.clr = newClr;
             this.level = newLevel;
-            console.log(newClr);
             if (this.onChangeCallback) {
                 this.onChangeCallback(newClr, newLevel);
             }
