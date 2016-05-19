@@ -5,7 +5,7 @@ var abilities = [
         image: 'blueButton1',
         usageCallback: undefined,
         onClickOptions: {
-            cost: 100,
+            cost: 45,
             imageName: 'tower',
             alpha: 0.6,
             inIsoUnitsGroup: true,

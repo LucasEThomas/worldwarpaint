@@ -84,8 +84,8 @@ class GameInputs {
                 game.gameServer.manualSplatter(point.x, point.y, 50, game.player.id);
             }
             else{
-                //let point = game.iso.unproject(game.input.activePointer.position)
-                //console.log(game.gameBoardLayer.gameBoardGraphics.colorMatch(point.x, point.y, game.player.clr));
+                let point = game.iso.unproject(game.input.activePointer.position)
+                console.log(game.gameBoardLayer.gameBoardGraphics.colorMatch(point.x, point.y, game.player.clr));
             }
 
 

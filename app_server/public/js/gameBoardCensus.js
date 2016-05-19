@@ -32,9 +32,10 @@ class GameBoardCensus {
             }
         }
     }
-    performCensus() {
+    performCensus(onFinish) {
         if (this.registeredTiles.length) {
             this.countPixels(this.registeredTiles.slice(), (processedRects) => {
+                let totalScoreChange = 0;
                 processedRects.forEach((tile, index) => {
                     let arrayLocation = tile.x + tile.y * 64
                     this.tiles[arrayLocation].selected = false;
@@ -43,9 +44,11 @@ class GameBoardCensus {
                         g: this.data[1 + arrayLocation * 4],
                         b: this.data[2 + arrayLocation * 4]
                     };
-                    let newLevel = this.data[3 + arrayLocation * 4];
-                    this.tiles[arrayLocation].doUpdate(newClr, newLevel);
+                    let newScore = Math.floor(this.data[3 + arrayLocation * 4]);
+                    totalScoreChange += this.tiles[arrayLocation].calculateScoreChange(game.player.clr, newClr, newScore);
+                    this.tiles[arrayLocation].doUpdate(newClr, newScore);
                 });
+                onFinish(totalScoreChange);
             });
             this.registeredTiles = [];
         }
@@ -140,7 +143,7 @@ class GameBoardCensus {
         var meldPixels = (rects, reductionFactor, outW, outH, inW, inH, texIn, texInLocNum, fbOut) => {
             //compute from inputTex into tex1
             gl.useProgram(this.program);
-            
+
             gl.bindBuffer(gl.ARRAY_BUFFER, this.rectsBuffer);
             gl.enableVertexAttribArray(locCache.getLoc('a_positionOut'));
             gl.vertexAttribPointer(locCache.getLoc('a_positionOut'), 2, gl.FLOAT, false, 0, 0);
@@ -222,16 +225,41 @@ class CensusTile {
             g: 0,
             b: 0
         };
-        this.level = 0;
+        this.score = 0;
     }
-    doUpdate(newClr, newLevel) {
-        if (newClr.r !== this.clr.r || newClr.g !== this.clr.g || newClr.b !== this.clr.b || newLevel !== this.level) {
+    doUpdate(newClr, newScore) {
+        if (!this.compareClr(newClr, this.clr) || newScore !== this.score) {
             this.clr = newClr;
-            this.level = newLevel;
+            this.score = newScore;
             if (this.onChangeCallback) {
-                this.onChangeCallback(newClr, newLevel);
+                this.onChangeCallback(newClr, newScore);
             }
         }
+    }
+    calculateScoreChange(myClr, newClr, newScore) {
+        let oldClr = this.clr;
+        if (this.compareClr(oldClr, newClr)) { //no color change happened
+            //console.log(oldClr);
+            //console.log(newClr);
+            //console.log(myClr);
+            if (this.compareClr(newClr, myClr)) { //if it's my color
+                return newScore - this.score;
+            } else { //if it's not my color
+                return 0;
+            }
+        } else { //a color change happened
+            if (this.compareClr(newClr, myClr)) { //if it changed to my color
+                return newScore;
+            } else if (this.compareClr(oldClr, myClr)){ //if it changed from my color
+                return -newScore;
+            }
+            else{
+                return 0;
+            }
+        }
+    }
+    compareClr(a, b) {
+        return a.r === b.r && a.g === b.g && a.b === b.b;
     }
 
 }

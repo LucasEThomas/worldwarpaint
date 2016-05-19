@@ -1,7 +1,7 @@
 class moneyManager {
     constructor() {
         this.amount = 0;
-        this.rate = 1;
+        this.rate = 0;
         
         var text = this.text = game.add.text(game.camera.width - 100, 20, "$0");
         text.anchor.setTo(1,0);
@@ -19,6 +19,6 @@ class moneyManager {
     }
     update() {
         this.amount += this.rate;
-        this.text.text = "$" + this.amount;
+        this.text.text = '$' + Math.floor(this.amount) + '\nrate:' + Math.round(this.rate*3600) + '/min';
     }
 }
