@@ -1,7 +1,7 @@
 class Unit {
     constructor(x, y, id, ownerId, type) {
         this.sprite = game.add.isoSprite(x, y, 0, 'tower', 0, game.units.group);
-        this.sprite.anchor.setTo(0.5, 0.84); //1-((tower.width/4)/tower.height));
+        this.sprite.anchor.setTo(0.5, 0.75); //1-((tower.width/4)/tower.height));
 
         this.id = id;
         this.ownerID = ownerId;
@@ -11,7 +11,11 @@ class Unit {
         if (event.type === 'sprinklerUnit') {
             let clr = game.players.getClr(event.ownerID);
             event.data.forEach((splatter, n) => {
-                new projectile(game, this.sprite.isoX, this.sprite.isoY, 60, splatter.x, splatter.y, 0, 200, 750, () => {
+                let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
+                let endPoint = new Victor(splatter.x, splatter.y);
+                //start points in a circle around the top of the tower
+                let newStart = new Victor(13, 13).rotate(endPoint.subtract(startPoint).angle()).add(startPoint); 
+                new projectile(game, newStart.x, newStart.y, 45, splatter.x, splatter.y, 0, 50, 750, () => {
                     game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
                 });
 
@@ -48,7 +52,6 @@ class UnitsManager {
 }
 class projectile {
     constructor(game, x1, y1, z1, x2, y2, z2, lobHeight, airTime, impactCallback) {
-        let distance = new Victor(x1, y1).distance(new Victor(x2, y2));
         let sprite = game.add.isoSprite(x1, y1, z1, 'projectile', 0, game.units.group);
         let linearTween = game.add.tween(sprite).to({
             isoX: x2,
@@ -59,7 +62,7 @@ class projectile {
             sprite.destroy();
         });
         let parabolicTween = game.add.tween(sprite).to({
-            isoZ: [z1, lobHeight, lobHeight, z2]
+            isoZ: [z1, z1 + lobHeight, z1 + lobHeight, z2]
         }, airTime, null, true).interpolation(Phaser.Math.bezierInterpolation);
 
     }
