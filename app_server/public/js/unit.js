@@ -11,7 +11,7 @@ class Unit {
         if (event.type === 'sprinklerUnit') {
             let clr = game.players.getClr(event.ownerID);
             event.data.forEach((splatter, n) => {
-                new projectile(game, this.sprite.isoX, this.sprite.isoY, 60, splatter.x, splatter.y, 0, 0.25, () => {
+                new projectile(game, this.sprite.isoX, this.sprite.isoY, 60, splatter.x, splatter.y, 0, 200, 750, () => {
                     game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
                 });
 
@@ -47,21 +47,20 @@ class UnitsManager {
     }
 }
 class projectile {
-    constructor(game, x1, y1, z1, x2, y2, z2, speed, impactCallback) {
+    constructor(game, x1, y1, z1, x2, y2, z2, lobHeight, airTime, impactCallback) {
         let distance = new Victor(x1, y1).distance(new Victor(x2, y2));
         let sprite = game.add.isoSprite(x1, y1, z1, 'projectile', 0, game.units.group);
         let linearTween = game.add.tween(sprite).to({
             isoX: x2,
             isoY: y2,
-        }, distance / speed, null, true);
+        }, airTime, null, true);
         linearTween.onComplete.add(() => {
             impactCallback();
             sprite.destroy();
         });
-        let points = [0, 50, 0];
         let parabolicTween = game.add.tween(sprite).to({
-            isoZ: [z1, 300, z2]
-        }, distance / speed, null, true).interpolation(Phaser.Math.bezierInterpolation);
+            isoZ: [z1, lobHeight, lobHeight, z2]
+        }, airTime, null, true).interpolation(Phaser.Math.bezierInterpolation);
 
     }
 }
