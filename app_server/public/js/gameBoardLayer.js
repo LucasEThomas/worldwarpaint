@@ -69,7 +69,7 @@ class GameBoardLayer {
     }
     performCensus(){
         this.gameBoardCensus.performCensus((totalScoreChange)=>{
-            console.log(totalScoreChange)
+            //console.log(totalScoreChange)
             game.money.rate += totalScoreChange * 0.000005;//1/60 since this the rate should agrigate at 60 fps
         });
     }

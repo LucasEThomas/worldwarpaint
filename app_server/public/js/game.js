@@ -41,6 +41,10 @@ class Game extends Phaser.Game {
         game.load.image('towerBlue2', 'assets/TowerBlue2.png');
         game.load.image('towerBlue3', 'assets/TowerBlue3.png');
         game.load.image('towerBlue4', 'assets/TowerBlue4.png');
+        game.load.image('healthBarGreen', 'assets/healthBarGreen.png');
+        game.load.image('healthBarWhite', 'assets/healthBarWhite.png');
+        game.load.image('healthBarRed', 'assets/healthBarRed.png');
+        game.load.image('healthBarBlue', 'assets/healthBarBlue.png');
         game.load.image('notebookPaper', 'assets/isometricNotebookPaper.png');
         game.load.image('splatters', 'assets/splatters.png');
         game.load.image('wildFlowerNoise', 'assets/wildFlowerNoise.png');
