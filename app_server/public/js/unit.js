@@ -1,6 +1,22 @@
 class Unit {
-    constructor() {
+    constructor(x, y, id, ownerId, type) {
+        this.sprite = game.add.isoSprite(x, y, 0, 'tower', 0, game.units.group);
+        this.sprite.anchor.setTo(0.5, 0.84); //1-((tower.width/4)/tower.height));
 
+        this.id = id;
+        this.ownerID = ownerId;
+        this.type = type;
+    }
+    processEvent(event) {
+        if (event.type === 'sprinklerUnit') {
+            let clr = game.players.getClr(event.ownerID);
+            event.data.forEach((splatter, n) => {
+                new projectile(game, this.sprite.isoX, this.sprite.isoY, 60, splatter.x, splatter.y, 0, 0.25, () => {
+                    game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
+                });
+
+            });
+        }
     }
 }
 class UnitsManager {
@@ -9,21 +25,12 @@ class UnitsManager {
         this.group = game.add.group();
     }
     newTower(x, y, id, ownerId, type) {
-        var tower = game.add.isoSprite(x, y, 0, 'tower', 0, game.units.group);
-        tower.id = id;
-        // if you don't set the anchor the sprite won't show on the map correctly (will be offset)
-        tower.anchor.setTo(0.5, 0.84); //1-((tower.width/4)/tower.height));
-        tower.ownerID = ownerId;
-        tower.type = type;
-        this.units.push(tower);
+        this.units.push(new Unit(x, y, id, ownerId, type));
     }
     processEvent(event) {
         //this logic should be somewhere else... but here's fine for now :) 
         if (event.type === 'sprinklerUnit') {
-            let clr = game.players.getClr(event.ownerID);
-            event.data.forEach((splatter, n) => {
-                game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
-            });
+            this.units.find((t) => t.id === event.unitId).processEvent(event);
         } else if (event.type === 'manualSplatter') {
             let clr = game.players.getClr(event.ownerID);
             let splatter = event.data[0];
@@ -35,7 +42,26 @@ class UnitsManager {
             tower.y = event.data.y;
         }
     }
-    update(){
+    update() {
         game.iso.simpleSort(this.group);
+    }
+}
+class projectile {
+    constructor(game, x1, y1, z1, x2, y2, z2, speed, impactCallback) {
+        let distance = new Victor(x1, y1).distance(new Victor(x2, y2));
+        let sprite = game.add.isoSprite(x1, y1, z1, 'projectile', 0, game.units.group);
+        let linearTween = game.add.tween(sprite).to({
+            isoX: x2,
+            isoY: y2,
+        }, distance / speed, null, true);
+        linearTween.onComplete.add(() => {
+            impactCallback();
+            sprite.destroy();
+        });
+        let points = [0, 50, 0];
+        let parabolicTween = game.add.tween(sprite).to({
+            isoZ: [z1, 300, z2]
+        }, distance / speed, null, true).interpolation(Phaser.Math.bezierInterpolation);
+
     }
 }

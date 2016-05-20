@@ -120,6 +120,7 @@ class Game {
             var events = unit.generateEvents();
             events.forEach((event, index) => {
                 toReturn.push({
+                    unitId: unit.id,
                     ownerID: unit.ownerID,
                     type: event.type,
                     data: event.data

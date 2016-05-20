@@ -22,7 +22,7 @@ class Unit {
         var toReturn = [];
         //just create 5 sprinkles for now.
         var sprinkles = [];
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < 1; i++) {
             var unitRange = 200 * Math.random();
             var randomDirection = Math.TWOPI * Math.random();
             var splatterX = Math.round(this.x + (unitRange * Math.cos(randomDirection)));
