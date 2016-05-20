@@ -13,7 +13,8 @@ class gameServer {
             playerType: game.player.type,
             // send player's id
             playerID: game.player.id,
-            playerClr: game.player.clr
+            playerClr: game.player.clr,
+            playerClrName: game.player.clrName
         }));
     };
 
@@ -32,6 +33,7 @@ class gameServer {
 
             // set player color
             game.player.clr = data.playerClr;
+            game.player.clrName = data.playerClrName;
             // save players for the game session
             game.players.setPlayers(data.players);
             //set the player's id (the server could have changed it);

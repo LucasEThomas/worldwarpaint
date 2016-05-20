@@ -1,10 +1,11 @@
 "use strict";
 
 class Player {
-    constructor(id, ws, clr, onInitSync, onDisconnect, onNewTower, onManualSplatter, onUnitDestination) {
+    constructor(id, ws, clrName, clr, onInitSync, onDisconnect, onNewTower, onManualSplatter, onUnitDestination) {
         this.ws = ws;
         this.id = id;
         this.clr = clr;
+        this.clrName = clrName;
 
         this.onInitSync = onInitSync;
         this.onDisconnect = onDisconnect;
@@ -62,7 +63,8 @@ class Player {
     toJSON() {
         return {
             id: this.id,
-            clr: this.clr
+            clr: this.clr,
+            clrName: this.clrName
         };
     }
     wsSend(data){

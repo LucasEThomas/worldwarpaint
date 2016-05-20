@@ -9,13 +9,14 @@ class Unit {
     }
     processEvent(event) {
         if (event.type === 'sprinklerUnit') {
+            let clrName = game.players.getClrName(event.ownerID);
             let clr = game.players.getClr(event.ownerID);
             event.data.forEach((splatter, n) => {
                 let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
                 let endPoint = new Victor(splatter.x, splatter.y);
                 //start points in a circle around the top of the tower
                 let newStart = new Victor(13, 13).rotate(endPoint.subtract(startPoint).angle()).add(startPoint); 
-                new projectile(game, newStart.x, newStart.y, 45, splatter.x, splatter.y, 0, 50, 750, () => {
+                new projectile(game, newStart.x, newStart.y, 45, splatter.x, splatter.y, 0, 50, 750, 'projectile_' + clrName, () => {
                     game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
                 });
 
@@ -51,8 +52,8 @@ class UnitsManager {
     }
 }
 class projectile {
-    constructor(game, x1, y1, z1, x2, y2, z2, lobHeight, airTime, impactCallback) {
-        let sprite = game.add.isoSprite(x1, y1, z1, 'projectile', 0, game.units.group);
+    constructor(game, x1, y1, z1, x2, y2, z2, lobHeight, airTime, imageName, impactCallback) {
+        let sprite = game.add.isoSprite(x1, y1, z1, imageName, 0, game.units.group);
         let linearTween = game.add.tween(sprite).to({
             isoX: x2,
             isoY: y2,

@@ -9,14 +9,16 @@ class Game {
     constructor() {
         this.map = new Map(64, 64);
         this.players = [
-            new Player('dda2571a-55d9-46d3-96c2-8b984164c904', null, Utility.hexToRgb(this.pickRandomColor())),
-            new Player('5afdaeaf-f317-4470-ae6f-33bca53fd0de', null, Utility.hexToRgb(this.pickRandomColor())),
-            new Player('dda2571a-55d9-46d3-96c2-8b984164c905', null, Utility.hexToRgb(this.pickRandomColor()))];
+            //new Player('dda2571a-55d9-46d3-96c2-8b984164c904', null, Utility.hexToRgb(this.pickRandomColor())),
+            //new Player('5afdaeaf-f317-4470-ae6f-33bca53fd0de', null, Utility.hexToRgb(this.pickRandomColor())),
+            //new Player('dda2571a-55d9-46d3-96c2-8b984164c905', null, Utility.hexToRgb(this.pickRandomColor()))
+        ];
         // create a units array, for now we auto-generate two units linked to two players for testing
-        this.units = [];
-        //new Unit(1, 600, 300, 'hero', 'dda2571a-55d9-46d3-96c2-8b984164c904'),
-        //new Unit(2, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
-        //new Unit(3, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')];
+        this.units = [
+            //new Unit(1, 600, 300, 'hero', 'dda2571a-55d9-46d3-96c2-8b984164c904'),
+            //new Unit(2, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
+            //new Unit(3, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')
+        ];
         this.extraEvents = [];
 
         this.interval = setInterval(() => {
@@ -28,7 +30,8 @@ class Game {
     addNewPlayer(ws) {
         // make a unique uuid
         var id = uuid.v4();
-        var clr = Utility.hexToRgb(this.pickRandomColor());
+        var clrName = this.pickRandomColorName()
+        var clr = Utility.hexToRgb(this.convertColorNameToColor(clrName));
 
         var onInitSyncLoc = (player) => {
             this.onInitSync(player);
@@ -46,7 +49,7 @@ class Game {
             this.onUnitDestination(player, id, x, y);
         };
 
-        var newPlayer = new Player(id, ws, clr, onInitSyncLoc, onDisconnectLoc, onNewTowerLoc, onManualSplatterLoc, onUnitDestinationLoc);
+        var newPlayer = new Player(id, ws, clrName, clr, onInitSyncLoc, onDisconnectLoc, onNewTowerLoc, onManualSplatterLoc, onUnitDestinationLoc);
         this.players.push(newPlayer);
     }
 
@@ -175,6 +178,10 @@ class Game {
         var colors = ['blue', 'teal', 'white', 'yellow', 'orange', 'red', 'magenta', 'violet'];
         var chosenColor = colors[Math.rangeInt(0, colors.length - 1)];
         return this.convertColorNameToColor(chosenColor);
+    }
+    pickRandomColorName() {
+        var colors = ['blue', 'teal', 'white', 'yellow', 'orange', 'red', 'magenta', 'violet'];
+        return colors[Math.rangeInt(0, colors.length - 1)];
     }
 }
 
