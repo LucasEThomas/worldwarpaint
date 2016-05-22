@@ -78,7 +78,7 @@ class HealthBar {
         this.tween = game.add.tween(this.redBar);
         this.tween.to({
             alpha: 0.2
-        }, 300, Phaser.Easing.Quadratic.In);
+        }, 500, Phaser.Easing.Cubic.In);
         this.tween.onComplete.add(() => {
             this.redBar.scale.setTo(0, 3);
         });
