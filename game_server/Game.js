@@ -99,7 +99,7 @@ class Game {
             inputIndex = Math.round(Math.getRandomArbitrary(0, 47));
 
         this.extraEvents.push({
-            ownerID: owner,
+            ownerId: owner,
             type: 'manualSplatter',
             data: [{
                 x: x,
@@ -124,7 +124,7 @@ class Game {
             events.forEach((event, index) => {
                 toReturn.push({
                     unitId: unit.id,
-                    ownerID: unit.ownerID,
+                    ownerId: unit.ownerId,
                     type: event.type,
                     data: event.data
                 });

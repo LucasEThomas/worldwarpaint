@@ -28,6 +28,9 @@ class Utility {
         }
         return "";
     }
+    static compareClr(a, b) {
+        return a.r === b.r && a.g === b.g && a.b === b.b;
+    }
 };
 
 Math.getRandomArbitrary = function(min, max) {

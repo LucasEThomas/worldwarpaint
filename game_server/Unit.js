@@ -11,7 +11,7 @@ class Unit {
         this.destX = x; //if the unit is moving, it's current destination
         this.destY = y;
         this.type = type;
-        this.ownerID = owner;
+        this.ownerId = owner;
     };
     setDestination(x, y) {
         this.destX = x;

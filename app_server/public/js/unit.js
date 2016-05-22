@@ -3,21 +3,32 @@ class Unit {
         let sprite = this.sprite = game.add.isoSprite(x, y, 0, 'tower', 0, game.units.group);
         this.sprite.anchor.setTo(0.5, 0.75); //1-((tower.width/4)/tower.height));
 
-        this.sprite.inputEnabled = true;
-        sprite.events.onInputDown.add(() => {
-            this.health.takeDamage(10);
-        }, this.health);
+//        this.sprite.inputEnabled = true;
+//        sprite.events.onInputDown.add(() => {
+//            this.health.takeDamage(10);
+//        }, this.health);
 
         this.health = new HealthBar(16, this.sprite, 100, 100);
 
         this.id = id;
         this.ownerID = ownerId;
         this.type = type;
+
+        let thisClr = game.players.getClr(ownerId);
+        let tileX = Math.round(x * 0.03125); //0.03125 = 1/32
+        let tileY = Math.round(y * 0.03125);
+        game.gameBoardLayer.gameBoardCensus.tiles[tileX + tileY * 64].onChangeCallback = (currentClr, change) => {
+            console.log(`r ${currentClr.r} change ${change}`);
+            if ((!Utility.compareClr(currentClr, thisClr) && change > 0) || (Utility.compareClr(currentClr, thisClr) && change < 0)) {
+                game.gameBoardLayer.stageSplatter(x, y, 16, thisClr, 64);
+                this.health.takeDamage(5);
+            }
+        };
     }
     processEvent(event) {
         if (event.type === 'sprinklerUnit') {
-            let clrName = game.players.getClrName(event.ownerID);
-            let clr = game.players.getClr(event.ownerID);
+            let clrName = game.players.getClrName(event.ownerId);
+            let clr = game.players.getClr(event.ownerId);
             event.data.forEach((splatter, n) => {
                 let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
                 let endPoint = new Victor(splatter.x, splatter.y);
@@ -44,7 +55,7 @@ class UnitsManager {
         if (event.type === 'sprinklerUnit') {
             this.units.find((t) => t.id === event.unitId).processEvent(event);
         } else if (event.type === 'manualSplatter') {
-            let clr = game.players.getClr(event.ownerID);
+            let clr = game.players.getClr(event.ownerId);
             let splatter = event.data[0];
             game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
         } else if (event.type === 'moveUnit') {
@@ -89,9 +100,9 @@ class HealthBar {
     takeDamage(amount) {
         if (amount < 0) amount = 0;
         else if (amount >= this.currentHealth) amount = this.currentHealth;
-        
+
         this.parentSprite.tint = 0xff7777;
-        setTimeout(()=>{
+        setTimeout(() => {
             this.parentSprite.tint = 0xffffff;
         }, 150);
 

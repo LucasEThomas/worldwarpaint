@@ -9,7 +9,7 @@ var abilities = [
             imageName: 'tower',
             alpha: 0.6,
             inIsoUnitsGroup: true,
-            snap: 23,
+            snap: 32,
             mustColorMatch: true,
             onClickCallback: function(x, y) {
                 game.gameServer.createTower(x, y, 'sprinklerTower', game.player.id);

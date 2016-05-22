@@ -228,29 +228,29 @@ class CensusTile {
         this.score = 0;
     }
     doUpdate(newClr, newScore) {
-        if (!this.compareClr(newClr, this.clr) || newScore !== this.score) {
+        if (!Utility.compareClr(newClr, this.clr) || newScore !== this.score) {
             this.clr = newClr;
-            this.score = newScore;
             if (this.onChangeCallback) {
-                this.onChangeCallback(newClr, newScore);
+                this.onChangeCallback(newClr, newScore - this.score);
             }
+            this.score = newScore;
         }
     }
     calculateScoreChange(myClr, newClr, newScore) {
         let oldClr = this.clr;
-        if (this.compareClr(oldClr, newClr)) { //no color change happened
+        if (Utility.compareClr(oldClr, newClr)) { //no color change happened
             //console.log(oldClr);
             //console.log(newClr);
             //console.log(myClr);
-            if (this.compareClr(newClr, myClr)) { //if it's my color
+            if (Utility.compareClr(newClr, myClr)) { //if it's my color
                 return newScore - this.score;
             } else { //if it's not my color
                 return 0;
             }
         } else { //a color change happened
-            if (this.compareClr(newClr, myClr)) { //if it changed to my color
+            if (Utility.compareClr(newClr, myClr)) { //if it changed to my color
                 return newScore;
-            } else if (this.compareClr(oldClr, myClr)){ //if it changed from my color
+            } else if (Utility.compareClr(oldClr, myClr)){ //if it changed from my color
                 return -newScore;
             }
             else{
@@ -258,8 +258,6 @@ class CensusTile {
             }
         }
     }
-    compareClr(a, b) {
-        return a.r === b.r && a.g === b.g && a.b === b.b;
-    }
+
 
 }
