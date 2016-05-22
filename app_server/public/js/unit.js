@@ -62,6 +62,7 @@ class HealthBar {
     constructor(verticalOffset, parentSprite, maxHealth, currentHealth) {
         this.maxHealth = maxHealth;
         this.currentHealth = currentHealth;
+        this.parentSprite = parentSprite;
 
         let x = maxHealth * -0.5;
         let y = verticalOffset;
@@ -77,7 +78,7 @@ class HealthBar {
         this.tween = game.add.tween(this.redBar);
         this.tween.to({
             alpha: 0.2
-        }, 3000, Phaser.Easing.Quadratic.In);
+        }, 300, Phaser.Easing.Quadratic.In);
         this.tween.onComplete.add(() => {
             this.redBar.scale.setTo(0, 3);
         });
@@ -88,6 +89,11 @@ class HealthBar {
     takeDamage(amount) {
         if (amount < 0) amount = 0;
         else if (amount >= this.currentHealth) amount = this.currentHealth;
+        
+        this.parentSprite.tint = 0xff7777;
+        setTimeout(()=>{
+            this.parentSprite.tint = 0xffffff;
+        }, 150);
 
         let newHealth = (this.currentHealth - amount) > 0 ? (this.currentHealth - amount) : 0;
         this.greenBar.scale.setTo(newHealth, 3);
