@@ -72,9 +72,15 @@ class HealthBar {
         this.greenBar = parentSprite.addChild(game.make.sprite(x, y, 'healthBarGreen'));
         this.greenBar.scale.setTo(currentHealth, 3);
 
-        this.tween;
         this.redBar = parentSprite.addChild(game.make.sprite(x, y, 'healthBarRed'));
         this.redBar.scale.setTo(0, 3);
+        this.tween = game.add.tween(this.redBar);
+        this.tween.to({
+            alpha: 0.2
+        }, 3000, Phaser.Easing.Quadratic.In);
+        this.tween.onComplete.add(() => {
+            this.redBar.scale.setTo(0, 3);
+        });
 
         this.blueBar = parentSprite.addChild(game.make.sprite(x, y, 'healthBarBlue'));
         this.blueBar.scale.setTo(0, 3);
@@ -88,14 +94,10 @@ class HealthBar {
         this.redBar.x = this.whiteBar.x + this.currentHealth - amount;
         this.redBar.scale.setTo(this.redBar.width + amount, 3);
         this.redBar.alpha = 1;
-        if (this.tween && this.tween.stop)
-            this.tween.stop();
-        this.tween = game.add.tween(this.redBar).to({
-            alpha: 0,
-        }, 750, null, true).onComplete.add(() => {
-            this.redBar.scale.setTo(0, 3);
-        });
-
+        this.tween.stop();
+        this.tween.pendingDelete = false;
+        this.tween.timeline[0].startTime = Date.now();
+        this.tween.start();
 
         this.currentHealth = newHealth;
     }
