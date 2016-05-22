@@ -1,6 +1,7 @@
 "use strict";
 var Utility = require('./Utility.js');
 var AStar = require('./AStar.js');
+var Victor = require('victor');
 
 class Map {
     constructor(mapWidth, mapHeight) {
@@ -52,18 +53,25 @@ class Map {
         return [x, y];
     }
 
+    pickRandomCoord() {
+        return {
+            x: Math.rangeInt(0, this.mapWidth - 1),
+            y: Math.rangeInt(0, this.mapHeight - 1)
+        };
+    }
+
     // procedurally generate the map
     generateMap() {
         // generate the grass
         // generate cities and intra-roads
         // generate inter-city paths
         // generate rivers (stop at forks)
-            // actually, let's redo this
-            // create a "big river" function that creates a wide "main" river
-                // and create "little rivers" based off of points on that main river
-                // maybe use the heuristic to prevent split offs from being to close? (so a reversed "closest point" heuristic)
-            // create a "small river" function that creates a small river
-                // if it intersects any other river, it forks into it and "dies"
+        // actually, let's redo this
+        // create a "big river" function that creates a wide "main" river
+        // and create "little rivers" based off of points on that main river
+        // maybe use the heuristic to prevent split offs from being to close? (so a reversed "closest point" heuristic)
+        // create a "small river" function that creates a small river
+        // if it intersects any other river, it forks into it and "dies"
         // generate trees/forests
         // generate shrubs/other nature
 
@@ -95,10 +103,59 @@ class Map {
         this.generateRiver(3, this.nodeWeights);
 
 
+        // generate trees and forests
+        this.generateForests();
+        this.generateForests();
+
+        // generate bushes/shrubs
+        //this.generateBushes();
 
 
+    }
+
+    generateBushes() {
+        for (var x = 0; x < this.mapWidth; x++) {
+            for (var y = 0; y < this.mapHeight; y++) {
+                if (this.terrainMap[x][y] === 0) {
+                    if (Math.random() < 0.02) {
+                        this.terrainMap[x][y] = Math.rangeInt(10, 13);
+                        this.nodeWeights[[x, y]] = 999999;
+                    }
+                }
+            }
+        }
+    }
+
+    generateTree(x, y, probability) {
+        if (this.terrainMap[x][y] === 0) {
+            if (Math.random() < probability) {
+                this.terrainMap[x][y] = Math.rangeInt(7, 9);
+                this.nodeWeights[[x, y]] = 999999;
+            } else if (Math.random() < probability - Math.random() * .7) {
+                this.terrainMap[x][y] = Math.rangeInt(10, 13);
+                this.nodeWeights[[x, y]] = 999999;
+            }
+        }
+    }
+
+    generateForests() {
+        var center = this.pickRandomCoord();
+        var radius = 16;
+        let centerVictor = new Victor(center.x, center.y)
+
+        let lowerX = ((center.x - radius) >= 0) ? (center.x - radius) : 0;
+        let upperX = ((center.x + radius) < this.mapWidth) ? center.x + radius : this.mapWidth - 1;
+        let lowerY = ((center.y - radius) >= 0) ? (center.y - radius) : 0;
+        let upperY = ((center.y + radius) < this.mapHeight) ? center.y + radius : this.mapHeight - 1;
 
 
+        for (var x = lowerX; x < upperX; x++) {
+            for (var y = lowerY; y < upperY; y++) {
+                let distance = new Victor(x, y).distance(centerVictor);
+                distance = (distance > radius) ? radius : distance;
+                this.generateTree(x, y, 0.5 - (distance / radius) * 0.5);
+            }
+        }
     }
 
     generateRiver(width, nodeWeights) {
@@ -136,8 +193,8 @@ class Map {
 
         // update the terrain map with the river path (calculate turns)
         //   first set the start and end node terrain
-        //this.terrainMap[startNode[1]][startNode[0]] = 2;
-        //this.terrainMap[endNode[1]][endNode[0]] = 2;
+        this.terrainMap[startNode[1]][startNode[0]] = 2;
+        this.terrainMap[endNode[1]][endNode[0]] = 2;
         //   iterate over the path to draw the river
         var iCurrentNode = findRiverPath.last_node;
         var iPrevNode = [];

@@ -60,10 +60,15 @@ class Game extends Phaser.Game {
         game.load.image('mWater3', 'assets/forestPack/water3x2.png'); // 5
         game.load.image('mWater4', 'assets/forestPack/water1x2.png'); // 6
 
-        // load game object assets (houses, trees, items that will have a value or needs depth on the map level) 0 is nothing
-        game.load.image('mTree0', 'assets/forestPack/tree3x2.png'); // 1
-        game.load.image('mTree1', 'assets/forestPack/tree1x2.png'); // 2
-        game.load.image('mTree2', 'assets/forestPack/tree2x2.png'); // 3
+        // ???load game object assets (houses, trees, items that will have a value or needs depth on the map level) 0 is nothing
+        game.load.image('mTree0', 'assets/forestPack/tree3.png'); // 7
+        game.load.image('mTree1', 'assets/forestPack/tree1.png'); // 8
+        game.load.image('mTree2', 'assets/forestPack/tree2.png'); // 9
+        
+        game.load.image('mBush0', 'assets/forestPack/bush0.png'); // 10
+        game.load.image('mBush1', 'assets/forestPack/bush1.png'); // 11
+        game.load.image('mBush2', 'assets/forestPack/bush2.png'); // 12
+        game.load.image('mBush3', 'assets/forestPack/bush3.png'); // 13
     }
 
     childCreate() {

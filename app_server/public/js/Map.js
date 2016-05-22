@@ -1,6 +1,6 @@
 "use strict";
 
-class Map extends Phaser.RenderTexture{
+class Map extends Phaser.RenderTexture {
     constructor(game) {
         super(game, 3548, 2048, 'terrainBackground');
         game.world.create(0, 0, this);
@@ -11,7 +11,7 @@ class Map extends Phaser.RenderTexture{
     }
 
     renderTerrainTexture(terrain) {
-        
+
         var noteTile = game.make.sprite(0, 0, 'notebookPaper');
         noteTile.anchor.set(.5);
         for (var nx = 0; nx < 4096; nx += 1132) {
@@ -30,36 +30,75 @@ class Map extends Phaser.RenderTexture{
                 //var tile = (Math.random() < .9) ? game.make.sprite(0, 0, 'grass1') : game.make.sprite(0, 0, 'grass2');
                 var coordVal = terrain[gridY][gridX];
                 var gTile = game.make.sprite(0, 0, 'mGrass0');
+                let imageName = '';
+                let tileAnchor = [0.5];
                 switch (coordVal) {
-                    default: var tile = game.make.sprite(0, 0, 'mGrass0');
+                    default: imageName = 'mGrass0';
                     break;
 
                     case 1:
-                            var tile = game.make.sprite(0, 0, 'mGrass1');
+                            imageName = 'mGrass1';
                         break;
 
                     case 2:
-                            var tile = game.make.sprite(0, 0, 'mWater0');
+                            imageName = 'mWater0';
                         break;
 
                     case 3:
-                            var tile = game.make.sprite(0, 0, 'mWater1');
+                            imageName = 'mWater1';
                         break;
 
                     case 4:
-                            var tile = game.make.sprite(0, 0, 'mWater2');
+                            imageName = 'mWater2';
                         break;
 
                     case 5:
-                            var tile = game.make.sprite(0, 0, 'mWater3');
+                            imageName = 'mWater3';
                         break;
 
                     case 6:
-                            var tile = game.make.sprite(0, 0, 'mWater4');
+                            imageName = 'mWater4';
+                        break;
+
+                    case 7:
+                            imageName = 'mTree0';
+                        tileAnchor = [0.5, .9];
+                        break;
+
+                    case 8:
+                            imageName = 'mTree1';
+                        tileAnchor = [0.5, .9];
+                        break;
+
+                    case 9:
+                            imageName = 'mTree2';
+                        tileAnchor = [0.5, .9];
+                        break;
+
+                    case 10:
+                            imageName = 'mBush0';
+                        tileAnchor = [0.5, .9];
+                        break;
+
+                    case 11:
+                            imageName = 'mBush1';
+                        tileAnchor = [0.5, .9];
+                        break;
+
+                    case 12:
+                            imageName = 'mBush2';
+                        tileAnchor = [0.5, .9];
+                        break;
+
+                    case 13:
+                            imageName = 'mBush3';
+                        tileAnchor = [0.5, .9];
                         break;
 
                 }
-                tile.anchor.set(0.5);
+
+                let tile = game.make.sprite(0, 0, imageName);
+                tile.anchor.set(...tileAnchor);
                 gTile.anchor.set(0.5);
                 var point = game.iso.projectXY({
                     x: xx,
