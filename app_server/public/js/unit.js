@@ -3,10 +3,10 @@ class Unit {
         let sprite = this.sprite = game.add.isoSprite(x, y, 0, 'tower', 0, game.units.group);
         this.sprite.anchor.setTo(0.5, 0.75); //1-((tower.width/4)/tower.height));
 
-//        this.sprite.inputEnabled = true;
-//        sprite.events.onInputDown.add(() => {
-//            this.health.takeDamage(10);
-//        }, this.health);
+        //        this.sprite.inputEnabled = true;
+        //        sprite.events.onInputDown.add(() => {
+        //            this.health.takeDamage(10);
+        //        }, this.health);
 
         this.health = new HealthBar(16, this.sprite, 100, 100);
 
@@ -18,7 +18,6 @@ class Unit {
         let tileX = Math.round(x * 0.03125); //0.03125 = 1/32
         let tileY = Math.round(y * 0.03125);
         game.gameBoardLayer.gameBoardCensus.tiles[tileX + tileY * 64].onChangeCallback = (currentClr, change) => {
-            console.log(`r ${currentClr.r} change ${change}`);
             if ((!Utility.compareClr(currentClr, thisClr) && change > 0) || (Utility.compareClr(currentClr, thisClr) && change < 0)) {
                 game.gameBoardLayer.stageSplatter(x, y, 16, thisClr, 64);
                 this.health.takeDamage(5);
@@ -154,6 +153,17 @@ class projectile {
         let parabolicTween = game.add.tween(sprite).to({
             isoZ: [z1, z1 + lobHeight, z1 + lobHeight, z2]
         }, airTime, null, true).interpolation(Phaser.Math.bezierInterpolation);
+        
+        sprite.update = () => {
+            let tileX = Math.floor(sprite.isoX * 0.03125);
+            let tileY = Math.floor(sprite.isoY * 0.03125);
+            let censusResidents = game.gameBoardLayer.gameBoardCensus.tiles[tileX + tileY * 64].residents;
+            if (censusResidents.indexOf('tree') >= 0) {
+                linearTween.stop();
+                parabolicTween.stop();
+                sprite.destroy();
+            }
+        }
 
     }
 }

@@ -220,6 +220,7 @@ class CensusTile {
     constructor() {
         this.selected = false;
         this.onChangeCallback;
+        this.residents = [];
         this.clr = {
             r: 0,
             g: 0,

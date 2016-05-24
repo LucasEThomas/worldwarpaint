@@ -113,6 +113,9 @@ class Map extends Phaser.RenderTexture {
                 });
                 this.renderXY(gTile, point.x, point.y);
                 if (unitsLayer) {
+                    if(imageName.toLowerCase().includes('tree')){
+                        game.gameBoardLayer.gameBoardCensus.tiles[gridX + gridY * 64].residents.push('tree');
+                    }
                     let sprite = game.add.isoSprite(xx, yy, 0, imageName, 0, game.units.group);
                     sprite.anchor.setTo(...tileAnchor);
                 } else {
