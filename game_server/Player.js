@@ -1,7 +1,7 @@
 "use strict";
 
 class Player {
-    constructor(id, ws, clrName, clr, onInitSync, onDisconnect, onNewTower, onManualSplatter, onUnitDestination) {
+    constructor(id, ws, clrName, clr, onInitSync, onDisconnect, onNewTower, onDestroyTower, onManualSplatter, onUnitDestination) {
         this.ws = ws;
         this.id = id;
         this.clr = clr;
@@ -10,6 +10,7 @@ class Player {
         this.onInitSync = onInitSync;
         this.onDisconnect = onDisconnect;
         this.onNewTower = onNewTower;
+        this.onDestroyTower = onDestroyTower;
         this.onManualSplatter = onManualSplatter;
         this.onUnitDestination = onUnitDestination;
 
@@ -29,6 +30,8 @@ class Player {
             this.onInitSync(this, data);
         } else if (data.event === 'new tower') {
             this.onNewTower(this, data.x, data.y, data.type, data.owner);
+        } else if (data.event === 'destroy tower') {
+            this.onDestroyTower(data.id);
         } else if (data.event === 'manual splatter') {
             this.onManualSplatter(this, data.x, data.y, data.radius, data.owner);
         } else if (data.event === 'unit destination') {

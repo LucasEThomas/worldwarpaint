@@ -40,9 +40,9 @@ class gameServer {
             game.player.id = data.playerID;
             document.cookie = 'pid=' + game.player.id + ';';
             // display the towers that existed before the client connected
-            data.units.forEach(function(e, i) {
+            data.units.forEach((e, i) => {
                 // create a sprite to represent each tower from the server
-                game.units.newTower(e.x, e.y, e.id, e.ownerId, e.type);
+                game.units.newTower(e.x, e.y, e.id, e.ownerId, e.type, (id) => this.destroyTower(id));
             });
         } else if (data.event === 'scheduleEvents') {
             //A new list of events has come down from the server. Each one needs to scheduled in the eventQueue.
@@ -53,7 +53,7 @@ class gameServer {
                 game.eventQueue.push(currentScheduleItem)
             }
         } else if (data.event === 'sync-addUnit') {
-            game.units.newTower(data.unit.x, data.unit.y, data.unit.id, data.unit.ownerId, data.unit.type);
+            game.units.newTower(data.unit.x, data.unit.y, data.unit.id, data.unit.ownerId, data.unit.type, (id) => this.destroyTower(id));
         }
     }
 
@@ -64,6 +64,12 @@ class gameServer {
             y: y,
             type: type,
             owner: owner
+        }));
+    }
+    destroyTower(id) {
+        this.ws.send(JSON.stringify({
+            event: 'destroy tower',
+            id: id,
         }));
     }
     manualSplatter(x, y, radius, owner) {

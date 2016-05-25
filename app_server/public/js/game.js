@@ -94,7 +94,7 @@ class Game extends Phaser.Game {
         this.gameServer = new gameServer(this.player.type);
     }
     childUpdate() {
-        //if the  time has come for the next item in the queue to be executed, add it to the render queue
+        //if the time has come for the next item in the queue to be executed, add it to the render queue
         let game = this;
         var currentTime = (new Date()).getTime();
         if (this.eventQueue.length && this.eventQueue[0].scheduledTime <= currentTime) {

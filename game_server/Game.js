@@ -33,23 +33,13 @@ class Game {
         var clrName = this.pickRandomColorName()
         var clr = Utility.hexToRgb(this.convertColorNameToColor(clrName));
 
-        var onInitSyncLoc = (player) => {
-            this.onInitSync(player);
-        };
-        var onDisconnectLoc = (player) => {
-            this.onDisconnect(player);
-        };
-        var onNewTowerLoc = (player, x, y, type, ownerId) => {
-            this.onNewTower(player, x, y, type, ownerId);
-        };
-        var onManualSplatterLoc = (player, x, y, radius, ownerId) => {
-            this.onManualSplatter(player, x, y, radius, ownerId);
-        };
-        var onUnitDestinationLoc = (player, id, x, y) => {
-            this.onUnitDestination(player, id, x, y);
-        };
-
-        var newPlayer = new Player(id, ws, clrName, clr, onInitSyncLoc, onDisconnectLoc, onNewTowerLoc, onManualSplatterLoc, onUnitDestinationLoc);
+        var newPlayer = new Player(id, ws, clrName, clr, ...[
+            (...a) => this.onInitSync(...a),
+            (...a) => this.onDisconnect(...a),
+            (...a) => this.onNewTower(...a),
+            (...a) => this.onDestroyTower(...a),
+            (...a) => this.onManualSplatter(...a),
+            (...a) => this.onUnitDestination(...a)]);
         this.players.push(newPlayer);
     }
 
@@ -71,6 +61,13 @@ class Game {
             currentPlayer.addUnit(unit);
         });
     }
+    onDestroyTower(id) {
+        let index = this.units.map((u) => u.id).indexOf(id);
+        if (index >= 0) {
+            console.log('tower destroyed');
+            this.units.splice(index, 1);
+        }
+    }
     onManualSplatter(player, x, y, radius, ownerId) {
         this.scheduleSplatter(x, y, radius, ownerId);
     }
@@ -83,6 +80,11 @@ class Game {
         //Schedule 5 event ops per update. We are currently running 4 updates per sec, so there will be 20 paint ops per sec client side.
         for (var i = 0; i < 5; i++) {
             schedule.push(this.generateScheduleItemEvents());
+        }
+
+        if (this.extraEvents.length) {
+            schedule[0].push(...this.extraEvents);
+            this.extraEvents = [];
         }
 
         this.players.forEach((player, index) => {
@@ -118,7 +120,6 @@ class Game {
     }
     generateScheduleItemEvents() {
         var toReturn = [];
-
         this.units.forEach((unit, index) => {
             var events = unit.generateEvents();
             events.forEach((event, index) => {
@@ -129,16 +130,10 @@ class Game {
                     data: event.data
                 });
             });
-
         });
-
-        if (this.extraEvents.length) {
-            toReturn.push(...this.extraEvents);
-            this.extraEvents.length = 0;
-        }
-
         return toReturn;
     }
+
     //this algorithm doesn't work for units.length == 2 :/
     fairlyIterateThroughUnits(callback) {
         var tLength = this.units.length; //cache for clean code
