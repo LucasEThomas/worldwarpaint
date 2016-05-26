@@ -9,6 +9,7 @@ class Unit {
         //        }, this.health);
 
         this.health = new HealthBar(16, this, 100, 100);
+        this.environmentalDamage = 0;
 
         this.onKilled = onKilled;
         this.id = id;
@@ -19,11 +20,12 @@ class Unit {
         let tileX = Math.round(x * 0.03125); //0.03125 = 1/32
         let tileY = Math.round(y * 0.03125);
         this.censusTile = game.gameBoardLayer.gameBoardCensus.tiles[tileX + tileY * 64];
-        console.log(this.censusTile);
-        this.censusTile.onChangeCallback = (currentClr, change) => {
-            if ((!Utility.compareClr(currentClr, thisClr) && change > 0) || (Utility.compareClr(currentClr, thisClr) && change < 0)) {
-                game.gameBoardLayer.stageSplatter(x, y, 16, thisClr, 64);
-                this.health.takeDamage(5);
+        this.censusTile.onChangeCallback = (newClr, newValue) => {
+            if ((!Utility.compareClr(newClr, thisClr))) {
+                this.environmentalDamage = Math.round(newValue * 0.25); // 0.25 = 1/4
+            }
+            else{
+                this.environmentalDamage = 0;
             }
         };
     }
@@ -40,6 +42,12 @@ class Unit {
                     game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
                 });
             });
+        }
+    }
+    takeEnvironmentalDamage(){
+        if(this.environmentalDamage){
+            console.log(this.environmentalDamage)
+            this.health.takeDamage(this.environmentalDamage);
         }
     }
     kill() {
@@ -79,6 +87,7 @@ class UnitsManager {
     constructor() {
         this.units = [];
         this.group = game.add.group();
+        this.damageLoop = game.time.events.loop(Phaser.Timer.SECOND, this.damageTimerLoop, this);
     }
     newTower(x, y, id, ownerId, type, onKill) {
         this.units.push(new Unit(x, y, id, ownerId, type, (id)=>{
@@ -107,6 +116,11 @@ class UnitsManager {
             tower.x = event.data.x;
             tower.y = event.data.y;
         }
+    }
+    damageTimerLoop(){
+        this.units.forEach((unit,index)=>{
+            unit.takeEnvironmentalDamage();
+        });
     }
     update() {
         game.iso.simpleSort(this.group);

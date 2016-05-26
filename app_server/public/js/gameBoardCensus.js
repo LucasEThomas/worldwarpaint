@@ -230,10 +230,10 @@ class CensusTile {
     }
     doUpdate(newClr, newScore) {
         if (!Utility.compareClr(newClr, this.clr) || newScore !== this.score) {
-            this.clr = newClr;
             if (this.onChangeCallback) {
-                this.onChangeCallback(newClr, newScore - this.score);
+                this.onChangeCallback(newClr, newScore);
             }
+            this.clr = newClr;
             this.score = newScore;
         }
     }
