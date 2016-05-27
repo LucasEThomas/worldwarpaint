@@ -23,8 +23,7 @@ class Unit {
         this.censusTile.onChangeCallback = (newClr, newValue) => {
             if ((!Utility.compareClr(newClr, thisClr))) {
                 this.environmentalDamage = Math.round(newValue * 0.25); // 0.25 = 1/4
-            }
-            else{
+            } else {
                 this.environmentalDamage = 0;
             }
         };
@@ -37,15 +36,27 @@ class Unit {
                 let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
                 let endPoint = new Victor(splatter.x, splatter.y);
                 //start points in a circle around the top of the tower
-                let newStart = new Victor(13, 13).rotate(endPoint.subtract(startPoint).angle()).add(startPoint);
-                Unit.lobProjectile(newStart.x, newStart.y, 45, splatter.x, splatter.y, 0, 50, 750, 'projectile_' + clrName, () => {
+                let newStart = new Victor(12, 12).rotate(endPoint.subtract(startPoint).angle() - Math.TWOPI*0.25).add(startPoint);
+//                Unit.lobProjectile(newStart.x, newStart.y, 45, splatter.x, splatter.y, 0, 50, 750, 'projectile_' + clrName, () => {
+//                    game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
+//                });
+
+                Unit.fireLaser({
+                    x: newStart.x,
+                    y: newStart.y,
+                    z: 35
+                }, {
+                    x: splatter.x,
+                    y: splatter.y,
+                    z: 0
+                }, () => {
                     game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
                 });
             });
         }
     }
-    takeEnvironmentalDamage(){
-        if(this.environmentalDamage){
+    takeEnvironmentalDamage() {
+        if (this.environmentalDamage) {
             console.log(this.environmentalDamage)
             this.health.takeDamage(this.environmentalDamage);
         }
@@ -82,6 +93,58 @@ class Unit {
             }
         }
     }
+
+    static fireLaser(startPointIsoSpace, endPointIsoSpace, impactCallback) {
+        let startPoint = Victor.fromObject(game.iso.project(startPointIsoSpace));
+        let endPoint = Victor.fromObject(game.iso.project(endPointIsoSpace));
+
+        let distance = startPoint.distance(endPoint);
+        let angle = endPoint.clone().subtract(startPoint).angleDeg();
+
+        let sprite = game.add.sprite(startPoint.x, startPoint.y);
+        let startSprite = sprite.addChild(game.make.sprite(0, 0, 'laser_end'));
+        let beamSprite = sprite.addChild(game.make.sprite(10, 0, 'laser_beam'));
+        sprite.blendMode = PIXI.blendModes.ADD;
+        beamSprite.scale.setTo(distance, 1);
+        let endSprite = sprite.addChild(game.make.sprite(distance, 0, 'laser_end'));
+        endSprite.x += 20;
+        endSprite.y += 20;
+        endSprite.angle = 180;
+
+        sprite.angle = angle;
+        let linearTween = game.add.tween(sprite).to({
+            alpha: 0,
+        },500, null, true).onComplete.add(() => {
+            sprite.destroy();
+        });
+
+        impactCallback();
+        //            sprite.destroy();
+        //        });
+
+        //        let linearTween = game.add.tween(sprite).to({
+        //            isoX: x2,
+        //            isoY: y2,
+        //        }, airTime, null, true);
+        //        linearTween.onComplete.add(() => {
+        //            impactCallback();
+        //            sprite.destroy();
+        //        });
+        //        let parabolicTween = game.add.tween(sprite).to({
+        //            isoZ: [z1, z1 + lobHeight, z1 + lobHeight, z2]
+        //        }, airTime, null, true).interpolation(Phaser.Math.bezierInterpolation);
+        //
+        //        sprite.update = () => {
+        //            let tileX = Math.floor(sprite.isoX * 0.03125);
+        //            let tileY = Math.floor(sprite.isoY * 0.03125);
+        //            let censusResidents = game.gameBoardLayer.gameBoardCensus.tiles[tileX + tileY * 64].residents;
+        //            if (censusResidents.indexOf('tree') >= 0) {
+        //                linearTween.stop();
+        //                parabolicTween.stop();
+        //                sprite.destroy();
+        //            }
+        //        }
+    }
 }
 class UnitsManager {
     constructor() {
@@ -90,7 +153,7 @@ class UnitsManager {
         this.damageLoop = game.time.events.loop(Phaser.Timer.SECOND, this.damageTimerLoop, this);
     }
     newTower(x, y, id, ownerId, type, onKill) {
-        this.units.push(new Unit(x, y, id, ownerId, type, (id)=>{
+        this.units.push(new Unit(x, y, id, ownerId, type, (id) => {
             this.destroyUnit(id);
             onKill(id);
         }));
@@ -103,7 +166,7 @@ class UnitsManager {
         //this logic should be somewhere else... but here's fine for now :) 
         if (event.type === 'sprinklerUnit') {
             let unit = this.units.find((t) => t.id === event.unitId)
-            if(unit){
+            if (unit) {
                 unit.processEvent(event);
             }
         } else if (event.type === 'manualSplatter') {
@@ -117,8 +180,8 @@ class UnitsManager {
             tower.y = event.data.y;
         }
     }
-    damageTimerLoop(){
-        this.units.forEach((unit,index)=>{
+    damageTimerLoop() {
+        this.units.forEach((unit, index) => {
             unit.takeEnvironmentalDamage();
         });
     }

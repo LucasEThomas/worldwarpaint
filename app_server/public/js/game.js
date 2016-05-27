@@ -29,6 +29,7 @@ class Game extends Phaser.Game {
         game.load.image('blueButton4', 'assets/BlueButton4.png');
         game.load.image('tower', 'assets/forestPack/tower1.png');
         game.load.image('robot', 'assets/robot_1.png');
+        
         game.load.image('projectile_red', 'assets/projectileRed.png');
         game.load.image('projectile_blue', 'assets/projectileBlue.png');
         game.load.image('projectile_teal', 'assets/projectileTeal.png');
@@ -37,6 +38,10 @@ class Game extends Phaser.Game {
         game.load.image('projectile_magenta', 'assets/projectileMagenta.png');
         game.load.image('projectile_violet', 'assets/projectileViolet.png');
         game.load.image('projectile_white', 'assets/projectileWhite.png');
+        
+        game.load.image('laser_beam', 'assets/laserBeam.png');
+        game.load.image('laser_end', 'assets/laserEnd.png');
+        
         game.load.image('towerBlue1', 'assets/TowerBlue1.png');
         game.load.image('towerBlue2', 'assets/TowerBlue2.png');
         game.load.image('towerBlue3', 'assets/TowerBlue3.png');
