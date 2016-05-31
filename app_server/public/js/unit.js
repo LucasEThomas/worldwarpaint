@@ -102,11 +102,17 @@ class Unit {
         let angle = endPoint.clone().subtract(startPoint).angleDeg();
 
         let sprite = game.add.sprite(startPoint.x, startPoint.y);
+        sprite.scale.setTo(1,0.5)
         let startSprite = sprite.addChild(game.make.sprite(0, 0, 'laser_end'));
+        startSprite.blendMode = PIXI.blendModes.ADD;
         let beamSprite = sprite.addChild(game.make.sprite(10, 0, 'laser_beam'));
-        sprite.blendMode = PIXI.blendModes.ADD;
         beamSprite.scale.setTo(distance, 1);
         let endSprite = sprite.addChild(game.make.sprite(distance, 0, 'laser_end'));
+        
+        beamSprite.blendMode = PIXI.blendModes.ADD;
+        startSprite.blendMode = PIXI.blendModes.ADD;
+        endSprite.blendMode = PIXI.blendModes.ADD;
+        
         endSprite.x += 20;
         endSprite.y += 20;
         endSprite.angle = 180;
@@ -119,31 +125,6 @@ class Unit {
         });
 
         impactCallback();
-        //            sprite.destroy();
-        //        });
-
-        //        let linearTween = game.add.tween(sprite).to({
-        //            isoX: x2,
-        //            isoY: y2,
-        //        }, airTime, null, true);
-        //        linearTween.onComplete.add(() => {
-        //            impactCallback();
-        //            sprite.destroy();
-        //        });
-        //        let parabolicTween = game.add.tween(sprite).to({
-        //            isoZ: [z1, z1 + lobHeight, z1 + lobHeight, z2]
-        //        }, airTime, null, true).interpolation(Phaser.Math.bezierInterpolation);
-        //
-        //        sprite.update = () => {
-        //            let tileX = Math.floor(sprite.isoX * 0.03125);
-        //            let tileY = Math.floor(sprite.isoY * 0.03125);
-        //            let censusResidents = game.gameBoardLayer.gameBoardCensus.tiles[tileX + tileY * 64].residents;
-        //            if (censusResidents.indexOf('tree') >= 0) {
-        //                linearTween.stop();
-        //                parabolicTween.stop();
-        //                sprite.destroy();
-        //            }
-        //        }
     }
 }
 class UnitsManager {
