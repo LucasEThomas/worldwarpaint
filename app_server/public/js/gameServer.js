@@ -4,6 +4,8 @@ class gameServer {
         this.ws = new WebSocket('ws://' + host + ':8081');
         this.ws.onopen = (e) => this.initialSync(e);
         this.ws.onmessage = (e) => this.serverMessage(e);
+
+        game.units.onUnitKilled = (id) => this.destroyTower(id);
     }
 
     // send any init info to the server on start
@@ -42,7 +44,7 @@ class gameServer {
             // display the towers that existed before the client connected
             data.units.forEach((e, i) => {
                 // create a sprite to represent each tower from the server
-                game.units.newTower(e.x, e.y, e.id, e.ownerId, e.type, (id) => this.destroyTower(id));
+                game.units.newTower(e.x, e.y, e.id, e.ownerId, e.type);
             });
         } else if (data.event === 'scheduleEvents') {
             //A new list of events has come down from the server. Each one needs to scheduled in the eventQueue.
@@ -53,7 +55,7 @@ class gameServer {
                 game.eventQueue.push(currentScheduleItem)
             }
         } else if (data.event === 'sync-addUnit') {
-            game.units.newTower(data.unit.x, data.unit.y, data.unit.id, data.unit.ownerId, data.unit.type, (id) => this.destroyTower(id));
+            game.units.newTower(data.unit.x, data.unit.y, data.unit.id, data.unit.ownerId, data.unit.type);
         }
     }
 
