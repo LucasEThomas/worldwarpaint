@@ -1,5 +1,5 @@
-class SprinklerTower extends Unit{
-    constructor(x, y, id, ownerId, onKilled){
+class SprinklerTower extends Unit {
+    constructor(x, y, id, ownerId, onKilled) {
         super(x, y, id, ownerId, 'tower', 100, onKilled);
         this.type = 'sprinkler';
     }
@@ -12,13 +12,13 @@ class SprinklerTower extends Unit{
             let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
             let endPoint = new Victor(splatter.x, splatter.y);
             //start points in a circle around the top of the tower
-            let newStart = new Victor(12, 12).rotate(endPoint.subtract(startPoint).angle() - Math.TWOPI*0.25).add(startPoint);
+            let newStart = new Victor(12, 12).rotate(endPoint.subtract(startPoint).angle() - Math.TWOPI * 0.25).add(startPoint);
             SprinklerTower.lobProjectile(newStart.x, newStart.y, 45, splatter.x, splatter.y, 0, 50, 750, 'projectile_' + clrName, () => {
                 game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
             });
         }
     }
-    
+
     static lobProjectile(x1, y1, z1, x2, y2, z2, lobHeight, airTime, imageName, impactCallback) {
         let sprite = game.add.isoSprite(x1, y1, z1, imageName, 0, game.units.group);
         let linearTween = game.add.tween(sprite).to({

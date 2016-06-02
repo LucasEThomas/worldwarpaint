@@ -3,6 +3,7 @@ var Utility = require('./Utility.js');
 var Player = require('./Player.js');
 var Map = require('./Map.js');
 var SprinklerTower = require('./units/SprinklerTower.js');
+var SniperTower = require('./units/SniperTower.js');
 var uuid = require('node-uuid');
 
 class Game {
@@ -43,9 +44,9 @@ class Game {
     onNewTower(player, x, y, type, ownerId) {
         let unit = null;
         if (type === 'sprinklerTower') {
-            unit = new SprinklerTower(uuid.v4(), x, y, ownerId);
+            unit = new SprinklerTower(uuid.v4(), x, y, player);
         } else if (type === 'sniperTower') {
-            unit = new SniperTower(uuid.v4(), x, y, ownerId);
+            unit = new SniperTower(uuid.v4(), x, y, player, this.units);
         }
 
         if (unit) {

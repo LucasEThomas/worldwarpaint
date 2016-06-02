@@ -6,12 +6,14 @@ var unitTypes = ['champion', 'archer', 'sprinklerTower'];
 class Unit {
     constructor(id, x, y, type, owner) {
         this.id = id;
+        this.ownerId = owner.id;
+        this.clr = owner.clr;
+        this.clrName = owner.clrName;
         this.x = x; //units current position
         this.y = y;
         this.destX = x; //if the unit is moving, it's current destination
         this.destY = y;
         this.type = type;
-        this.ownerId = owner;
         this.speed = 5;
     };
     setDestination(x, y) {
@@ -46,6 +48,15 @@ class Unit {
             x: this.x,
             y: this.y,
             id: this.id
+        };
+    }
+    toJSON(){
+        return{
+            id: this.id,
+            ownerId: this.ownerId,
+            type: this.type,
+            x: this.x,
+            y: this.y,
         };
     }
 }

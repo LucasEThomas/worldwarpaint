@@ -53,7 +53,7 @@ class Player {
     syncNewUnit(unit) {
         this.wsSend({
             event: 'sync-addUnit',
-            unit: unit
+            unit: unit.toJSON()
         });
     }
     syncNewEvents(schedule) {
