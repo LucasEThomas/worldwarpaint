@@ -22,6 +22,12 @@ class Unit {
             }
         };
     }
+    processEvent(event) {
+        if (event.type === 'moveUnit') {
+            this.x = event.x;
+            this.y = event.y;
+        }
+    }
     takeEnvironmentalDamage() {
         if (this.environmentalDamage) {
             this.health.takeDamage(this.environmentalDamage);

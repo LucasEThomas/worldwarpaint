@@ -47,14 +47,9 @@ class gameServer {
                 game.units.newTower(e.x, e.y, e.id, e.ownerId, e.type);
             });
         } else if (data.event === 'scheduleEvents') {
-            //A new list of events has come down from the server. Each one needs to scheduled in the eventQueue.
-            var currentTime = (new Date()).getTime();
-            for (var i = 0; i < data.schedule.length; i += 1) {
-                var currentScheduleItem = data.schedule[i];
-                currentScheduleItem.scheduledTime = currentTime + (i * 50);
-                game.eventQueue.push(currentScheduleItem)
-            }
+            game.eventQueue.queueEvents(data.schedule);
         } else if (data.event === 'sync-addUnit') {
+            console.log(data);
             game.units.newTower(data.unit.x, data.unit.y, data.unit.id, data.unit.ownerId, data.unit.type);
         }
     }

@@ -50,13 +50,13 @@ class Player {
             //objectMap: map.objectMap // houses, trees, etc (anything with depth)
         });
     }
-    addUnit(unit) {
+    syncNewUnit(unit) {
         this.wsSend({
             event: 'sync-addUnit',
             unit: unit
         });
     }
-    scheduleEvents(schedule) {
+    syncNewEvents(schedule) {
         this.wsSend({
             event: 'scheduleEvents',
             schedule: schedule

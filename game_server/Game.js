@@ -2,30 +2,17 @@
 var Utility = require('./Utility.js');
 var Player = require('./Player.js');
 var Map = require('./Map.js');
-var Unit = require('./Unit.js');
+var SprinklerTower = require('./units/SprinklerTower.js');
 var uuid = require('node-uuid');
 
 class Game {
     constructor() {
         this.map = new Map(64, 64);
-        this.players = [
-            //new Player('dda2571a-55d9-46d3-96c2-8b984164c904', null, Utility.hexToRgb(this.pickRandomColor())),
-            //new Player('5afdaeaf-f317-4470-ae6f-33bca53fd0de', null, Utility.hexToRgb(this.pickRandomColor())),
-            //new Player('dda2571a-55d9-46d3-96c2-8b984164c905', null, Utility.hexToRgb(this.pickRandomColor()))
-        ];
-        // create a units array, for now we auto-generate two units linked to two players for testing
-        this.units = [
-            //new Unit(1, 600, 300, 'hero', 'dda2571a-55d9-46d3-96c2-8b984164c904'),
-            //new Unit(2, 900, 300, 1, '5afdaeaf-f317-4470-ae6f-33bca53fd0de'),
-            //new Unit(3, 750, 560, 1, 'dda2571a-55d9-46d3-96c2-8b984164c905')
-        ];
-        this.extraEvents = [];
+        this.players = [];
+        this.units = [];
+        this.unitlessEvents = [];
 
-        this.interval = setInterval(() => {
-            this.gameLoop();
-        }, 250);
-        this.reverseIterate = false;
-        this.roundRobinOffset = 0;
+        this.interval = setInterval(() => this.gameLoop(), 250);
     }
     addNewPlayer(ws) {
         // make a unique uuid
@@ -54,44 +41,25 @@ class Game {
         //this.players = this.players.filter((v) => v.id !== player.id);
     }
     onNewTower(player, x, y, type, ownerId) {
-        var unit = new Unit(uuid.v4(), x, y, type, ownerId);
-        this.units.push(unit);
-        // push the new unit to other players
-        this.players.forEach(function(currentPlayer, index) {
-            currentPlayer.addUnit(unit);
-        });
+        let unit = null;
+        if (type === 'sprinklerTower') {
+            unit = new SprinklerTower(uuid.v4(), x, y, ownerId);
+        } else if (type === 'sniperTower') {
+            unit = new SniperTower(uuid.v4(), x, y, ownerId);
+        }
+
+        if (unit) {
+            this.units.push(unit);
+            this.players.forEach((nPlayer, index) => nPlayer.syncNewUnit(unit));
+        }
     }
     onDestroyTower(id) {
         let index = this.units.map((u) => u.id).indexOf(id);
         if (index >= 0) {
-            console.log('tower destroyed');
             this.units.splice(index, 1);
         }
     }
     onManualSplatter(player, x, y, radius, ownerId) {
-        this.scheduleSplatter(x, y, radius, ownerId);
-    }
-    onUnitDestination(player, id, x, y) {
-        this.setUnitDestination(x, y, id);
-    }
-
-    gameLoop() {
-        var schedule = [];
-        //Schedule 5 event ops per update. We are currently running 4 updates per sec, so there will be 20 paint ops per sec client side.
-        for (var i = 0; i < 5; i++) {
-            schedule.push(this.generateScheduleItemEvents());
-        }
-
-        if (this.extraEvents.length) {
-            schedule[0].push(...this.extraEvents);
-            this.extraEvents = [];
-        }
-
-        this.players.forEach((player, index) => {
-            player.scheduleEvents(schedule);
-        });
-    }
-    scheduleSplatter(x, y, radius, owner) {
         var inputIndex = 0;
         if (radius < 16)
             inputIndex = Math.round(Math.getRandomArbitrary(96, 159));
@@ -100,61 +68,39 @@ class Game {
         else
             inputIndex = Math.round(Math.getRandomArbitrary(0, 47));
 
-        this.extraEvents.push({
-            ownerId: owner,
+        this.unitlessEvents.push({
+            ownerId: ownerId,
             type: 'manualSplatter',
-            data: [{
-                x: x,
-                y: y,
-                radius: radius,
-                inputIndex: inputIndex
-            }]
+            x: x,
+            y: y,
+            radius: radius,
+            inputIndex: inputIndex
         });
     }
-    setUnitDestination(x, y, id) {
-        this.units.forEach((unit, index) => {
-            if (unit.id === id) {
-                unit.setDestination(x, y);
-            }
-        });
-    }
-    generateScheduleItemEvents() {
-        var toReturn = [];
-        this.units.forEach((unit, index) => {
-            var events = unit.generateEvents();
-            events.forEach((event, index) => {
-                toReturn.push({
-                    unitId: unit.id,
-                    ownerId: unit.ownerId,
-                    type: event.type,
-                    data: event.data
-                });
-            });
-        });
-        return toReturn;
+    onUnitDestination(player, id, x, y) {
+        this.units.find((unit) => unit.id === id).setDestination(x, y);
     }
 
-    //this algorithm doesn't work for units.length == 2 :/
-    fairlyIterateThroughUnits(callback) {
-        var tLength = this.units.length; //cache for clean code
-        for (var i = 0; i < tLength; i++) {
-            var rri = (i + this.roundRobinOffset % tLength) || 0;
-            console.log('roundRobinOffset:' + this.roundRobinOffset);
-            var unit = this.units[this.reverseIterate ? (-rri + tLength - 1) : rri]
-            if (tLength === 2) {
-                console.log(this.units);
-                console.log('roundRobinOffset:' + this.roundRobinOffset);
-                console.log('rri:' + rri);
-                console.log('-rri' + (-rri))
-                console.log('(-rri + tLength - 1)' + (-rri + tLength - 1))
-                console.log('index:' + (this.reverseIterate ? (-rri + tLength - 1) : rri));
-            }
-            callback(unit);
+    gameLoop() {
+        var schedule = [];
+        //Schedule 5 event ops per update. We are currently running 4 updates per sec, so there will be 20 paint ops per sec client side.
+        let currentTime = Date.now();
+        for (var i = 0; i < 5; i++) {
+            let scheduleTime = currentTime + i * 50;
+            schedule.push(this.generateScheduleItemEvents(scheduleTime));
         }
-        if (this.reverseIterate) {
-            this.roundRobinOffset = ((this.roundRobinOffset + 1) % tLength) || 0;
+        
+        if (this.unitlessEvents.length) {
+            schedule[0].push(...this.unitlessEvents);
+            this.unitlessEvents = [];
         }
-        this.reverseIterate = !this.reverseIterate;
+        
+        this.players.forEach((player, index) => player.syncNewEvents(schedule));
+    }
+    generateScheduleItemEvents(time) {
+        var events = [];
+        this.units.forEach((unit, index) => events.push(...unit.generateEvents(time)));
+        return events;
     }
     convertColorNameToColor(name) {
         var colorsDict = {

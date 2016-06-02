@@ -11,7 +11,7 @@ class Game extends Phaser.Game {
 
         this.players = new PlayersManager();
 
-        this.eventQueue = [];
+        this.eventQueue = new EventManager();
     }
 
     childPreload() {
@@ -29,7 +29,7 @@ class Game extends Phaser.Game {
         game.load.image('blueButton4', 'assets/BlueButton4.png');
         game.load.image('tower', 'assets/forestPack/tower1.png');
         game.load.image('robot', 'assets/robot_1.png');
-        
+
         game.load.image('projectile_red', 'assets/projectileRed.png');
         game.load.image('projectile_blue', 'assets/projectileBlue.png');
         game.load.image('projectile_teal', 'assets/projectileTeal.png');
@@ -38,10 +38,10 @@ class Game extends Phaser.Game {
         game.load.image('projectile_magenta', 'assets/projectileMagenta.png');
         game.load.image('projectile_violet', 'assets/projectileViolet.png');
         game.load.image('projectile_white', 'assets/projectileWhite.png');
-        
+
         game.load.image('laser_beam', 'assets/laserBeam.png');
         game.load.image('laser_end', 'assets/laserEnd.png');
-        
+
         game.load.image('towerBlue1', 'assets/TowerBlue1.png');
         game.load.image('towerBlue2', 'assets/TowerBlue2.png');
         game.load.image('towerBlue3', 'assets/TowerBlue3.png');
@@ -69,7 +69,7 @@ class Game extends Phaser.Game {
         game.load.image('mTree0', 'assets/forestPack/tree3.png'); // 7
         game.load.image('mTree1', 'assets/forestPack/tree1.png'); // 8
         game.load.image('mTree2', 'assets/forestPack/tree2.png'); // 9
-        
+
         game.load.image('mBush0', 'assets/forestPack/bush0.png'); // 10
         game.load.image('mBush1', 'assets/forestPack/bush1.png'); // 11
         game.load.image('mBush2', 'assets/forestPack/bush2.png'); // 12
@@ -99,19 +99,8 @@ class Game extends Phaser.Game {
         this.gameServer = new gameServer(this.player.type);
     }
     childUpdate() {
-        //if the time has come for the next item in the queue to be executed, add it to the render queue
-        let game = this;
-        var currentTime = (new Date()).getTime();
-        if (this.eventQueue.length && this.eventQueue[0].scheduledTime <= currentTime) {
-            let currentTimeSlot = this.eventQueue.shift();
-            for (var currentEvent of currentTimeSlot) {
-                this.units.processEvent(currentEvent);
-            }
-        }
-        //bandaid fix for when the browser looses focus and the eventQueue just piles up. Don't wanna memory leak!
-        if (this.eventQueue.length > 10) {
-            this.eventQueue.length = 0;
-        }
+        
+        this.eventQueue.update();
 
         this.gameInputs.update();
         this.units.update();
@@ -119,8 +108,8 @@ class Game extends Phaser.Game {
     }
 
     childRender() {
-        let rect = new Phaser.Rectangle( game.camera.x + (game.camera.width / 2) - 160, game.camera.y + 12, 340, 30 );
-        game.debug.geom( rect, 'rgba(55,55,55,1)' );
+        let rect = new Phaser.Rectangle(game.camera.x + (game.camera.width / 2) - 160, game.camera.y + 12, 340, 30);
+        game.debug.geom(rect, 'rgba(55,55,55,1)');
         game.debug.text('fps:' + (game.time.fps || '--') + ' x:' + game.camera.x + ' y:' + game.camera.y + ' w:' + game.camera.width + ' h:' + game.camera.height, (game.camera.width / 2) - 150, 32);
         this.gameBoardLayer.render();
     }

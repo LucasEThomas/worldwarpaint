@@ -4,26 +4,26 @@ class SniperTower extends Unit{
         this.type = 'sniper';
     }
     processEvent(event) {
+        super.processEvent(event);
         if (event.type === 'sniperUnit') {
             let clrName = game.players.getClrName(event.ownerId);
             let clr = game.players.getClr(event.ownerId);
-            event.data.forEach((splatter, n) => {
-                let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
-                let endPoint = new Victor(splatter.x, splatter.y);
-                //start points in a circle around the top of the tower
-                let newStart = new Victor(12, 12).rotate(endPoint.subtract(startPoint).angle() - Math.TWOPI*0.25).add(startPoint);
+            let splatter = event;
+            let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
+            let endPoint = new Victor(splatter.x, splatter.y);
+            //start points in a circle around the top of the tower
+            let newStart = new Victor(12, 12).rotate(endPoint.subtract(startPoint).angle() - Math.TWOPI*0.25).add(startPoint);
 
-                SniperTower.fireLaser({
-                    x: newStart.x,
-                    y: newStart.y,
-                    z: 35
-                }, {
-                    x: splatter.x,
-                    y: splatter.y,
-                    z: 0
-                }, () => {
-                    game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
-                });
+            SniperTower.fireLaser({
+                x: newStart.x,
+                y: newStart.y,
+                z: 35
+            }, {
+                x: splatter.x,
+                y: splatter.y,
+                z: 0
+            }, () => {
+                game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
             });
         }
     }

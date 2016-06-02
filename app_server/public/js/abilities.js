@@ -1,6 +1,6 @@
 var abilities = [
     {
-        name: 'new tower',
+        name: 'new sprinkler tower',
         cost: 0,
         image: 'blueButton1',
         usageCallback: undefined,
@@ -15,7 +15,25 @@ var abilities = [
                 game.gameServer.createTower(x, y, 'sprinklerTower', game.player.id);
             }
         }
+    },
+    {
+        name: 'new sniper tower',
+        cost: 0,
+        image: 'blueButton1',
+        usageCallback: undefined,
+        onClickOptions: {
+            cost: 90,
+            imageName: 'tower',
+            alpha: 0.6,
+            inIsoUnitsGroup: true,
+            snap: 32,
+            mustColorMatch: true,
+            onClickCallback: function(x, y) {
+                game.gameServer.createTower(x, y, 'sniperTower', game.player.id);
+            }
+        }
     }
+    
 ];
 
 //imageName,            //the cursor image changes to this after selecting the ability

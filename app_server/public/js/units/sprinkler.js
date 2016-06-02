@@ -4,17 +4,17 @@ class SprinklerTower extends Unit{
         this.type = 'sprinkler';
     }
     processEvent(event) {
-        if (event.type === 'sprinklerUnit') {
+        super.processEvent(event);
+        if (event.type === 'sprinkle') {
             let clrName = game.players.getClrName(event.ownerId);
             let clr = game.players.getClr(event.ownerId);
-            event.data.forEach((splatter, n) => {
-                let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
-                let endPoint = new Victor(splatter.x, splatter.y);
-                //start points in a circle around the top of the tower
-                let newStart = new Victor(12, 12).rotate(endPoint.subtract(startPoint).angle()).add(startPoint);
-                SprinklerTower.lobProjectile(newStart.x, newStart.y, 45, splatter.x, splatter.y, 0, 50, 750, 'projectile_' + clrName, () => {
-                    game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
-                });
+            let splatter = event;
+            let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
+            let endPoint = new Victor(splatter.x, splatter.y);
+            //start points in a circle around the top of the tower
+            let newStart = new Victor(12, 12).rotate(endPoint.subtract(startPoint).angle() - Math.TWOPI*0.25).add(startPoint);
+            SprinklerTower.lobProjectile(newStart.x, newStart.y, 45, splatter.x, splatter.y, 0, 50, 750, 'projectile_' + clrName, () => {
+                game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
             });
         }
     }
