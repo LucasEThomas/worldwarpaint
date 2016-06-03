@@ -1,12 +1,11 @@
-class SniperTower extends Unit {
+class HealerTower extends Unit {
     constructor(x, y, id, ownerId, onKilled) {
         super(x, y, id, ownerId, 'tower', 100, onKilled);
-        this.type = 'sniper';
+        this.type = 'healerTower';
     }
     processEvent(event) {
         super.processEvent(event);
-        console.log(event);
-        if (event.type === 'snipe') {
+        if (event.type === 'heal') {
 
             let target = game.units.units.find((u) => u.id === event.targetId);
             if (target) {
@@ -15,7 +14,7 @@ class SniperTower extends Unit {
                 //start points in a circle around the top of the tower
                 let newStart = new Victor(12, 12).rotate(endPoint.clone().subtract(startPoint).angle() - Math.TWOPI * 0.25).add(startPoint);
 
-                SniperTower.fireLaser({
+                HealerTower.fireLaser({
                     x: newStart.x,
                     y: newStart.y,
                     z: 35
@@ -24,7 +23,7 @@ class SniperTower extends Unit {
                     y: endPoint.y,
                     z: 0
                 }, () => {
-                    target.health.takeDamage(event.damage);
+                    target.health.takeHealing(event.healing);
                 });
             }
         }
@@ -38,11 +37,11 @@ class SniperTower extends Unit {
 
         let sprite = game.add.sprite(startPoint.x, startPoint.y);
         sprite.scale.setTo(1, 0.5)
-        let startSprite = sprite.addChild(game.make.sprite(0, 0, 'laser_end'));
+        let startSprite = sprite.addChild(game.make.sprite(0, 0, 'healer_end'));
         startSprite.blendMode = PIXI.blendModes.ADD;
-        let beamSprite = sprite.addChild(game.make.sprite(10, 0, 'laser_beam'));
+        let beamSprite = sprite.addChild(game.make.sprite(10, 0, 'healer_beam'));
         beamSprite.scale.setTo(distance, 1);
-        let endSprite = sprite.addChild(game.make.sprite(distance, 0, 'laser_end'));
+        let endSprite = sprite.addChild(game.make.sprite(distance, 0, 'healer_end'));
 
         beamSprite.blendMode = PIXI.blendModes.ADD;
         startSprite.blendMode = PIXI.blendModes.ADD;
