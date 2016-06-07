@@ -42,8 +42,8 @@ class Game extends Phaser.Game {
         game.load.image('laser_beam', 'assets/laserBeam.png');
         game.load.image('laser_end', 'assets/laserEnd.png');
         
-        game.load.image('healer_beam', 'assets/laserBeam.png');
-        game.load.image('healer_end', 'assets/laserEnd.png');
+        game.load.image('healer_beam', 'assets/healerBeam.png');
+        game.load.image('healer_end', 'assets/healerEnd.png');
 
         game.load.image('towerBlue1', 'assets/TowerBlue1.png');
         game.load.image('towerBlue2', 'assets/TowerBlue2.png');
@@ -90,11 +90,13 @@ class Game extends Phaser.Game {
         game.camera.x = 1020;
 
         //create the five visible layers (it matters which order we create these in)
-        this.terrainRenderTexture = new Map(game, 3548, 2048, 'terrainBackground'); //  1st Layer, the terrain background
+        this.terrainRenderTexture = new Map(game, 3548, 2048, 'terrainBackground'); //  1st layer, the terrain 
         this.gameBoardLayer = new GameBoardLayer(this); //                              2nd layer, the paint
-        this.units = new UnitsManager(); //                                             3rd layer, the game units
-        this.gameInputs = new GameInputs(abilities); //                                 4th layer, the gui buttons
-        this.money = new moneyManager(); //                                             5th layer, the money
+        this.groundEffects = new GroundEffectsManager(this) //                          3rd layer, effects beneath units
+        this.units = new UnitsManager(); //                                             4th layer, the game units
+        this.airEffects = game.add.group() //                                           5nd layer, effects above units
+        this.gameInputs = new GameInputs(abilities); //                                 6th layer, the gui buttons
+        this.money = new moneyManager(); //                                             7th layer, the money
 
         //initialize the connection with the game server
         // this will trigger the exchange of initial sync data between the server and client
