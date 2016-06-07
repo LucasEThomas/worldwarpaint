@@ -10,7 +10,7 @@ class HealerTower extends Unit {
         this.healerAngle = 0;
 
         this.healerRangeMax = 250;
-        this.healerROFInterval = 1000;
+        this.healerROFInterval = 2000;
         this.healerPower = 5;
         this.healerRotateSpeed = Math.TWOPI / 49; //spin per 20th of a second.
         this.healerAttackAngle = Math.TWOPI / 20; //how close the healer has to aim before it can fire
@@ -44,13 +44,13 @@ class HealerTower extends Unit {
         let maxRangeSqr = Math.pow(this.healerRangeMax, 2);
         let targets = this.gameUnits.filter((nUnit)=>this.testCanHeal(nUnit));
         let target = null;
-        targets.forEach((nTarget, n) => {
-            if (target.health < lowestHealth) {
-                target = nTarget;
-                lowestHealth = sqrDist;
-            }
-        });
-        return target;
+//        targets.forEach((nTarget, n) => {
+//            if (target.health < lowestHealth) {
+//                target = nTarget;
+//                lowestHealth = sqrDist;
+//            }
+//        });
+        return targets[0];
     }
     testCanHeal(unit) {
         if (unit) {
