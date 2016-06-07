@@ -4,6 +4,7 @@ var Player = require('./Player.js');
 var Map = require('./Map.js');
 var SprinklerTower = require('./units/SprinklerTower.js');
 var SniperTower = require('./units/SniperTower.js');
+var HealerTower = require('./units/HealerTower.js');
 var uuid = require('node-uuid');
 
 class Game {
@@ -47,6 +48,8 @@ class Game {
             unit = new SprinklerTower(uuid.v4(), x, y, player);
         } else if (type === 'sniperTower') {
             unit = new SniperTower(uuid.v4(), x, y, player, this.units);
+        } else if (type === 'healerTower') {
+            unit = new HealerTower(uuid.v4(), x, y, player, this.units);
         }
 
         if (unit) {
@@ -90,12 +93,12 @@ class Game {
             let scheduleTime = currentTime + i * 50;
             schedule.push(this.generateScheduleItemEvents(scheduleTime));
         }
-        
+
         if (this.unitlessEvents.length) {
             schedule[0].push(...this.unitlessEvents);
             this.unitlessEvents = [];
         }
-        
+
         this.players.forEach((player, index) => player.syncNewEvents(schedule));
     }
     generateScheduleItemEvents(time) {

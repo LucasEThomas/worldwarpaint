@@ -19,7 +19,7 @@ var abilities = [
     {
         name: 'new sniper tower',
         cost: 0,
-        image: 'blueButton1',
+        image: 'blueButton2',
         usageCallback: undefined,
         onClickOptions: {
             cost: 90,
@@ -30,6 +30,23 @@ var abilities = [
             mustColorMatch: true,
             onClickCallback: function(x, y) {
                 game.gameServer.createTower(x, y, 'sniperTower', game.player.id);
+            }
+        }
+    },
+        {
+        name: 'new healer tower',
+        cost: 0,
+        image: 'blueButton3',
+        usageCallback: undefined,
+        onClickOptions: {
+            cost: 90,
+            imageName: 'tower',
+            alpha: 0.6,
+            inIsoUnitsGroup: true,
+            snap: 32,
+            mustColorMatch: true,
+            onClickCallback: function(x, y) {
+                game.gameServer.createTower(x, y, 'healerTower', game.player.id);
             }
         }
     }

@@ -11,6 +11,8 @@ class UnitsManager {
             newUnit = new SprinklerTower(x, y, id, ownerId, (id) => this.destroyUnit(id));
         } else if (type == 'sniperTower') {
             newUnit = new SniperTower(x, y, id, ownerId, (id) => this.destroyUnit(id));
+        } else if (type == 'healerTower') {
+            newUnit = new HealerTower(x, y, id, ownerId, (id) => this.destroyUnit(id));
         }
         this.units.push(newUnit);
     }
