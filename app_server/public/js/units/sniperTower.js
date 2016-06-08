@@ -32,7 +32,7 @@ class SniperTower extends Unit {
         let startPoint = Victor.fromObject(game.iso.project(startPointIsoSpace));
         let endPoint = Victor.fromObject(game.iso.project(endPointIsoSpace));
 
-        let distance = startPoint.distance(endPoint);
+        let distance = startPoint.distance(endPoint) - 15;
         let angle = endPoint.clone().subtract(startPoint).angleDeg();
 
         let sprite = game.add.sprite(startPoint.x, startPoint.y);
@@ -41,15 +41,12 @@ class SniperTower extends Unit {
         startSprite.blendMode = PIXI.blendModes.ADD;
         let beamSprite = sprite.addChild(game.make.sprite(10, 0, 'laser_beam'));
         beamSprite.scale.setTo(distance, 1);
-        let endSprite = sprite.addChild(game.make.sprite(distance, 0, 'laser_end'));
+        let endSprite = sprite.addChild(game.make.sprite(distance + 20, 20, 'laser_end'));
+        endSprite.angle = 180;
 
         beamSprite.blendMode = PIXI.blendModes.ADD;
         startSprite.blendMode = PIXI.blendModes.ADD;
         endSprite.blendMode = PIXI.blendModes.ADD;
-
-        endSprite.x += 20;
-        endSprite.y += 20;
-        endSprite.angle = 180;
 
         sprite.angle = angle;
         let linearTween = game.add.tween(sprite).to({
