@@ -3,6 +3,10 @@ class Unit {
         this.sprite = game.add.isoSprite(x, y, 0, spriteImage, 0, game.units.group);
         this.sprite.anchor.setTo(0.5, 0.75); //1-((tower.width/4)/tower.height));
 
+        this.sprite.inputEnabled = true;
+        this.sprite.input.useHandCursor = true;
+        this.sprite.events.onInputDown.add(()=>console.log(this.type));
+        
         this.health = new HealthBar(16, this, maxHealth);//16 needs to be calculated based on the size of the sprite
         this.environmentalDamage = 0;
 

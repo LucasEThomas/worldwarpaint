@@ -13,7 +13,6 @@ class GameInputs {
         this.keys.shift = game.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
         this.keys.esc = game.input.keyboard.addKey(Phaser.Keyboard.ESC);
 
-
         game.canvas.oncontextmenu = this.rightMouseUp;
 
         abilities.forEach((ability, n) => {
@@ -120,8 +119,8 @@ class GameInputs {
         if (this.abilityCursor) {
             let point = game.iso.unproject(game.input.activePointer.position);
             let snap = this.abilityCursor.onClickOptions.snap
-            this.abilityCursor.isoX = snap + point.x - (point.x % snap);
-            this.abilityCursor.isoY = snap + point.y - (point.y % snap);
+            this.abilityCursor.isoX = 60 + snap + point.x - (point.x % snap);
+            this.abilityCursor.isoY = 60 +snap + point.y - (point.y % snap);
         }
     }
 

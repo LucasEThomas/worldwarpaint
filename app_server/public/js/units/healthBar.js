@@ -10,22 +10,25 @@ class HealthBar {
 
         this.whiteBar = parentSprite.addChild(game.make.sprite(x, y, 'healthBarWhite'));
         this.whiteBar.scale.setTo(maxHealth, 3);
-
+        
         this.greenBar = parentSprite.addChild(game.make.sprite(x, y, 'healthBarGreen'));
         this.greenBar.scale.setTo(this.currentHealth, 3);
 
         this.redBar = parentSprite.addChild(game.make.sprite(x, y, 'healthBarRed'));
-        this.redBar.scale.setTo(0, 3);
+        this.redBar.alpha = 0;
+        this.redBar.scale.setTo(1, 3);
         this.tween = game.add.tween(this.redBar);
         this.tween.to({
             alpha: 0.2
         }, 500, Phaser.Easing.Cubic.In);
         this.tween.onComplete.add(() => {
-            this.redBar.scale.setTo(0, 3);
+            this.redBar.alpha = 0;
+            this.redBar.scale.setTo(1,3);
         });
 
         this.blueBar = parentSprite.addChild(game.make.sprite(x, y, 'healthBarBlue'));
-        this.blueBar.scale.setTo(0, 3);
+        this.blueBar.scale.setTo(1, 3);
+        this.blueBar.alpha = 0;
     }
     takeDamage(amount) {
         if (amount < 0) amount = 0;

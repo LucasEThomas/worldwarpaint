@@ -102,7 +102,7 @@ class Game {
         this.players.forEach((player, index) => player.syncNewEvents(schedule));
     }
     generateScheduleItemEvents(time) {
-        var events = [];
+        let events = [];
         this.units.forEach((unit, index) => events.push(...unit.generateEvents(time)));
         return events;
     }
