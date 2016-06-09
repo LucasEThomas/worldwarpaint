@@ -3,6 +3,8 @@ class GroundEffectsManager {
         this.groundEffectsGroup = game.add.group();
     }
     displayUnitRange(x, y, maxRange) {
+        this.groundEffectsGroup.removeAll();
+        
         //  Our BitmapData (same size as our canvas)
         let width = 300 * Math.sqrt(3) / Math.sqrt(2);
         let height = 300 / Math.sqrt(2);

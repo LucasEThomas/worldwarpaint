@@ -5,7 +5,7 @@ class Unit {
 
         this.sprite.inputEnabled = true;
         this.sprite.input.useHandCursor = true;
-        this.sprite.events.onInputDown.add(()=>console.log(this.type));
+        this.sprite.events.onInputDown.add(()=>game.groundEffects.displayUnitRange(x, y, 100));
         
         this.health = new HealthBar(16, this, maxHealth);//16 needs to be calculated based on the size of the sprite
         this.environmentalDamage = 0;

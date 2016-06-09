@@ -2,7 +2,7 @@ class SprinklerTower extends Unit {
     constructor(x, y, id, ownerId, onKilled) {
         super(x, y, id, ownerId, 'tower', 100, onKilled);
         this.type = 'sprinklerTower';
-        game.groundEffects.displayUnitRange(x, y, 100);
+        //game.groundEffects.displayUnitRange(x, y, 100);
     }
     processEvent(event) {
         super.processEvent(event);
