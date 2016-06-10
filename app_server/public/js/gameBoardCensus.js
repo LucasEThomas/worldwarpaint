@@ -53,6 +53,87 @@ class GameBoardCensus {
             this.registeredTiles = [];
         }
     }
+    performCensus2(onFinish) {
+        if (this.registeredTiles.length) {
+
+            this.registeredTiles.forEach((ntile, n) => {
+                this.tiles[ntile.x + ntile.y * 64].selected = false;
+            });
+
+            this.countPixels(this.registeredTiles.slice(), (processedRects) => this.doFinishCensus(processedRects, onFinish));
+            this.registeredTiles = [];
+        }
+    }
+    doFinishCensus(processedRects, onFinishCallback) {
+        this.updateTiles(processedRects); //this tells all of the tiles to call their respective callbacks.
+        onFinishCallback(this.computeSummary(processedRects)); //this callback is used to comminicate the census results with the server.
+    }
+
+    computeSummary(processedRects) {
+        let changedTiles = [];
+
+        processedRects.forEach((nRect, n) => {
+            let arrayLocation = nRect.x + nRect.y * 64;
+
+            let r = this.data[0 + arrayLocation * 4];
+            let g = this.data[1 + arrayLocation * 4];
+            let b = this.data[2 + arrayLocation * 4];
+
+            let summary = {
+                loc: arrayLocation,
+                color: this.colorName(r, g, b),
+                level: this.data[3 + arrayLocation * 4]
+            };
+            changedTiles.push(summary);
+        });
+        
+        return changedTiles;
+    }
+
+
+    updateTiles(processedRects) {
+        processedRects.forEach((nRect, n) => {
+            let arrayLocation = nRect.x + nRect.y * 64;
+            let newClr = {
+                r: this.data[0 + arrayLocation * 4],
+                g: this.data[1 + arrayLocation * 4],
+                b: this.data[2 + arrayLocation * 4]
+            };
+            let newScore = this.data[3 + arrayLocation * 4];
+            this.tiles[arrayLocation].doUpdate(newClr, newScore);
+        });
+    }
+
+
+    colorName(r, g, b) {
+        let clrDigest = r | (g << 8) | (b << 16);
+
+        //{r: 235, g: 77, b: 77} red        digest = 5,066,219
+        //{r: 242, g: 139, b: 49} orange    digest = 3,247,090
+        //{r: 236, g: 200, b: 47} yellow    digest = 3,131,628
+        //{r: 87, g: 197, b: 184} teal      digest = 12,109,143
+        //{r: 65, g: 134, b: 239} blue      digest = 15,697,473
+
+        //{r: 236, g: 83, b: 172} magenta   digest = 11,293,676
+
+
+        if (clrDigest === 5066219)
+            return 'red';
+        else if (clrDigest === 3247090)
+            return 'orange';
+        else if (clrDigest === 3131628)
+            return 'yellow';
+        else if (clrDigest === 12109143)
+            return 'teal';
+        else if (clrDigest === 15697473)
+            return 'blue';
+        else if (clrDigest === 123)
+            return 'white';
+        else if (clrDigest === 11293676)
+            return 'magenta';
+        else if (clrDigest === 123)
+            return 'violet';
+    }
 
     initializeGL(gl, texInput) {
         this.gl = gl;
@@ -251,14 +332,11 @@ class CensusTile {
         } else { //a color change happened
             if (Utility.compareClr(newClr, myClr)) { //if it changed to my color
                 return newScore;
-            } else if (Utility.compareClr(oldClr, myClr)){ //if it changed from my color
+            } else if (Utility.compareClr(oldClr, myClr)) { //if it changed from my color
                 return -newScore;
-            }
-            else{
+            } else {
                 return 0;
             }
         }
     }
-
-
 }

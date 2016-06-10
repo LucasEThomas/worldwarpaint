@@ -69,6 +69,12 @@ class gameServer {
             id: id,
         }));
     }
+    sendCensusData(tiles) {
+        this.ws.send(JSON.stringify({
+            event: 'census',
+            tiles: tiles,
+        }));
+    }
     manualSplatter(x, y, radius, owner) {
         this.ws.send(JSON.stringify({
             event: 'manual splatter',

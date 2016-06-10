@@ -10,13 +10,13 @@ class GameBoardLayer {
         this.sprite = game.add.sprite(0, 0, texture, textureFrame);
         this.sprite.fixedToCamera = false;
         this.sprite.inputEnabled = true;
-        this.sprite.events.onInputUp.add(()=>game.gameInputs.mouseUp());
-        
+        this.sprite.events.onInputUp.add(() => game.gameInputs.mouseUp());
+
         this.stageOutputColors = [];
         this.stageInputRects = [];
         this.stageOutputRects = [];
-        
-        this.censusInterval = setInterval(()=>{
+
+        this.censusInterval = setInterval(() => {
             this.performCensus();
         }, 400);
     }
@@ -67,10 +67,13 @@ class GameBoardLayer {
             this.stageOutputColors = [];
         }
     }
-    performCensus(){
-        this.gameBoardCensus.performCensus((totalScoreChange)=>{
-            //console.log(totalScoreChange)
-            game.money.rate += totalScoreChange * 0.000005;//1/60 since this the rate should agrigate at 60 fps
+    performCensus() {
+        //        this.gameBoardCensus.performCensus((totalScoreChange)=>{
+        //            game.money.rate += totalScoreChange * 0.000005;
+        //        });
+        this.gameBoardCensus.performCensus2((changedTiles) => {
+            //console.log(changedTiles.);
+            game.gameServer.sendCensusData(changedTiles);
         });
     }
 }
