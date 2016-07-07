@@ -80,7 +80,7 @@ class GameBoardCensus {
             let b = this.data[2 + arrayLocation * 4];
 
             let summary = {
-                loc: arrayLocation,
+                location: arrayLocation,
                 color: this.colorName(r, g, b),
                 level: this.data[3 + arrayLocation * 4]
             };

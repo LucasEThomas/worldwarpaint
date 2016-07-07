@@ -26,6 +26,8 @@ class EventManager {
                     let clr = game.players.getClr(nEvent.ownerId);
                     let splatter = nEvent;
                     game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
+                } else if (nEvent.type === 'districtUpdate') {
+                    console.log(nEvent);
                 }
             });
         }

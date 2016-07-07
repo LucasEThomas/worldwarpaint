@@ -1,12 +1,13 @@
 "use strict";
 
 class Player {
-    constructor(id, ws, clrName, clr, onInitSync, onDisconnect, onNewTower, onDestroyTower, onManualSplatter, onUnitDestination) {
+    constructor(id, ws, clrName, clr, onCensusVote, onInitSync, onDisconnect, onNewTower, onDestroyTower, onManualSplatter, onUnitDestination) {
         this.ws = ws;
         this.id = id;
         this.clr = clr;
         this.clrName = clrName;
 
+        this.onCensusVote = onCensusVote;
         this.onInitSync = onInitSync;
         this.onDisconnect = onDisconnect;
         this.onNewTower = onNewTower;
@@ -26,7 +27,9 @@ class Player {
     }
 
     messageRxvd(data) {
-        if (data.event === 'initsyncClient') {
+        if (data.event === 'census vote') {
+            this.onCensusVote(this, data);
+        } else if (data.event === 'initsyncClient') {
             this.onInitSync(this, data);
         } else if (data.event === 'new tower') {
             this.onNewTower(this, data.x, data.y, data.type, data.owner);

@@ -2,6 +2,7 @@
 var Utility = require('./Utility.js');
 var Player = require('./Player.js');
 var Map = require('./Map.js');
+var CensusData = require('./CensusData.js');
 var SprinklerTower = require('./units/SprinklerTower.js');
 var SniperTower = require('./units/SniperTower.js');
 var HealerTower = require('./units/HealerTower.js');
@@ -10,6 +11,7 @@ var uuid = require('node-uuid');
 class Game {
     constructor() {
         this.map = new Map(64, 64);
+        this.censusData = new CensusData();
         this.players = [];
         this.units = [];
         this.unitlessEvents = [];
@@ -23,6 +25,7 @@ class Game {
         var clr = Utility.hexToRgb(this.convertColorNameToColor(clrName));
 
         var newPlayer = new Player(id, ws, clrName, clr, ...[
+            (...a) => this.onCensusVote(...a),
             (...a) => this.onInitSync(...a),
             (...a) => this.onDisconnect(...a),
             (...a) => this.onNewTower(...a),
@@ -30,6 +33,10 @@ class Game {
             (...a) => this.onManualSplatter(...a),
             (...a) => this.onUnitDestination(...a)]);
         this.players.push(newPlayer);
+    }
+
+    onCensusVote(player, data) {
+        this.censusData.arbiter.processVotes(player, data.votes);
     }
 
     onInitSync(player, data) {
@@ -86,6 +93,14 @@ class Game {
     }
 
     gameLoop() {
+        this.censusData.holdElections().forEach((nDistrict, n) => {
+            this.unitlessEvents.push({
+                type: 'districtUpdate',
+                n: nDistrict.n,
+                clr: nDistrict.clr,
+                lvl: nDistrict.lvl
+            });
+        });
         var schedule = [];
         //Schedule 5 event ops per update. We are currently running 4 updates per sec, so there will be 20 paint ops per sec client side.
         let currentTime = Date.now();

@@ -72,7 +72,6 @@ class GameBoardLayer {
         //            game.money.rate += totalScoreChange * 0.000005;
         //        });
         this.gameBoardCensus.performCensus2((changedTiles) => {
-            //console.log(changedTiles.);
             game.gameServer.sendCensusData(changedTiles);
         });
     }
