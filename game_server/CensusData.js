@@ -27,8 +27,8 @@ class CensusData {
 
     holdElections() {
         let changedDistricts = [];
-        this.arbiter.holdElections().forEach(([nColor, nLevel], n) => {
-            let electionResult = this.registerElectionResults(nColor, nLevel, n);
+        this.arbiter.holdElections().forEach(([nColor, nLevel, nIndex], n) => {
+            let electionResult = this.registerElectionResults(nColor, nLevel, nIndex);
             if(electionResult){
                 changedDistricts.push(electionResult);
             }
@@ -38,6 +38,7 @@ class CensusData {
     }
 
     registerElectionResults(newClr, newLvl, index) {
+        index
         let oldClr = this.districts[index].clr;
         let oldLvl = this.districts[index].lvl;
 

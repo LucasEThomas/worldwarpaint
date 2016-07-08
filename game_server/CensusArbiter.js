@@ -17,7 +17,7 @@ class CensusArbiter {
         this.electionDistricts.forEach((nElection, n) => {
             let result = nElection.holdElection();
             if (result) {
-                results.push([result.color, result.level]);
+                results.push([result.color, result.level, n]);
             }
         });
         return results;
