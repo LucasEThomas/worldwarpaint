@@ -97,7 +97,7 @@ class Game {
             this.unitlessEvents.push({
                 type: 'districtUpdate',
                 n: nDistrict.n,
-                clr: nDistrict.clr,
+                clr: nDistrict.clr || 'none',
                 lvl: nDistrict.lvl
             });
         });

@@ -27,7 +27,10 @@ class EventManager {
                     let splatter = nEvent;
                     game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
                 } else if (nEvent.type === 'districtUpdate') {
-                    console.log(nEvent);
+                    //                    let newClr = nEvent.clr;
+                    //                    let newLvl = nEvent.lvl;
+                    //                    let index = nEvent.n;
+                    //                    game.gameBoardLayer.gameBoardCensus.tiles[index].doUpdate(newClr, newLvl);
                 }
             });
         }
