@@ -65,6 +65,13 @@ class Player {
             schedule: schedule
         });
     }
+    syncMoney(amount, rate) {
+        this.wsSend({
+            event: 'syncMoney',
+            amt: amount,
+            rate: rate
+        });
+    }
     // creates a dictionary for sending player info to the client
     toJSON() {
         return {

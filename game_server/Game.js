@@ -3,6 +3,7 @@ var Utility = require('./Utility.js');
 var Player = require('./Player.js');
 var Map = require('./Map.js');
 var CensusData = require('./CensusData.js');
+var Bank = require('./Bank.js');
 var SprinklerTower = require('./units/SprinklerTower.js');
 var SniperTower = require('./units/SniperTower.js');
 var HealerTower = require('./units/HealerTower.js');
@@ -12,6 +13,7 @@ class Game {
     constructor() {
         this.map = new Map(64, 64);
         this.censusData = new CensusData();
+        this.bank = new Bank(this.censusData.totalColorScores);
         this.players = [];
         this.units = [];
         this.unitlessEvents = [];
@@ -33,6 +35,8 @@ class Game {
             (...a) => this.onManualSplatter(...a),
             (...a) => this.onUnitDestination(...a)]);
         this.players.push(newPlayer);
+        
+        this.bank.createAccount(newPlayer);
     }
 
     onCensusVote(player, data) {
@@ -93,14 +97,11 @@ class Game {
     }
 
     gameLoop() {
-        this.censusData.holdElections().forEach((nDistrict, n) => {
-            this.unitlessEvents.push({
-                type: 'districtUpdate',
-                n: nDistrict.n,
-                clr: nDistrict.clr || 'none',
-                lvl: nDistrict.lvl
-            });
-        });
+        this.censusData.holdElections();
+        
+        this.bank.updateBankAccounts();
+        this.bank.transmitBankStatements();
+        
         var schedule = [];
         //Schedule 5 event ops per update. We are currently running 4 updates per sec, so there will be 20 paint ops per sec client side.
         let currentTime = Date.now();
