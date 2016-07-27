@@ -18,6 +18,7 @@ class moneyManager {
         text.inputEnabled = true;
     }
     update() {
+        this.amount += this.rate / 100;
         this.text.text = '$' + Math.floor(this.amount) + '\nrate:' + Math.round(this.rate*3600) + '/min';
     }
 }

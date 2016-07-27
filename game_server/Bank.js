@@ -13,7 +13,6 @@ class Bank {
         this.accounts.forEach((nAcnt) => {
             nAcnt.rate = this.censusResults[nAcnt.player.clrName];
             nAcnt.amount += nAcnt.rate;
-            console.log(nAcnt.rate);
         });
     }
     transmitBankStatements() {
