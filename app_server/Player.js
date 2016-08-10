@@ -1,10 +1,12 @@
 "use strict";
 
 class Player {
-    constructor(id, ws, onUpdate, onChangeRoom, onDisconnect) {
+    constructor(id, ws, onUpdate, onJoinRoom, onLeaveRoom, onCreateRoom, onDisconnect) {
         this.ws = ws;
         this.onUpdate = onUpdate;
-        this.onChangeRoom = onChangeRoom;
+        this.onJoinRoom = onJoinRoom;
+        this.onLeaveRoom = onLeaveRoom;
+        this.onCreateRoom = onCreateRoom;
         this.onDisconnect = onDisconnect;
 
         this.id = id;
@@ -28,8 +30,12 @@ class Player {
         if (data.event === 'setPlayerData') {
             this.setPlayerData(data);
             this.onUpdate(this);
-        } else if (data.event === 'changeRoom') {
-            this.onChangeRoom(this, data.newRoomId);
+        } else if (data.event === 'leaveRoom') {
+            this.onLeaveRoom(this);
+        } else if (data.event === 'joinRoom') {
+            this.onJoinRoom(this, data.roomId);
+        } else if (data.event === 'createRoom') {
+            this.onCreateRoom(this, data.roomId);
         }
     }
     setPlayerData(data) {

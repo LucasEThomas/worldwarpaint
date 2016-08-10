@@ -254,51 +254,60 @@
     <script src="js/units/sprinklerTower.js"></script>
     <div ng-app="app" ng-controller="RoomController">
         <div id="setupContainer">
-            <h2 style="display:inline">player name: {{name}}</h2>
-            <input ng-model="name" type="text" style="display:inline">
-            <button class="bigButton" type="button" onclick="">READY</button>
-            <button class="bigButton" type="button" ng-click="sendPlayerData();">SEND DATA</button>
-            <button class="bigButton" type="button" onclick="startGame('champion');">START GAME</button>
             <div id="flexContainer">
+                <div id="roomsContainer">
+                    <h1 class="centeredHeader">select room</h1>
+                    <div ng-repeat="room in rooms" class="teamContainer">
+                        <svg width="50" height="0" ng-attr-height="{{20 + team.players.length * 30}}">
+                            <svg preserveAspectRatio="xMinYMid meet" viewBox="0 0 30 30" width="30" height="100%">
+                                <rect x="0" y="0" rx="4" ry="4" width="30" height="30" style="fill:{{team.clr}};" />
+                            </svg>
+                            <line x1="35" y1="2" x2="50" y2="2" style="stroke:#505050;stroke-width:4" />
+                            <line x1="38" y1="2" x2="38" y2="100%" style="stroke:#505050;stroke-width:6" />
+                            <svg preserveAspectRatio="xMaxYMax meet" viewBox="0 0 50 4" width="100%" height="100%">
+                                <line x1="35" y1="2" x2="50" y2="2" style="stroke:#505050;stroke-width:4" />
+                            </svg>
+                        </svg>
+                        <div class="playersContainer">
+                            <div ng-repeat="player in team.players" class="playerContainer">
+                                <span class="playerName">{{room.name}}</span>
+                                <span class="playerListType">{{room.playerCount}}</span>
+                                <span class="playerReady" ng-style="{{(room.timeToBattle > 60)?styleGreen:styleRed}}">{{(room.timeToBattle)?'ready':'not ready'}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="colorsContainer">
-                    <h1 class="centeredHeader">select team color</h1>
+                    <h1 class="centeredHeader">player options</h1>
                     <div id="colorsRadiosContainer">
-                        <input class="blue" id="radioBlue" type="radio" name="clr" ng-model="clr" value="blue">
-                            <label for="radioBlue"></label>
-                        <input class="teal" id="radioTeal" type="radio" name="clr" ng-model="clr" value="teal">
-                            <label for="radioTeal"></label>
-                        <input class="white" id="radioWhite" type="radio" name="clr" ng-model="clr" value="white">
-                            <label for="radioWhite"></label>
-                        <input class="yellow" id="radioYellow" type="radio" name="clr" ng-model="clr" value="yellow">
-                            <label for="radioYellow"></label>
-                        <input class="orange" id="radioOrange" type="radio" name="clr" ng-model="clr" value="orange">
-                            <label for="radioOrange"></label>
-                        <input class="red" id="radioRed" type="radio" name="clr" ng-model="clr" value="red">
-                            <label for="radioRed"></label>
-                        <input class="magenta" id="radioMagenta" type="radio" name="clr" ng-model="clr" value="magenta">
-                            <label for="radioMagenta"></label>
-                        <input class="violet" id="radioViolet" type="radio" name="clr" ng-model="clr" value="violet">
-                            <label for="radioViolet"></label>
+                        <h2 style="display:inline">player name</h2>
+                        <input ng-model="name" type="text" style="display:inline">
+                       
+                       <div>
+                            <input class="blue" id="radioBlue" type="radio" name="clr" ng-model="clr" value="blue">
+                                <label for="radioBlue"></label>
+                            <input class="teal" id="radioTeal" type="radio" name="clr" ng-model="clr" value="teal">
+                                <label for="radioTeal"></label>
+                            <input class="white" id="radioWhite" type="radio" name="clr" ng-model="clr" value="white">
+                                <label for="radioWhite"></label>
+                            <input class="yellow" id="radioYellow" type="radio" name="clr" ng-model="clr" value="yellow">
+                                <label for="radioYellow"></label>
+                            <input class="orange" id="radioOrange" type="radio" name="clr" ng-model="clr" value="orange">
+                                <label for="radioOrange"></label>
+                            <input class="red" id="radioRed" type="radio" name="clr" ng-model="clr" value="red">
+                                <label for="radioRed"></label>
+                            <input class="magenta" id="radioMagenta" type="radio" name="clr" ng-model="clr" value="magenta">
+                                <label for="radioMagenta"></label>
+                            <input class="violet" id="radioViolet" type="radio" name="clr" ng-model="clr" value="violet">
+                                <label for="radioViolet"></label>
+                        </div>
+                            
+                        <button class="bigButton" type="button" onclick="">READY</button>
+                        <button class="bigButton" type="button" ng-click="sendPlayerData();">SEND DATA</button>
+                        <button class="bigButton" type="button" onclick="startGame('champion');">START GAME</button>
                     </div>
                 </div>
 
-                <div style="display:inline-flex; flex-flow:column nowrap; justify-content:flex-start; width:360px; margin-right:50px;">
-                    <h1 class="centeredHeader">select player type</h1>
-                    <div id="columnTitles">
-                        <div id='spacer'></div>
-                        <h2>POWERFUL</h2>
-                        <h2>TACTICAL</h2>
-                    </div>
-                    <div style="display:inline-flex; flex-flow:row nowrap; justify-content:flex-start; width:300px;">
-                        <div id=rowTitles>
-                            <h2 class='vertical-text' style="height:165px">ARCHITECT</h2>
-                            <h2 class='vertical-text' style="height:165px">HERO</h2>
-                        </div>
-                        <div style="display:inline-flex; flex-flow:row wrap; justify-content:space-around; width:270px; height:270px;">
-                            <custom-radio-button ng-repeat="playerType in playerTypes"></custom-radio-button>
-                        </div>
-                    </div>
-                </div>
                 <div id="playersContainer">
                     <h1 class="centeredHeader">teams:{{numberOfTeams}} players:{{numberOfPlayers}}</h1>
                     <div ng-repeat="team in teams" class="teamContainer">
@@ -311,8 +320,7 @@
                             <svg preserveAspectRatio="xMaxYMax meet" viewBox="0 0 50 4" width="100%" height="100%">
                                 <line x1="35" y1="2" x2="50" y2="2" style="stroke:#505050;stroke-width:4" />
                             </svg>
-
-    <                   </svg>
+                        </svg>
                         <div class="playersContainer">
                             <div ng-repeat="player in team.players" class="playerContainer">
                                 <span class="playerName">{{player.name}}</span>
@@ -321,7 +329,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

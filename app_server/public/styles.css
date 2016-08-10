@@ -67,7 +67,7 @@ body {
     width: 320px;
 }
 
-#chooserContainer {
+#roomsContainer {
     display: inline-block;
     width: 390px;
     float: left;
@@ -94,8 +94,8 @@ input[type=radio] + label {
 input[type=radio] + label:before {
     content: "";
     display: inline-block;
-    width: 128px;
-    height: 128px;
+    width: 32px;
+    height: 32px;
     margin-right: 15px;
     left: 0;
     bottom: 1px;

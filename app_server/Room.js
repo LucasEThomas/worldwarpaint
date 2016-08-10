@@ -25,7 +25,7 @@ class Room {
             currentPlayer.ready = this.coinFlip();
             currentPlayer.clr = this.pickRandomColor();
             currentPlayer.type = this.pickRandomType();
-            this.pushUpdatedPlayer(currentPlayer);
+            this.broadcastUpdatedPlayer(currentPlayer);
         }, 1000);
         
     }
@@ -34,10 +34,14 @@ class Room {
         var id = uuid.v4();
         
         var onUpdate = (player) => {
-            this.pushUpdatedPlayer(player);
+            this.broadcastUpdatedPlayer(player);
         };
         
-        var onChangeRoom = (newRoomId) => {
+        var onJoinRoom = (newRoomId) => {
+            this.changePlayerRoom(ws, newRoomId);
+        };
+        
+        var onCreateRoom = (newRoomId) => {
             this.changePlayerRoom(ws, newRoomId);
         };
         
@@ -45,11 +49,11 @@ class Room {
             this.playerDisconnected(player.id);
         };
         
-        var newPlayer = new Player(id, ws, onUpdate, onChangeRoom, onDisconnect);
+        var newPlayer = new Player(id, ws, onUpdate, onJoinRoom, onDisconnect);
         this.players.push(newPlayer);
         newPlayer.sendMultiPlayersData(this.buildMultiPlayersData());
     }
-    pushUpdatedPlayer(updatedPlayer){
+    broadcastUpdatedPlayer(updatedPlayer){
         //iterate through all players and tell them to send the new data through their sockets
         this.players.forEach((currentPlayer,index)=>{
             currentPlayer.sendPlayerData(updatedPlayer.toJSON());
