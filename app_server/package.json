@@ -20,6 +20,7 @@
   "license": "",
   "dependencies": {
     "express": "^4.13.4",
+    "gcloud": "^0.37.0",
     "mongoose": "^4.5.7",
     "node-uuid": "^1.4.7",
     "request": "^2.69.0",
