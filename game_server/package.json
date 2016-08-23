@@ -19,6 +19,7 @@
   ],
   "license": "",
   "dependencies": {
+    "@google-cloud/pubsub": "^0.1.1",
     "mongoose": "^4.5.7",
     "node-uuid": "^1.4.7",
     "victor": "^1.1.0",

@@ -136,7 +136,7 @@ class RoomServersDatastore {
 		var error;
 
 		datastore.runInTransaction((transaction, done) => {
-			let serverKey = datastore.key(['RoomServer', roomId]);
+			let serverKey = datastore.key(['RoomServer', gameServerId]);
 
 			transaction.get(serverKey, function(err, server) {
 				if (err) {
