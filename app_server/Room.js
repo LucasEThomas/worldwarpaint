@@ -44,12 +44,16 @@ class Room {
         var onCreateRoom = (newRoomId) => {
             this.changePlayerRoom(ws, newRoomId);
         };
+		
+		var onLeaveRoom = (newRoomId) => {
+            this.changePlayerRoom(ws, newRoomId);
+        };
         
         var onDisconnect = (player) => {
             this.playerDisconnected(player.id);
         };
         
-        var newPlayer = new Player(id, ws, onUpdate, onJoinRoom, onDisconnect);
+        var newPlayer = new Player(id, ws, onUpdate, onJoinRoom, onLeaveRoom, onCreateRoom, onDisconnect);
         this.players.push(newPlayer);
         newPlayer.sendMultiPlayersData(this.buildMultiPlayersData());
     }
