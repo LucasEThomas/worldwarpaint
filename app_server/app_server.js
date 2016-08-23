@@ -8,10 +8,9 @@ var Utility = require('./Utility.js');
 var Room = require('./Room.js');
 var WebSocketServer = require('ws').Server;
 
-var datastores = require('./Datastore.js');
+//var datastores = require('./Datastore.js');
 
-var roomServersDatastore = new datastores.RoomServersDatastore();
-
+//var roomServersDatastore = new datastores.RoomServersDatastore();
 
 //http stuff
 app.use(express.static(__dirname + '/public'));
@@ -25,6 +24,10 @@ app.get('/externalip', function(req, res) {
 });
 
 app.get('/listallservers', function(req, res) {
+	res.send("db currently wip");
+//	roomServersDatastore.listAllServers((nothing, servers, paginationStuff) => {
+//		res.send(servers);
+//	});
 });
 
 app.listen(8080);
@@ -34,16 +37,32 @@ var rooms = [];
 rooms[0] = new Room(); //for now just one room
 
 var wss = new WebSocketServer({
+	port: 8181
 });
 wss.on('connection', function connection(ws) {
+	rooms[0].addNewPlayer(ws);
 });
 
 // In order to use websockets on App Engine, you need to connect directly to
 // application instance using the instance's public external IP. This IP can
 // be obtained from the metadata server.
 var METADATA_NETWORK_INTERFACE_URL = 'http://metadata/computeMetadata/v1/' +
+	'/instance/network-interfaces/0/access-configs/0/external-ip';
 
 function getExternalIp(cb) {
+	var options = {
+		url: METADATA_NETWORK_INTERFACE_URL,
+		headers: {
+			'Metadata-Flavor': 'Google'
+		}
+	};
 
+	request(options, function(err, resp, body) {
+		if (err || resp.statusCode !== 200 || !/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/.test(body)) {
 
+			console.log('Error while talking to metadata server, assuming localhost');
+			return cb('localhost');
+		}
+		return cb(body);
+	});
 }
