@@ -33,12 +33,10 @@ class Unit {
 	setEnvironmentalDamage(clr, lvl) {
 		if (clr !== this.clrName) {
 			this.envDmg = lvl * this.envDmgSus;
-			console.log('Oh no! Enemy color! Damage taken per second: ' + this.envDmg);
 		} else if (!this.noClrSurivor && lvl === 0) {
 			this.envDmg = this.envDmgSus;
 		} else {
 			this.envDmg = 0;
-            console.log('Yay! Friendly color! No Damage taken per second! :) ');
 		}
 	}
 	setDestination(x, y) {
