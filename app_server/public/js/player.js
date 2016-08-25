@@ -15,6 +15,9 @@ class PlayersManager {
     setPlayers(players) {
         this.players.push(...players);
     }
+	addPlayer(player) {
+        this.players.push(player);
+    }
     // given a player id, return the player's color {r,g,b} object
     getClr(id) {
         let player = this.players.find((player) => player.id === id);

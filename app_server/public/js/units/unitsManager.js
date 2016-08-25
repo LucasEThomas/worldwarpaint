@@ -3,7 +3,6 @@ class UnitsManager {
         this.onUnitKilled;
         this.units = [];
         this.group = game.add.group();
-        this.damageLoop = game.time.events.loop(Phaser.Timer.SECOND, this.damageTimerLoop, this);
     }
     newTower(x, y, id, ownerId, type, onKill) {
         let newUnit = null;
@@ -22,12 +21,6 @@ class UnitsManager {
         if (this.onUnitKilled) {
             this.onUnitKilled(id);
         }
-    }
-    damageTimerLoop() {
-        this.units.forEach((unit, index) => {
-            if(unit)
-                unit.takeEnvironmentalDamage();
-        });
     }
     update() {
         game.iso.simpleSort(this.group);

@@ -51,6 +51,8 @@ class gameServer {
         } else if (data.event === 'syncMoney') {
             game.money.amount = data.amt;
             game.money.rate = data.rate;
+        } else if (data.event === 'newPlayer') {
+			game.players.addPlayer(data.player);
         } else if (data.event === 'sync-addUnit') {
             console.log(data);
             game.units.newTower(data.unit.x, data.unit.y, data.unit.id, data.unit.ownerId, data.unit.type);

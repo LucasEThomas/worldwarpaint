@@ -65,7 +65,7 @@ class GameBoardCensus {
         }
     }
     doFinishCensus(processedRects, onFinishCallback) {
-        this.updateTiles(processedRects); //this tells all of the tiles to call their respective callbacks.
+        //this.updateTiles(processedRects); //this tells all of the tiles to call their respective callbacks.
         onFinishCallback(this.computeSummary(processedRects)); //this callback is used to comminicate the census results with the server.
     }
 

@@ -56,7 +56,7 @@ class HealthBar {
     }
     takeHealing(amount) {
         if (amount < 0) amount = 0;
-        let newHealth = (this.currentHealth + amount) <= this.maxHealth ? (this.currentHealth + amount) : maxHealth;
+        let newHealth = (this.currentHealth + amount) <= this.maxHealth ? (this.currentHealth + amount) : this.maxHealth;
         this.greenBar.scale.setTo(newHealth, 3);
         this.currentHealth = newHealth;
     }

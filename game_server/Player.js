@@ -72,6 +72,12 @@ class Player {
             rate: rate
         });
     }
+	syncNewPlayer(player){
+		this.wsSend({
+            event: 'newPlayer',
+            player: player
+        });
+	}
     // creates a dictionary for sending player info to the client
     toJSON() {
         return {

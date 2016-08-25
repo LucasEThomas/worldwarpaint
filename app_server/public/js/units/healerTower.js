@@ -18,8 +18,9 @@ class HealerTower extends Unit {
                 newStart.z = 35;
                 endPoint.z = 0;
 
+				//console.log(event);
                 HealerTower.fireHealRay(newStart, endPoint, () => {
-                    //target.health.takeHealing(event.healing);
+                    target.health.takeHealing(event.amount);
                 });
             }
         }

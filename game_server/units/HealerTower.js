@@ -2,10 +2,8 @@
 var Unit = require('./Unit.js');
 
 class HealerTower extends Unit {
-    constructor(id, x, y, owner, gameUnits) {
-        super(id, x, y, 'healerTower', owner);
-
-        this.gameUnits = gameUnits;
+    constructor(id, x, y, owner, gameState) {
+        super(id, x, y, 'healerTower',  owner, gameState);
 
         this.healerAngle = 0;
 
@@ -25,6 +23,7 @@ class HealerTower extends Unit {
             let target = this.findNeediestTarget();
             if (target) {
                 let amount = Math.floor(Math.getRandomArbitrary(this.healerPower - 2, this.healerPower + 3));
+				target.takeHealing(amount);
                 events.push({
                     unitId: this.id,
                     ownerId: this.ownerId,
@@ -42,8 +41,8 @@ class HealerTower extends Unit {
     findNeediestTarget() {
         let lowestHealth = 1000000000;
         let maxRangeSqr = Math.pow(this.healerRangeMax, 2);
-        let targets = this.gameUnits.filter((nUnit)=>this.testCanHeal(nUnit));
-        let target = null;
+        let targets = this.gameState.gameUnits.filter((nUnit)=>this.testCanHeal(nUnit));
+        //let target = null;
 //        targets.forEach((nTarget, n) => {
 //            if (target.health < lowestHealth) {
 //                target = nTarget;
@@ -57,7 +56,7 @@ class HealerTower extends Unit {
             let maxRangeSqr = Math.pow(this.healerRangeMax, 2);
             let distSqr = this.sqrDistTo(unit);
 
-            return distSqr <= maxRangeSqr && unit.clrName === this.clrName && unit.id != this.id;
+            return distSqr <= maxRangeSqr && unit.clrName === this.clrName && unit.id != this.id && unit.needsHealing();
         }
         else{
             return false;

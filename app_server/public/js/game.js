@@ -103,10 +103,9 @@ class Game extends Phaser.Game {
         // the map will be generated/rendered upon receipt of the map data from the server
         this.gameServer = new gameServer(this.player.type);
     }
+	
     childUpdate() {
-        
         this.eventQueue.update();
-
         this.gameInputs.update();
         this.units.update();
         this.money.update();

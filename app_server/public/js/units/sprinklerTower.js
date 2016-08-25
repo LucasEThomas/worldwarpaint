@@ -21,7 +21,8 @@ class SprinklerTower extends Unit {
     }
 
     static lobProjectile(x1, y1, z1, x2, y2, z2, lobHeight, airTime, imageName, impactCallback) {
-        let sprite = game.add.isoSprite(x1, y1, z1, imageName, 0, game.units.group);
+        //impactCallback();
+		let sprite = game.add.isoSprite(x1, y1, z1, imageName, 0, game.units.group);
         let linearTween = game.add.tween(sprite).to({
             isoX: x2,
             isoY: y2,

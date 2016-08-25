@@ -2,11 +2,11 @@
 var Unit = require('./Unit.js');
 
 class SprinklerTower extends Unit {
-    constructor(id, x, y, owner) {
-        super(id, x, y, 'sprinklerTower', owner);
+    constructor(id, x, y, owner, gameState) {
+        super(id, x, y, 'sprinklerTower', owner, gameState);
 
         this.sprinklerAngle = 0;
-        this.sprinklerRangeMin = 100;
+        this.sprinklerRangeMin = 10;
         this.sprinklerRangeMax = 150;
         this.sprinklerROFInterval = 10;
         this.sprinklerSplashRadius = 10;

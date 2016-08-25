@@ -2,10 +2,8 @@
 var Unit = require('./Unit.js');
 
 class SniperTower extends Unit {
-    constructor(id, x, y, owner, gameUnits) {
-        super(id, x, y, 'sniperTower', owner);
-
-        this.gameUnits = gameUnits;
+    constructor(id, x, y, owner, gameState) {
+        super(id, x, y, 'sniperTower', owner, gameState);
 
         this.sniperAngle = 0;
         this.sniperRangeMin = 50;
@@ -42,7 +40,7 @@ class SniperTower extends Unit {
     findNearestTarget() {
         let lowestDist = 1000000000;
         let target = null
-        this.gameUnits.forEach((nTarget, n) => {
+        this.gameState.gameUnits.forEach((nTarget, n) => {
             let sqrDist = this.sqrDistTo(nTarget)
             if (sqrDist < lowestDist && nTarget.id != this.id) {
                 target = nTarget;

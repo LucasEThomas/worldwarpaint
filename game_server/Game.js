@@ -19,6 +19,11 @@ class Game {
         this.unitlessEvents = [];
 
         this.interval = setInterval(() => this.gameLoop(), 250);
+		
+		this.gameState = {
+			gameUnits: this.units,
+			censusData: this.censusData,
+		}
     }
     addNewPlayer(ws) {
         // make a unique uuid
@@ -34,9 +39,16 @@ class Game {
             (...a) => this.onDestroyTower(...a),
             (...a) => this.onManualSplatter(...a),
             (...a) => this.onUnitDestination(...a)]);
-        this.players.push(newPlayer);
+        
+		//broadcast new player to everyone.
+		let newPlayerJSON = newPlayer.toJSON();
+		this.players.forEach((nPlayer)=>nPlayer.syncNewPlayer(newPlayerJSON));
+		
+		this.players.push(newPlayer);
         
         this.bank.createAccount(newPlayer);
+		
+		this.censusData.registerVoter(newPlayer.id);
     }
 
     onCensusVote(player, data) {
@@ -50,17 +62,17 @@ class Game {
         player.initSyncServer(sendPlayers, this.units, this.map);
     }
     onDisconnect(player) {
-        //remove player from players array
-        //this.players = this.players.filter((v) => v.id !== player.id);
+        //remove player from the voter registry
+        this.censusData.deRegisterVoter(player.id);
     }
     onNewTower(player, x, y, type, ownerId) {
         let unit = null;
         if (type === 'sprinklerTower') {
-            unit = new SprinklerTower(uuid.v4(), x, y, player);
+            unit = new SprinklerTower(uuid.v4(), x, y, player, this.gameState);
         } else if (type === 'sniperTower') {
-            unit = new SniperTower(uuid.v4(), x, y, player, this.units);
+            unit = new SniperTower(uuid.v4(), x, y, player, this.gameState);
         } else if (type === 'healerTower') {
-            unit = new HealerTower(uuid.v4(), x, y, player, this.units);
+            unit = new HealerTower(uuid.v4(), x, y, player, this.gameState);
         }
 
         if (unit) {
@@ -79,7 +91,7 @@ class Game {
         if (radius < 16)
             inputIndex = Math.round(Math.getRandomArbitrary(96, 159));
         else if (radius < 32)
-            inputIndex = Math.round(Math.getRandomArbitrary(46, 95));
+            inputIndex = Math.round(Math.getRandomArbitrary(48, 95));
         else
             inputIndex = Math.round(Math.getRandomArbitrary(0, 47));
 
