@@ -28,6 +28,7 @@ class Game extends Phaser.Game {
         game.load.image('blueButton3', 'assets/BlueButton3.png');
         game.load.image('blueButton4', 'assets/BlueButton4.png');
         game.load.image('tower', 'assets/forestPack/tower1.png');
+        game.load.image('brushTower', 'assets/brushTower.gif');
         game.load.image('robot', 'assets/robot_1.png');
 
         game.load.image('projectile_red', 'assets/projectileRed.png');
@@ -94,7 +95,7 @@ class Game extends Phaser.Game {
         this.gameBoardLayer = new GameBoardLayer(this); //                              2nd layer, the paint
         this.groundEffects = new GroundEffectsManager(this) //                          3rd layer, effects beneath units
         this.units = new UnitsManager(); //                                             4th layer, the game units
-        this.airEffects = game.add.group() //                                           5nd layer, effects above units
+        this.airEffects = new AirEffectsManager(this); //                               5nd layer, effects above units
         this.gameInputs = new GameInputs(abilities); //                                 6th layer, the gui buttons
         this.money = new moneyManager(); //                                             7th layer, the money
 

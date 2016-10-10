@@ -5,14 +5,10 @@ class UnitsManager {
         this.group = game.add.group();
     }
     newTower(x, y, id, ownerId, type, onKill) {
-        let newUnit = null;
-        if (type === 'sprinklerTower') {
-            newUnit = new SprinklerTower(x, y, id, ownerId, (id) => this.destroyUnit(id));
-        } else if (type == 'sniperTower') {
-            newUnit = new SniperTower(x, y, id, ownerId, (id) => this.destroyUnit(id));
-        } else if (type == 'healerTower') {
-            newUnit = new HealerTower(x, y, id, ownerId, (id) => this.destroyUnit(id));
-        }
+        console.log(towerClasses);
+        console.log(type);
+        let towerType = towerClasses.find((a) => a.name === type);
+        let newUnit = new Unit(towerType.name, id, x, y, towerType.spriteName, ownerId, towerType.maxHealth, towerType.processEvent, (id) => this.destroyUnit(id));
         this.units.push(newUnit);
     }
     destroyUnit(id) {

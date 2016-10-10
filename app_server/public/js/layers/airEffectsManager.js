@@ -1,32 +1,38 @@
-class HealerTower extends Unit {
-    constructor(x, y, id, ownerId, onKilled) {
-        super(x, y, id, ownerId, 'tower', 100, onKilled);
-        this.type = 'healerTower';
-
+class AirEffectsManager{
+    constructor(game){
+        this.airEffectsGroup = game.add.group();
     }
-    processEvent(event) {
-        super.processEvent(event);
-        if (event.type === 'heal') {
+    
+    fireLaser(startPointIsoSpace, endPointIsoSpace, impactCallback) {
+        let startPoint = Victor.fromObject(game.iso.project(startPointIsoSpace));
+        let endPoint = Victor.fromObject(game.iso.project(endPointIsoSpace));
 
-            let target = game.units.units.find((u) => u.id === event.targetId);
-            if (target) {
-                let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
-                let endPoint = new Victor(target.sprite.isoX, target.sprite.isoY);
-                //start points in a circle around the top of the tower
-                let newStart = new Victor(16, 0).rotate(endPoint.clone().subtract(startPoint).angle()).add(startPoint);
+        let distance = startPoint.distance(endPoint) - 15;
+        let angle = endPoint.clone().subtract(startPoint).angleDeg();
 
-                newStart.z = 35;
-                endPoint.z = 0;
+        let sprite = game.add.sprite(startPoint.x, startPoint.y);
+        sprite.scale.setTo(1, 0.5)
+        let startSprite = sprite.addChild(game.make.sprite(0, 0, 'laser_end'));
+        startSprite.blendMode = PIXI.blendModes.ADD;
+        let beamSprite = sprite.addChild(game.make.sprite(10, 0, 'laser_beam'));
+        beamSprite.scale.setTo(distance, 1);
+        let endSprite = sprite.addChild(game.make.sprite(distance + 20, 20, 'laser_end'));
+        endSprite.angle = 180;
 
-				//console.log(event);
-                HealerTower.fireHealRay(newStart, endPoint, () => {
-                    target.health.takeHealing(event.amount);
-                });
-            }
-        }
+        beamSprite.blendMode = PIXI.blendModes.ADD;
+        startSprite.blendMode = PIXI.blendModes.ADD;
+        endSprite.blendMode = PIXI.blendModes.ADD;
+
+        sprite.angle = angle;
+        let linearTween = game.add.tween(sprite).to({
+            alpha: 0,
+        }, 500, null, true).onComplete.add(() => {
+            sprite.destroy();
+        });
+
+        impactCallback();
     }
-
-    static fireHealRay(startPointIsoSpace, endPointIsoSpace, impactCallback) {
+    fireHealRay(startPointIsoSpace, endPointIsoSpace, impactCallback) {
         let directionVectorIso = endPointIsoSpace.clone().subtract(startPointIsoSpace);
 
         let startPoint = Victor.fromObject(game.iso.project({
@@ -149,5 +155,31 @@ class HealerTower extends Unit {
         }, 1000, null, true);
 
         impactCallback();
+    }
+    lobProjectile(x1, y1, z1, x2, y2, z2, lobHeight, airTime, imageName, impactCallback) {
+        //impactCallback();
+		let sprite = game.add.isoSprite(x1, y1, z1, imageName, 0, game.units.group);
+        let linearTween = game.add.tween(sprite).to({
+            isoX: x2,
+            isoY: y2,
+        }, airTime, null, true);
+        linearTween.onComplete.add(() => {
+            impactCallback();
+            sprite.destroy();
+        });
+        let parabolicTween = game.add.tween(sprite).to({
+            isoZ: [z1, z1 + lobHeight, z1 + lobHeight, z2]
+        }, airTime, null, true).interpolation(Phaser.Math.bezierInterpolation);
+
+        sprite.update = () => {
+            let tileX = Math.floor(sprite.isoX * 0.03125);
+            let tileY = Math.floor(sprite.isoY * 0.03125);
+            let censusResidents = game.gameBoardLayer.gameBoardCensus.tiles[tileX + tileY * 64].residents;
+            if (censusResidents.indexOf('tree') >= 0) {
+                linearTween.stop();
+                parabolicTween.stop();
+                sprite.destroy();
+            }
+        }
     }
 }
