@@ -42,7 +42,7 @@ class SniperTower extends Unit {
         let target = null
         this.gameState.gameUnits.forEach((nTarget, n) => {
             let sqrDist = this.sqrDistTo(nTarget)
-            if (sqrDist < lowestDist && nTarget.id != this.id) {
+            if (nTarget.clrName !== this.clrName && sqrDist < lowestDist && nTarget.id != this.id) {
                 target = nTarget;
                 lowestDist = sqrDist;
             }
