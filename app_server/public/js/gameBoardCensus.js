@@ -107,14 +107,19 @@ class GameBoardCensus {
 
     colorName(r, g, b) {
         let clrDigest = r | (g << 8) | (b << 16);
+        
+        //digest = r + g*2^8 + b*2^16
+        // = (r)+(g*256)+(b*65536) //(computer copyable form)
 
-        //{r: 235, g: 77, b: 77} red        digest = 5,066,219
-        //{r: 242, g: 139, b: 49} orange    digest = 3,247,090
-        //{r: 236, g: 200, b: 47} yellow    digest = 3,131,628
-        //{r: 87, g: 197, b: 184} teal      digest = 12,109,143
-        //{r: 65, g: 134, b: 239} blue      digest = 15,697,473
-
-        //{r: 236, g: 83, b: 172} magenta   digest = 11,293,676
+        //{r: 235, g: 77, b: 77}   red       digest = 5,066,219
+        //{r: 242, g: 139, b: 49}  orange    digest = 3,247,090
+        //{r: 236, g: 200, b: 47}  yellow    digest = 3,131,628
+        //{r: 87, g: 197, b: 184}  teal      digest = 12,109,143
+        //{r: 65, g: 134, b: 239}  blue      digest = 15,697,473
+        //{r: 236, g: 224, b: 242} white     digest = 15,917,292
+        //{r: 236, g: 83, b: 172}  magenta   digest = 11,293,676
+        //{r: 153, g: 80, b: 180}  purple    digest = 11,817,113
+        
 
 
         if (clrDigest === 5066219)
@@ -127,11 +132,11 @@ class GameBoardCensus {
             return 'teal';
         else if (clrDigest === 15697473)
             return 'blue';
-        else if (clrDigest === 123)
+        else if (clrDigest === 15917292)
             return 'white';
         else if (clrDigest === 11293676)
             return 'magenta';
-        else if (clrDigest === 123)
+        else if (clrDigest === 11817113)
             return 'violet';
     }
 

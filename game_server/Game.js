@@ -138,12 +138,12 @@ class Game {
         var colorsDict = {
             blue: '#4186EF',
             teal: '#57C5B8',
-            white: '#F0E0E2',
+            white: '#ECE0F2',
             yellow: '#ECC82F',
             orange: '#F28B31',
             red: '#EB4D4D',
             magenta: '#EC53AC',
-            violet: '#B970D4'
+            violet: '#9950B4'
         };
         return colorsDict[name];
     }

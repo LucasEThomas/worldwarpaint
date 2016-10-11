@@ -10,6 +10,15 @@ function computeAndDisplayRGBArray(colorsArray) {
     console.log(colorsRGBArray);
 }
 
+function computeAndDisplayRGBIntArray(colorsArray) {
+    console.log(colorsArray);
+    var colorsRGBArray = colorsArray
+        .map((clr) => hexToRgb(clr))
+        .map((clr) => `r:${clr.r}, g:${clr.g}, b:${clr.b}, \n`)
+        .reduce((flat, toFlatten) => flat.concat(toFlatten))
+    console.log(colorsRGBArray);
+}
+
 function generateColorsArray() {
     var colorsDict = {
         blue: '#4186EF',
@@ -24,7 +33,7 @@ function generateColorsArray() {
     return Object.keys(colorsDict).map((key) => colorsDict[key]);
 }
 
-function paintTestInput(){
+function paintTestInput() {
     let colorsArray = generateColorsArray();
 
     paintCtx.beginPath();
@@ -86,7 +95,7 @@ function hexToRgb(hex) {
     } : null;
 }
 
-function generateCheckeredRects(offset){
+function generateCheckeredRects(offset) {
     var rects = [];
     for (var x = offset % 2; x <= 64; x += 4) {
         for (var y = Math.floor((offset / 2)) % 2; y <= 64; y += 4) {
