@@ -10,13 +10,20 @@ var towerClasses = [
                 let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
                 let endPoint = new Victor(splatter.x, splatter.y);
                 //start points in a circle around the top of the tower
-                let newStart = new Victor(12, 12).rotate(endPoint.subtract(startPoint).angle() - Math.TWOPI * 0.25).add(startPoint);
+                let newStart = new Victor(22, 22).rotate(endPoint.subtract(startPoint).angle() - Math.TWOPI * 0.25).add(startPoint);
                 game.airEffects.lobProjectile(newStart.x, newStart.y, 45, splatter.x, splatter.y, 0, 50, 750, 'projectile_' + clrName, () => {
                     game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
                 });
             }
         },
-        spriteName: 'tower',
+        spriteName: 'brushTower',
+        animations:[
+            {
+                name: 'spin',
+                generateFramesArgs: ['', 1, 32, '.png', 4],
+                numOfFrames: 32,
+            }
+        ],
         maxHealth: 100
     },
     {

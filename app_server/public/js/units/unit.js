@@ -1,7 +1,14 @@
 class Unit {
-    constructor(type, id, x, y, spriteImage, ownerId, maxHealth, onEvent, onKilled) {
+    constructor(type, id, x, y, spriteImage, ownerId, maxHealth, onEvent, onKilled, animations) {
         this.sprite = game.add.isoSprite(x, y, 0, spriteImage, 0, game.units.group);
         this.sprite.anchor.setTo(0.5, 0.75); //1-((tower.width/4)/tower.height));
+        
+        if(animations){
+            animations.forEach((animation, n)=>{
+                this.sprite.animations.add(animation.name, Phaser.Animation.generateFrameNames(...animation.generateFramesArgs), animation.numOfFrames, true, false);
+                this.sprite.play(animation.name);
+            });
+        }
 
         this.sprite.inputEnabled = true;
         this.sprite.input.useHandCursor = true;

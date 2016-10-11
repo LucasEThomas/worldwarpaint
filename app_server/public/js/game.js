@@ -21,6 +21,8 @@ class Game extends Phaser.Game {
         game.stage.backgroundColor = '#fff';
         game.plugins.add(new Phaser.Plugin.Isometric(game, undefined, Phaser.Plugin.Isometric.ISOMETRIC));
         //game.iso.anchor.setTo(0.5, 0);
+        
+        game.load.atlasJSONHash('brushTower', 'assets/brushTower.png', 'assets/brushTower.json');
 
         game.load.image('background', 'assets/background.jpg');
         game.load.image('blueButton1', 'assets/BlueButton1.png');
@@ -28,7 +30,6 @@ class Game extends Phaser.Game {
         game.load.image('blueButton3', 'assets/BlueButton3.png');
         game.load.image('blueButton4', 'assets/BlueButton4.png');
         game.load.image('tower', 'assets/forestPack/tower1.png');
-        game.load.image('brushTower', 'assets/brushTower.gif');
         game.load.image('robot', 'assets/robot_1.png');
 
         game.load.image('projectile_red', 'assets/projectileRed.png');
@@ -42,7 +43,6 @@ class Game extends Phaser.Game {
 
         game.load.image('laser_beam', 'assets/laserBeam.png');
         game.load.image('laser_end', 'assets/laserEnd.png');
-        
         game.load.image('healer_beam', 'assets/healerBeam.png');
         game.load.image('healer_end', 'assets/healerEnd.png');
 

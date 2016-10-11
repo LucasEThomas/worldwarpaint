@@ -5,10 +5,8 @@ class UnitsManager {
         this.group = game.add.group();
     }
     newTower(x, y, id, ownerId, type, onKill) {
-        console.log(towerClasses);
-        console.log(type);
         let towerType = towerClasses.find((a) => a.name === type);
-        let newUnit = new Unit(towerType.name, id, x, y, towerType.spriteName, ownerId, towerType.maxHealth, towerType.processEvent, (id) => this.destroyUnit(id));
+        let newUnit = new Unit(towerType.name, id, x, y, towerType.spriteName, ownerId, towerType.maxHealth, towerType.processEvent, (id) => this.destroyUnit(id), towerType.animations);
         this.units.push(newUnit);
     }
     destroyUnit(id) {
