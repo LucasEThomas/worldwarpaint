@@ -8,9 +8,9 @@ class SprinklerTower extends Unit {
         this.sprinklerAngle = 0;
         this.sprinklerRangeMin = 100;
         this.sprinklerRangeMax = 400;
-        this.sprinklerROFInterval = 500;
+        this.sprinklerROFInterval = 250;
         this.sprinklerSplashRadius = 30;
-        this.sprinklerSpinRate = Math.TWOPI / 11; //spin per tick.
+        this.sprinklerSpinRate = 1; //spin per tick.
         this.sprinklerHeads = 1;
 
         this.lastSprinkleTimestamp = Date.now();
@@ -23,12 +23,11 @@ class SprinklerTower extends Unit {
             let distance = Math.getRandomArbitrary(this.sprinklerRangeMin, this.sprinklerRangeMax);
             let direction = this.sprinklerAngle;
             let radius = Math.round(Math.getRandomArbitrary(this.sprinklerSplashRadius - 2, this.sprinklerSplashRadius + 2));
-            for(let theta = 0; theta < Math.TWOPI; theta += Math.TWOPI / 5){
-                let event = this.createSplatter(distance, direction + theta, radius)
-                if(event)
-                    events.push(event);
-            }
-            
+            let event = this.createSplatter(distance, direction, radius)
+            if (event)
+                events.push(event);
+
+
 
             this.lastSprinkleTimestamp = time;
         }
