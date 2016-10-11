@@ -266,9 +266,10 @@ class GameBoardCensus {
         setTimeout(() => {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo3);
             gl.readPixels(0, 0, 64, 64, gl.RGBA, gl.UNSIGNED_BYTE, this.data);
-            var testCtx = document.getElementById("canvasTest64").getContext("2d");
+            //var testCtx = document.getElementById("canvasTest64").getContext("2d");
+            // put this somewhere  for it to work: <canvas id="canvasTest64" width="64" height="64" style = "height:64px; width:64px;"></canvas>
             var data = new ImageData(new Uint8ClampedArray(this.data), 64, 64);
-            testCtx.putImageData(data, 0, 0);
+            //testCtx.putImageData(data, 0, 0);
             onFinishCallback(rects);
         }, 300);
     }
