@@ -84,7 +84,7 @@ class GameInputs {
             }
             else{
                 let point = game.iso.unproject(game.input.activePointer.position)
-                console.log(game.gameBoardLayer.gameBoardGraphics.colorMatch(point.x, point.y, game.player.clr));
+                //console.log(game.gameBoardLayer.gameBoardGraphics.colorMatch(point.x, point.y, game.player.clr));
             }
 
 
@@ -92,7 +92,7 @@ class GameInputs {
         }
     }
     rightMouseUp(e) {
-        console.log('right click');
+        //console.log('right click');
         e.preventDefault();
         if (game.player.type === 'champion' || game.player.type === 'archer')
             game.gameServer.moveHero(game.input.worldX, game.input.worldY);
