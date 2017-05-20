@@ -39,17 +39,20 @@ class Player {
             this.onManualSplatter(this, data.x, data.y, data.radius, data.owner);
         } else if (data.event === 'unit destination') {
             this.onUnitDestination(this, data.id, data.x, data.y);
+        } else if (data.event === 'transmitBitmap') {
+            
         }
     }
 
-    initSyncServer(players, units, map) {
+    initSyncServer(players, units, map, bitmap) {
         this.wsSend({
             event: 'initsyncServer',
             playerClr: this.clr,
             playerID: this.id,
             players: players,
             units: units,
-            terrainMap: map.terrainMap
+            terrainMap: map.terrainMap,
+            floorColors: bitmap
             //objectMap: map.objectMap // houses, trees, etc (anything with depth)
         });
     }
@@ -78,6 +81,12 @@ class Player {
             player: player
         });
 	}
+    requestBitmap(callback){
+       	this.wsSend({
+            event: 'requestBitmap'
+        }); 
+        callback();
+    }
     // creates a dictionary for sending player info to the client
     toJSON() {
         return {

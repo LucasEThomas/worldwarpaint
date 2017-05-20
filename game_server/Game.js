@@ -58,8 +58,17 @@ class Game {
     onInitSync(player, data) {
         // send players to connecting client
         //this.onNewTower(player, 1000, 1000, 'champion', player.id);
-        var sendPlayers = this.players.map((current) => current.toJSON());
-        player.initSyncServer(sendPlayers, this.units, this.map);
+        if(typeof players !== 'undefined'){ this.players[Math.rangeInt(0, players.length)].requestBitmap(bitmap => {
+            var sendPlayers = this.players.map((current) => current.toJSON());
+            player.initSyncServer(sendPlayers, this.units, this.map, bitmap);
+        }); //keeps the floor colors consistant?
+    }else{
+            var sendPlayers = this.players.map((current) => current.toJSON());
+            player.initSyncServer(sendPlayers, this.units, this.map, -1); 
+    }
+
+
+
     }
     onDisconnect(player) {
         //remove player from the voter registry
@@ -133,7 +142,7 @@ class Game {
         let events = [];
         this.units.forEach((unit, index) => events.push(...unit.generateEvents(time)));
         return events;
-    }
+    }    
     convertColorNameToColor(name) {
         var colorsDict = {
             blue: '#4186EF',

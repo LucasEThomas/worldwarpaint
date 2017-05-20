@@ -25,6 +25,16 @@ class GameBoardGraphics {
         return (Math.abs(pixelValues[0] - rgb.r) <= 12 && Math.abs(pixelValues[1] - rgb.g) <= 12 && Math.abs(pixelValues[2] - rgb.b) <= 12);
     }
 
+    getBitmap(){
+        var gl = this.gl;
+        var pixelValues = new Uint8Array(4);
+        gl.useProgram(this.program);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo2);
+        gl.readPixels(0, 0, 3548, 2048, gl.RGBA, gl.UNSIGNED_BYTE, pixelValues);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        return pixelValues;
+    }
+
     render(stageInputRects, stageOutputRects, stageOutputColors) {
         var gl = this.gl;
         var locCache = this.locCache;

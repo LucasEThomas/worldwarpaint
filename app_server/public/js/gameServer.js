@@ -55,6 +55,9 @@ class gameServer {
 			game.players.addPlayer(data.player);
         } else if (data.event === 'sync-addUnit') {
             game.units.newTower(data.unit.x, data.unit.y, data.unit.id, data.unit.ownerId, data.unit.type);
+        } else if (data.event === 'requestBitmap') {
+            sendBitmap(game.gameBoardGraphics.getBitmap());
+            
         }
     }
 
@@ -96,5 +99,12 @@ class gameServer {
             y: y,
         }));
     }
+    sendBitmap(bitmap) {
+        this.ws.send(JSON.stringify({
+            event: 'transmitBitmap',
+            bitmap: bitmap,
+        }));
+    }
+    
 
 }
