@@ -61,7 +61,7 @@ class Game {
         if(typeof players !== 'undefined'){ this.players[Math.rangeInt(0, players.length)].requestBitmap(bitmap => {
             var sendPlayers = this.players.map((current) => current.toJSON());
             player.initSyncServer(sendPlayers, this.units, this.map, bitmap);
-        }); //keeps the floor colors consistant?
+        }); //keeps the floor colors consistant.
     }else{
             var sendPlayers = this.players.map((current) => current.toJSON());
             player.initSyncServer(sendPlayers, this.units, this.map, -1); 
