@@ -45,6 +45,8 @@ class Game extends Phaser.Game {
         game.load.image('laser_end', 'assets/laserEnd.png');
         game.load.image('healer_beam', 'assets/healerBeam.png');
         game.load.image('healer_end', 'assets/healerEnd.png');
+        game.load.image('lightning_beam', 'assets/lightningBeam.png');
+        game.load.image('lightning_end', 'assets/lightningEnd.png');
 
         game.load.image('towerBlue1', 'assets/TowerBlue1.png');
         game.load.image('towerBlue2', 'assets/TowerBlue2.png');

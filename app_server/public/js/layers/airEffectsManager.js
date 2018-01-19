@@ -183,17 +183,20 @@ class AirEffectsManager{
         }
     }
     fireLightningBolt( startPointIsoSpace, endPointIsoSpace, impactCallback) {
-        thickness = 1;
+        //thickness = 1;
         let startingPoint = Victor.fromObject(game.iso.project(startPointIsoSpace));
         let endingPoint = Victor.fromObject(game.iso.project(endPointIsoSpace));
 
+        
+
         let results = [], positions = [],
-            tangent = endingPoint.subtract( startingPoint),
+            tangent = endingPoint.clone().subtract(startingPoint),
             normal  = tangent.clone().rotateBy(Math.TWOPI * 0.25).normalize(),
             length  = tangent.length(),
-            SWAY = 80,
+            SWAY = 800,
             JAGGEDNESS = 1 / SWAY,
-            prevPoint = startingPoint, prevDisplacement = 0,
+            prevPoint = startingPoint.clone(), 
+            prevDisplacement = 0,
             i, len;
     
         positions.push(0);
@@ -216,41 +219,47 @@ class AirEffectsManager{
             displacement -= ( displacement - prevDisplacement ) * ( 1 - scale );
             displacement *= envelope;
     
-            let point = startingPoint.add( tangent.divide( 1/pos ).add( normal.divide( 1/displacement ) ) );
+            let point = startingPoint.clone().add(tangent.clone().multiplyScalar(pos).add(normal.clone().multiplyScalar(displacement)));
     
-            this.fireLaser( prevPoint, point, ()=>{});
+            this.lightningSegment( prevPoint.clone(), point.clone());
     
-            prevPoint = point;
+            prevPoint = point.clone();
+            console.log('point: ' + point);
+            console.log('prevPoint: ' + prevPoint);
             prevDisplacement = displacement;
         }
     
-        this.fireLaser(prevPoint, endingPoint, ()=>{});
+        this.lightningSegment(prevPoint.clone(), endingPoint.clone());
     
         impactCallback();
     };
 
     lightningSegment(startPoint, endPoint){
-        let distance = startPoint.distance(endPoint) - 15;
+        //console.log(`startpoint: ${startPoint}, endpoint: ${endPoint}`)
+        let distance = startPoint.distance(endPoint);
         let angle = endPoint.clone().subtract(startPoint).angleDeg();
 
-        let sprite = game.add.sprite(startPoint.x, startPoint.y);
-        let startSprite = sprite.addChild(game.make.sprite(0, 0, 'laser_end'));
-        let beamSprite = sprite.addChild(game.make.sprite(10, 0, 'laser_beam'));
-        let endSprite = sprite.addChild(game.make.sprite(distance + 20, 20, 'laser_end'));
+        let sprite = game.add.sprite(startPoint.x, startPoint.y, 'lightning_beam');
+        //let startSprite = sprite.addChild(game.make.sprite(0, 0, 'lightning_end'));
+        //let beamSprite = sprite.addChild(game.make.sprite(0, 0, 'lightning_beam'));
+        //let endSprite = sprite.addChild(game.make.sprite(distance , 0, 'lightning_end'));
+        
+        //endSprite.angle = 180;
 
-        sprite.scale.setTo(1, 0.5)
-        beamSprite.scale.setTo(distance, 1);
+        //sprite.scale.setTo(1, 1)
+        //startSprite.scale.setTo(0.05, 0.05);
+        sprite.scale.setTo(distance, 0.05);
+        //endSprite.scale.setTo(0.05, 0.05);
+        
 
-        endSprite.angle = 180;
-
-        beamSprite.blendMode = PIXI.blendModes.ADD;
-        startSprite.blendMode = PIXI.blendModes.ADD;
-        endSprite.blendMode = PIXI.blendModes.ADD;
+        sprite.blendMode = PIXI.blendModes.ADD;
+        //startSprite.blendMode = PIXI.blendModes.ADD;
+        //endSprite.blendMode = PIXI.blendModes.ADD;
 
         sprite.angle = angle;
         let linearTween = game.add.tween(sprite).to({
             alpha: 0,
-        }, 500, null, true).onComplete.add(() => {
+        }, 1000, null, true).onComplete.add(() => {
             sprite.destroy();
         });
     }
