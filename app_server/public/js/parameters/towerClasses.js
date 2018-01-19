@@ -38,7 +38,7 @@ var towerClasses = [
                     //start points in a circle around the top of the tower
                     let newStart = new Victor(12, 12).rotate(endPoint.clone().subtract(startPoint).angle() - Math.TWOPI * 0.25).add(startPoint);
 
-                    game.airEffects.fireLaser({
+                    game.airEffects.fireLightningBolt({
                         x: newStart.x,
                         y: newStart.y,
                         z: 35

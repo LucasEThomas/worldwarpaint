@@ -32,6 +32,9 @@ class Utility {
         return a.r === b.r && a.g === b.g && a.b === b.b;
     }
 };
+Math.Rand = function( from, to ){
+    return ( Math.random() * ( to - from + 1 ) + from ) | 0; //generate lookup table beforehand?
+}
 
 Math.getRandomArbitrary = function(min, max) {
     return Math.random() * (max - min) + min;

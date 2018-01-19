@@ -182,4 +182,76 @@ class AirEffectsManager{
             }
         }
     }
+    fireLightningBolt( startPointIsoSpace, endPointIsoSpace, thickness, impactCallback) {
+
+        let startingPoint = Victor.fromObject(game.iso.project(startPointIsoSpace));
+        let endingPoint = Victor.fromObject(game.iso.project(endPointIsoSpace));
+
+        let results = [], positions = [],
+            tangent = endingPoint.subtract( startingPoint),
+            normal  = tangent.clone().rotateBy(Math.TWOPI * 0.25).normalize(),
+            length  = tangent.length(),
+            SWAY = 80,
+            JAGGEDNESS = 1 / SWAY,
+            prevPoint = startingPoint, prevDisplacement = 0,
+            i, len;
+    
+        positions.push(0);
+    
+        for( i = 0, len = length / 4; i < len; i++ ) {
+            positions.push( Math.random() );
+        }
+    
+        positions.sort();
+    
+        for( i = 1, len = positions.length; i < len; i++ ) {
+    
+            let pos = positions[i],
+                // used to prevent sharp angles by ensuring very close positions also have small perpendicular variation.
+                scale = ( length * JAGGEDNESS ) * ( pos - positions[i-1] ),
+                // defines an envelope. Points near the middle of the branchLightning can be further from the central line.
+                envelope = pos > 0.95 ? 20  * (  1 - pos ) : 1,
+                displacement = Math.Rand( -SWAY, SWAY );
+    
+            displacement -= ( displacement - prevDisplacement ) * ( 1 - scale );
+            displacement *= envelope;
+    
+            let point = startingPoint.add( tangent.divide( 1/pos ).add( normal.divide( 1/displacement ) ) );
+    
+            this.fireLaser( prevPoint, point, ()=>{});
+    
+            prevPoint = point;
+            prevDisplacement = displacement;
+        }
+    
+        this.fireLaser(prevPoint, endingPoint, ()=>{});
+    
+        impactCallback();
+    };
+
+    lightningSegment(startPoint, endPoint){
+        let distance = startPoint.distance(endPoint) - 15;
+        let angle = endPoint.clone().subtract(startPoint).angleDeg();
+
+        let sprite = game.add.sprite(startPoint.x, startPoint.y);
+        let startSprite = sprite.addChild(game.make.sprite(0, 0, 'laser_end'));
+        let beamSprite = sprite.addChild(game.make.sprite(10, 0, 'laser_beam'));
+        let endSprite = sprite.addChild(game.make.sprite(distance + 20, 20, 'laser_end'));
+
+        sprite.scale.setTo(1, 0.5)
+        beamSprite.scale.setTo(distance, 1);
+
+        endSprite.angle = 180;
+
+        beamSprite.blendMode = PIXI.blendModes.ADD;
+        startSprite.blendMode = PIXI.blendModes.ADD;
+        endSprite.blendMode = PIXI.blendModes.ADD;
+
+        sprite.angle = angle;
+        let linearTween = game.add.tween(sprite).to({
+            alpha: 0,
+        }, 500, null, true).onComplete.add(() => {
+            sprite.destroy();
+        });
+    }
 }
