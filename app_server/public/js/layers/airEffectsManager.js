@@ -182,8 +182,8 @@ class AirEffectsManager{
             }
         }
     }
-    fireLightningBolt( startPointIsoSpace, endPointIsoSpace, thickness, impactCallback) {
-
+    fireLightningBolt( startPointIsoSpace, endPointIsoSpace, impactCallback) {
+        thickness = 1;
         let startingPoint = Victor.fromObject(game.iso.project(startPointIsoSpace));
         let endingPoint = Victor.fromObject(game.iso.project(endPointIsoSpace));
 
