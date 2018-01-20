@@ -187,13 +187,13 @@ class AirEffectsManager{
         let startingPoint = Victor.fromObject(game.iso.project(startPointIsoSpace));
         let endingPoint = Victor.fromObject(game.iso.project(endPointIsoSpace));
 
-        
+        //this.lightningSegment(startingPoint.clone(), endingPoint.clone());
 
         let results = [], positions = [],
             tangent = endingPoint.clone().subtract(startingPoint),
             normal  = tangent.clone().rotateBy(Math.TWOPI * 0.25).normalize(),
             length  = tangent.length(),
-            SWAY = 800,
+            SWAY = 80,
             JAGGEDNESS = 1 / SWAY,
             prevPoint = startingPoint.clone(), 
             prevDisplacement = 0,
@@ -239,22 +239,22 @@ class AirEffectsManager{
         let distance = startPoint.distance(endPoint);
         let angle = endPoint.clone().subtract(startPoint).angleDeg();
 
-        let sprite = game.add.sprite(startPoint.x, startPoint.y, 'lightning_beam');
-        //let startSprite = sprite.addChild(game.make.sprite(0, 0, 'lightning_end'));
-        //let beamSprite = sprite.addChild(game.make.sprite(0, 0, 'lightning_beam'));
-        //let endSprite = sprite.addChild(game.make.sprite(distance , 0, 'lightning_end'));
+        let sprite = game.add.sprite(startPoint.x, startPoint.y);
+        let startSprite = sprite.addChild(game.make.sprite(-10.6, 0, 'lightning_end'));
+        let beamSprite = sprite.addChild(game.make.sprite(0, 0, 'lightning_beam'));
+        let endSprite = sprite.addChild(game.make.sprite(distance + 10.6, 22.6, 'lightning_end'));
         
-        //endSprite.angle = 180;
+        endSprite.angle = 180;
 
         //sprite.scale.setTo(1, 1)
-        //startSprite.scale.setTo(0.05, 0.05);
-        sprite.scale.setTo(distance, 0.05);
-        //endSprite.scale.setTo(0.05, 0.05);
+        startSprite.scale.setTo(0.2, 0.2);
+        beamSprite.scale.setTo(distance, 0.2);
+        endSprite.scale.setTo(0.2, 0.2);
         
 
-        sprite.blendMode = PIXI.blendModes.ADD;
-        //startSprite.blendMode = PIXI.blendModes.ADD;
-        //endSprite.blendMode = PIXI.blendModes.ADD;
+        beamSprite.blendMode = PIXI.blendModes.ADD;
+        startSprite.blendMode = PIXI.blendModes.ADD;
+        endSprite.blendMode = PIXI.blendModes.ADD;
 
         sprite.angle = angle;
         let linearTween = game.add.tween(sprite).to({
