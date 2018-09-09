@@ -27,4 +27,34 @@ class GroundEffectsManager {
         let sprite = game.add.isoSprite(x, y, 0, bmd, 0, this.groundEffectsGroup);
         sprite.anchor.setTo(0.5);
     }
+    animateSplatter(x, y, scale, clrHex){
+        let sprite = game.add.isoSprite(x, y, 0, 'splattersAnimated', 0, this.groundEffectsGroup);
+        sprite.anchor.setTo(0.5);
+
+
+        sprite.tint = parseInt('0x' + clrHex.substring(1))
+        sprite.alpha = 0.8
+
+        sprite.transformCallback = (matrix=>{
+            matrix.a = 1.73 * scale
+            matrix.b = 1 * scale
+            matrix.c = -1.73 * scale
+            matrix.d = 1 * scale
+        })
+
+        //(Math.sqrt(3), 1, -Math.sqrt(3), 1, 0.5, 0.5)
+
+        let randomSplatterIndex = Math.rangeInt(0,7)
+
+        let frames = [0, 1, 2, 3, 4, 5, 6, 7].map( index => index + (8 * randomSplatterIndex))
+
+
+
+        //sprite.context.setTransform(Math.sqrt(3), 1, -Math.sqrt(3), 1, width / 2, height / 2);
+
+        sprite.animations.add('splatterAnimated', frames, 10, true)
+        sprite.play('splatterAnimated', 20, false)
+        sprite.animations.currentAnim.onComplete.add( () => sprite.destroy(), this)
+        game.add.tween(sprite).to( { alpha: 0 }, 500, "Linear", true);
+    }
 }

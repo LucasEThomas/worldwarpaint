@@ -19,7 +19,6 @@ function drawSplatters() {
             drawRandomSplatter(x+16,y+16,14);
         }
     }
-
 }
 
 function drawRandomSplatter(x, y, radius) {

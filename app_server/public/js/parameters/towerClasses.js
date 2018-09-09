@@ -5,6 +5,7 @@ var towerClasses = [
         processEvent: function(event) {
             if (event.type === 'sprinkle') {
                 let clrName = game.players.getClrName(event.ownerId);
+                let clrHex = game.players.getClrHex(event.ownerId);
                 let clr = game.players.getClr(event.ownerId);
                 let splatter = event;
                 let startPoint = new Victor(this.sprite.isoX, this.sprite.isoY);
@@ -13,6 +14,7 @@ var towerClasses = [
                 let newStart = new Victor(22, 22).rotate(endPoint.subtract(startPoint).angle() - Math.TWOPI * 0.25).add(startPoint);
                 game.airEffects.lobProjectile(newStart.x, newStart.y, 45, splatter.x, splatter.y, 0, 50, 750, 'projectile_' + clrName, () => {
                     game.gameBoardLayer.stageSplatter(splatter.x, splatter.y, splatter.radius, clr, splatter.inputIndex);
+                    game.groundEffects.animateSplatter(splatter.x, splatter.y, 0.3, clrHex)
                 });
             }
         },

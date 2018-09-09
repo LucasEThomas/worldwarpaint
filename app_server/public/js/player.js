@@ -28,6 +28,10 @@ class PlayersManager {
             return {r:0.0, g:0.0, b:0.0};
         }
     }
+    getClrHex(id){
+        let {r, g, b} = this.getClr(id)
+        return Utility.rgbToHex(r,g,b)
+    }
     getClrName(id) {
         let player = this.players.find((player) => player.id === id);
         if (player) {
