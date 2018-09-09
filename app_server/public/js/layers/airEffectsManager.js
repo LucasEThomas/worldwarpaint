@@ -221,11 +221,13 @@ class AirEffectsManager{
     
             let point = startingPoint.clone().add(tangent.clone().multiplyScalar(pos).add(normal.clone().multiplyScalar(displacement)));
     
+            console.log('point: ' + point);
+            console.log('prevPoint: ' + prevPoint);
+            console.log('\n')
+
             this.lightningSegment( prevPoint.clone(), point.clone());
     
             prevPoint = point.clone();
-            console.log('point: ' + point);
-            console.log('prevPoint: ' + prevPoint);
             prevDisplacement = displacement;
         }
     
@@ -240,11 +242,12 @@ class AirEffectsManager{
         let angle = endPoint.clone().subtract(startPoint).angleDeg();
 
         let sprite = game.add.sprite(startPoint.x, startPoint.y);
+        endSprite.angle = 180;
         let startSprite = sprite.addChild(game.make.sprite(-10.6, 0, 'lightning_end'));
         let beamSprite = sprite.addChild(game.make.sprite(0, 0, 'lightning_beam'));
         let endSprite = sprite.addChild(game.make.sprite(distance + 10.6, 22.6, 'lightning_end'));
         
-        endSprite.angle = 180;
+        
 
         //sprite.scale.setTo(1, 1)
         startSprite.scale.setTo(0.2, 0.2);
